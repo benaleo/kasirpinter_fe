@@ -128,12 +128,84 @@ class _TextInputCustomState extends State<TextInputCustom> {
   }
 }
 
+class DrawerElement extends StatefulWidget {
+  const DrawerElement({super.key});
+
+  @override
+  State<DrawerElement> createState() => _DrawerElementState();
+}
+
+class _DrawerElementState extends State<DrawerElement> {
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          DrawerHeader(
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+            ),
+            child: Text(''),
+          ),
+          Container(
+            height: MediaQuery.of(context).size.height - 200.0,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Column(
+                  children: [
+                    DrawerListTile(
+                        index: 0,
+                        icon: Icons.dashboard,
+                        title: "Dashboard",
+                        selectedIndex: _selectedIndex,
+                        onItemTapped: _onItemTapped,
+                        routeName: "/dashboard"),
+                    DrawerListTile(
+                        index: 1,
+                        icon: Icons.shopping_cart,
+                        title: "Order",
+                        selectedIndex: _selectedIndex,
+                        onItemTapped: _onItemTapped,
+                        routeName: "/pos-order"),
+                    DrawerListTile(
+                        index: 2,
+                        icon: Icons.settings,
+                        title: "Setting",
+                        selectedIndex: _selectedIndex,
+                        onItemTapped: _onItemTapped,
+                        routeName: "/setting"),
+                  ],
+                ),
+                DrawerListTile(
+                    index: 3, icon: Icons.logout, title: "Logout", selectedIndex: _selectedIndex, onItemTapped: _onItemTapped, routeName: "/"),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
 class DrawerListTile extends StatelessWidget {
   final int index;
   final IconData icon;
   final String title;
   final int selectedIndex;
   final Function(int) onItemTapped;
+  final String routeName;
+
   const DrawerListTile({
     super.key,
     required this.index,
@@ -141,6 +213,7 @@ class DrawerListTile extends StatelessWidget {
     required this.title,
     required this.selectedIndex,
     required this.onItemTapped,
+    required this.routeName,
   });
 
   @override
@@ -153,14 +226,14 @@ class DrawerListTile extends StatelessWidget {
         ),
         gradient: selectedIndex == index
             ? LinearGradient(
-          colors: [
-            Colors.white,
-            Color(0xffE7772D).withOpacity(1.0),
-          ],
-          stops: [0.60, 1.0],
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        )
+                colors: [
+                  Colors.white,
+                  Color(0xffE7772D).withOpacity(1.0),
+                ],
+                stops: [0.60, 1.0],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              )
             : null,
       ),
       child: ListTile(
@@ -176,7 +249,7 @@ class DrawerListTile extends StatelessWidget {
         ),
         onTap: () {
           onItemTapped(index);
-          Navigator.pop(context);
+          Navigator.of(context).pushNamed(routeName);
         },
       ),
     );

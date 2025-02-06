@@ -9,14 +9,6 @@ class PosOrderTab extends StatefulWidget {
 }
 
 class _PosOrderTabState extends State<PosOrderTab> {
-  int _selectedIndex = 0; // Index item yang aktif
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -34,23 +26,7 @@ class _PosOrderTabState extends State<PosOrderTab> {
             width: 200.0,
           ),
         ),
-        drawer: Drawer(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              DrawerHeader(
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                ),
-                child: Text(''),
-              ),
-              DrawerListTile(index: 0, icon: Icons.dashboard, title: "Dashboard", selectedIndex: _selectedIndex, onItemTapped: _onItemTapped),
-              DrawerListTile(index: 1, icon: Icons.shopping_cart, title: "Order", selectedIndex: _selectedIndex, onItemTapped: _onItemTapped),
-              DrawerListTile(index: 2, icon: Icons.settings, title: "Setting", selectedIndex: _selectedIndex, onItemTapped: _onItemTapped),
-              DrawerListTile(index: 3, icon: Icons.logout, title: "Logout", selectedIndex: _selectedIndex, onItemTapped: _onItemTapped),
-            ],
-          ),
-        ),
+        drawer: DrawerElement(),
         backgroundColor: Colors.black12,
         body: Container(
           padding: EdgeInsets.symmetric(horizontal: 80.0, vertical: 20.0),
