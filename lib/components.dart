@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -60,24 +59,23 @@ class ElevateButtonCustom extends StatelessWidget {
   final String? route;
   final Color? bgColor;
   final Color? color;
+
   const ElevateButtonCustom({super.key, required this.text, required this.size, this.onPressed, this.route, this.bgColor, this.color});
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: onPressed != null ? onPressed : () {
-        route != null ? Navigator.of(context).pushNamed(route ?? "") : null;
-      },
+      onPressed: onPressed != null
+          ? onPressed
+          : () {
+              route != null ? Navigator.of(context).pushNamed(route ?? "") : null;
+            },
       style: ElevatedButton.styleFrom(
         minimumSize: Size(double.infinity, 50.0),
         backgroundColor: bgColor != null ? bgColor : Color(0xFF723E29),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
       ),
-      child: Sans(
-        text,
-        size,
-        color: color
-      ),
+      child: Sans(text, size, color: color),
     );
   }
 }
@@ -87,6 +85,7 @@ class TextInputCustom extends StatefulWidget {
   final Icon? icon;
   final TextEditingController? controller;
   final bool? isPassword;
+
   const TextInputCustom({super.key, required this.text, this.icon, this.controller, this.isPassword});
 
   @override
@@ -129,4 +128,57 @@ class _TextInputCustomState extends State<TextInputCustom> {
   }
 }
 
+class DrawerListTile extends StatelessWidget {
+  final int index;
+  final IconData icon;
+  final String title;
+  final int selectedIndex;
+  final Function(int) onItemTapped;
+  const DrawerListTile({
+    super.key,
+    required this.index,
+    required this.icon,
+    required this.title,
+    required this.selectedIndex,
+    required this.onItemTapped,
+  });
 
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(10.0),
+          bottomRight: Radius.circular(10.0),
+        ),
+        gradient: selectedIndex == index
+            ? LinearGradient(
+          colors: [
+            Colors.white,
+            Color(0xffE7772D).withOpacity(1.0),
+          ],
+          stops: [0.60, 1.0],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        )
+            : null,
+      ),
+      child: ListTile(
+        leading: Icon(
+          icon,
+          color: selectedIndex == index ? Color(0xffE7772D) : null,
+        ),
+        title: Text(
+          title,
+          style: TextStyle(
+            color: selectedIndex == index ? Color(0xffE7772D) : null,
+          ),
+        ),
+        onTap: () {
+          onItemTapped(index);
+          Navigator.pop(context);
+        },
+      ),
+    );
+  }
+}

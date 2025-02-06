@@ -63,7 +63,7 @@ class _LoginTabState extends State<LoginTab> {
                           ElevateButtonCustom(
                             text: "Login",
                             size: 18.0,
-                            route: "/dashboard",
+                            route: "/pos-order",
                             color: Colors.white,
                           ),
                           SizedBox(height: 20.0),
