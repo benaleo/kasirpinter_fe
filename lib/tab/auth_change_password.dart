@@ -8,6 +8,19 @@ class AuthChangePasswordTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    void _successPopup() {
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AuthPopupOTP(
+              route: "/",
+              buttonText: "OK",
+              title: "Yeay, password berhasil diperbarui",
+              body: "Password kamu sudah diperbarui, ingat terus ya password nya!",
+            );
+          });
+    }
+
     double heightDevice = MediaQuery.of(context).size.height;
     return Scaffold(
       body: SafeArea(
@@ -45,9 +58,10 @@ class AuthChangePasswordTab extends StatelessWidget {
                           DividerBorder(),
                           SizedBox(height: 20.0),
                           ElevateButtonCustom(
+                            onPressed: _successPopup,
                             text: "Simpan",
                             size: 18.0,
-                            route: "/dashboard",
+                            route: "/",
                             color: Colors.white,
                           ),
                           SizedBox(height: 20.0),

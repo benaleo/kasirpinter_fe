@@ -46,8 +46,11 @@ class SideBarAuth extends StatelessWidget {
 
 class AuthPopupOTP extends StatelessWidget {
   final route;
+  final title;
+  final body;
   final buttonText;
-  const AuthPopupOTP({super.key, this.route, this.buttonText});
+
+  const AuthPopupOTP({super.key, this.route, this.buttonText, this.title, this.body});
 
   @override
   Widget build(BuildContext context) {
@@ -79,12 +82,12 @@ class AuthPopupOTP extends StatelessWidget {
                 children: [
                   Image.asset("assets/images/success_man.png", height: 200.0, width: 200.0),
                   SizedBox(height: 10.0),
-                  SansBold("OTP berhasil dikirim", 20.0),
+                  SansBold(title != null ? title : "OTP berhasil dikirim", 20.0),
                   SizedBox(height: 10.0),
                   SizedBox(
                       width: 350.0,
                       child: Sans(
-                        "Silakan cek kotak masuk emailmu dan masukkan kode OTP di langkah selanjutnya",
+                        body != null ? body : "Silakan cek kotak masuk emailmu dan masukkan kode OTP di langkah selanjutnya",
                         16.0,
                         textAlign: TextAlign.center,
                       )),
