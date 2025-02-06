@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../auth_components.dart';
-import '../components.dart';
+import '../components/auth_components.dart';
+import '../components/components.dart';
 
 class AuthChangePasswordTab extends StatelessWidget {
   const AuthChangePasswordTab({super.key});

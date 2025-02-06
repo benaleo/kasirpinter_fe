@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:kasirpinter_fe/auth_components.dart';
+import 'package:kasirpinter_fe/components/auth_components.dart';
 
-import '../components.dart';
+import '../components/components.dart';
+
 
 class AuthOtpTab extends StatefulWidget {
   const AuthOtpTab({super.key});

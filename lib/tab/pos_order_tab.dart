@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:kasirpinter_fe/components.dart';
+
+import '../components/components.dart';
 
 class PosOrderTab extends StatefulWidget {
   const PosOrderTab({super.key});
@@ -33,47 +34,7 @@ class _PosOrderTabState extends State<PosOrderTab> {
           color: Colors.grey.shade200,
           child: Column(
             children: [
-              Container(
-                padding: EdgeInsets.all(2.0),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    style: BorderStyle.solid,
-                    width: 1.0,
-                  ),
-                  borderRadius: BorderRadius.circular(100.0),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      flex: 1,
-                      child: SizedBox(
-                        height: 30.0,
-                        child: TextButton(
-                          onPressed: () {},
-                          style: TextButton.styleFrom(
-                            padding: EdgeInsets.zero,
-                          ),
-                          child: Sans("Menu", 12.0),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 10.0),
-                    Expanded(
-                      flex: 1,
-                      child: SizedBox(
-                        height: 30.0,
-                        child: TextButton(
-                          onPressed: () {},
-                          style: TextButton.styleFrom(
-                            padding: EdgeInsets.zero,
-                          ),
-                          child: Sans("Order", 12.0),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              )
+
             ],
           ),
         ),

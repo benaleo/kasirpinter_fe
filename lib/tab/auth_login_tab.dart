@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:kasirpinter_fe/auth_components.dart';
-import 'package:kasirpinter_fe/components.dart';
+import 'package:kasirpinter_fe/components/auth_components.dart';
+
+import '../components/components.dart';
 
 class LoginTab extends StatefulWidget {
   const LoginTab({super.key});
@@ -63,7 +63,7 @@ class _LoginTabState extends State<LoginTab> {
                           ElevateButtonCustom(
                             text: "Login",
                             size: 18.0,
-                            route: "/pos-order",
+                            route: "/pos-menu",
                             color: Colors.white,
                           ),
                           SizedBox(height: 20.0),

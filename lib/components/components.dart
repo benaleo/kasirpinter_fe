@@ -177,7 +177,7 @@ class _DrawerElementState extends State<DrawerElement> {
                         title: "Order",
                         selectedIndex: _selectedIndex,
                         onItemTapped: _onItemTapped,
-                        routeName: "/pos-order"),
+                        routeName: "/pos-menu"),
                     DrawerListTile(
                         index: 2,
                         icon: Icons.settings,
