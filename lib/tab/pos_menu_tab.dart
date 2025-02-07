@@ -6,7 +6,6 @@ import '../components/components.dart';
 
 class PosMenuTab extends StatefulWidget {
   const PosMenuTab({super.key});
-
   @override
   State<PosMenuTab> createState() => _PosMenuTabState();
 }
@@ -37,12 +36,15 @@ class _PosMenuTabState extends State<PosMenuTab> {
           child: Column(
             children: [
               PosMenuOrderTabs(),
-
+              SizedBox(height: 20.0),
+              SizedBox(
+                height: 40.0,
+                child: RowListCategoryMenu(),
+              ),
             ],
           ),
         ),
       ),
     );
-    ;
   }
 }
