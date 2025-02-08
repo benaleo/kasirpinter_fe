@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:kasirpinter_fe/components/pos_components.dart';
 
 import '../components/components.dart';
 
@@ -34,7 +35,9 @@ class _PosOrderTabState extends State<PosOrderTab> {
           color: Colors.grey.shade200,
           child: Column(
             children: [
-
+              PosMenuOrderTabs(),
+              SizedBox(),
+              RowListCategoryMenu()
             ],
           ),
         ),

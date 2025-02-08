@@ -158,7 +158,7 @@ class RowListCategory extends StatelessWidget {
         constraints: BoxConstraints(minWidth: 40.0),
         child: SizedBox(
           height: 30.0,
-          child: Center(child: Sans(text, 16)),
+          child: Center(child: Poppins(text: text, size: 16.0)),
         ),
       ),
     );

@@ -37,6 +37,49 @@ class Sans extends StatelessWidget {
   }
 }
 
+class Poppins extends StatelessWidget {
+  final String text;
+  final double size;
+  final TextAlign? textAlign;
+  final color;
+
+  const Poppins({super.key, required this.text, required this.size, this.textAlign, this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      textAlign: textAlign,
+      style: GoogleFonts.poppins(
+        fontSize: size,
+        color: color,
+      ),
+    );
+  }
+}
+
+class PoppinsBold extends StatelessWidget {
+  final String text;
+  final double size;
+  final TextAlign? textAlign;
+  final color;
+
+  const PoppinsBold({super.key, required this.text, required this.size, this.textAlign, this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      textAlign: textAlign,
+      style: GoogleFonts.poppins(
+        fontWeight: FontWeight.bold,
+        fontSize: size,
+        color: color,
+      ),
+    );
+  }
+}
+
 class DividerBorder extends StatelessWidget {
   const DividerBorder({super.key});
 
@@ -173,12 +216,20 @@ class _DrawerElementState extends State<DrawerElement> {
                     DrawerListTile(
                         index: 1,
                         icon: Icons.shopping_cart,
+                        title: "Menu",
+                        selectedIndex: _selectedIndex,
+                        onItemTapped: _onItemTapped,
+                        routeName: "/pos-menu"),
+                         DrawerListTile(
+                        index: 2,
+                        icon: Icons.shopping_cart,
                         title: "Order",
                         selectedIndex: _selectedIndex,
                         onItemTapped: _onItemTapped,
                         routeName: "/pos-menu"),
+
                     DrawerListTile(
-                        index: 2,
+                        index: 3,
                         icon: Icons.settings,
                         title: "Setting",
                         selectedIndex: _selectedIndex,
@@ -187,7 +238,7 @@ class _DrawerElementState extends State<DrawerElement> {
                   ],
                 ),
                 DrawerListTile(
-                    index: 3, icon: Icons.logout, title: "Logout", selectedIndex: _selectedIndex, onItemTapped: _onItemTapped, routeName: "/"),
+                    index: 4, icon: Icons.logout, title: "Logout", selectedIndex: _selectedIndex, onItemTapped: _onItemTapped, routeName: "/"),
               ],
             ),
           )
