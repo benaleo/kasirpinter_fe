@@ -128,8 +128,9 @@ class TextInputCustom extends StatefulWidget {
   final Icon? icon;
   final TextEditingController? controller;
   final bool? isPassword;
+  final double? height;
 
-  const TextInputCustom({super.key, required this.text, this.icon, this.controller, this.isPassword});
+  const TextInputCustom({super.key, required this.text, this.icon, this.controller, this.isPassword, this.height});
 
   @override
   _TextInputCustomState createState() => _TextInputCustomState();
@@ -148,24 +149,58 @@ class _TextInputCustomState extends State<TextInputCustom> {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: widget.controller,
-      obscureText: widget.isPassword != null && widget.isPassword! ? _obscureText : false,
-      decoration: InputDecoration(
-        labelText: widget.text,
-        suffixIcon: widget.isPassword != null && widget.isPassword!
-            ? IconButton(
-                icon: Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
-                onPressed: () {
-                  setState(() {
-                    _obscureText = !_obscureText;
-                  });
-                },
-              )
-            : widget.icon,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.0),
+    return Container(
+      height: widget.height != null ? widget.height : 50.0,
+      child: TextField(
+        controller: widget.controller,
+        obscureText: widget.isPassword != null && widget.isPassword! ? _obscureText : false,
+        decoration: InputDecoration(
+          labelText: widget.text,
+          suffixIcon: widget.isPassword != null && widget.isPassword!
+              ? IconButton(
+                  icon: Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
+                  onPressed: () {
+                    setState(() {
+                      _obscureText = !_obscureText;
+                    });
+                  },
+                )
+              : widget.icon,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
         ),
+      ),
+    );
+  }
+}
+
+class GradientText extends StatelessWidget {
+  final String text;
+  final TextStyle style;
+  final List<Color> gradientColors;
+
+  const GradientText({
+    required this.text,
+    required this.style,
+    this.gradientColors = const [Color(0xff723E29), Color(0xffF88F01)],
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ShaderMask(
+      shaderCallback: (bounds) {
+        return LinearGradient(
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+          colors: gradientColors,
+        ).createShader(bounds);
+      },
+      blendMode: BlendMode.srcIn, // Tambahkan ini agar ShaderMask bekerja dengan baik
+      child: Text(
+        text,
+        style: style.copyWith(color: Colors.white), // Pastikan ada warna awal
       ),
     );
   }
@@ -220,14 +255,13 @@ class _DrawerElementState extends State<DrawerElement> {
                         selectedIndex: _selectedIndex,
                         onItemTapped: _onItemTapped,
                         routeName: "/pos-menu"),
-                         DrawerListTile(
+                    DrawerListTile(
                         index: 2,
                         icon: Icons.shopping_cart,
                         title: "Order",
                         selectedIndex: _selectedIndex,
                         onItemTapped: _onItemTapped,
                         routeName: "/pos-menu"),
-
                     DrawerListTile(
                         index: 3,
                         icon: Icons.settings,
@@ -302,6 +336,123 @@ class DrawerListTile extends StatelessWidget {
           Navigator.of(context).pushNamed(routeName);
         },
       ),
+    );
+  }
+}
+
+class IconBoxText extends StatelessWidget {
+  final icon;
+  final String text;
+  final double size;
+  final color;
+  final boxColor;
+  final double? height;
+  final onPresses;
+
+  const IconBoxText(this.text, this.size, {super.key, this.icon, this.color, this.boxColor, this.height, this.onPresses});
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: ElevatedButton(
+        onPressed: () => onPresses(),
+        style: ElevatedButton.styleFrom(
+          elevation: boxColor != null ? 5.0 : 0.0,
+          backgroundColor: boxColor != null ? boxColor : Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(50.0),
+            side: BorderSide(
+              width: 2.0,
+              color: Colors.grey.shade200,
+              style: BorderStyle.solid,
+            ),
+          ),
+        ),
+        child: Container(
+          padding: EdgeInsets.zero,
+          height: height != null ? height : 30.0,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              icon != null ? icon : Icon(Icons.payment_outlined, color: color != null ? color : Colors.grey.shade600),
+              SizedBox(width: 10.0),
+              PoppinsBold(
+                text: text,
+                size: size,
+                color: color != null ? color : Colors.grey.shade600,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class StackCloseButton extends StatelessWidget {
+  final VoidCallback? onPressed;
+
+  const StackCloseButton({super.key, this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      right: 2.0,
+      top: 2.0,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          elevation: 0.0,
+        ),
+        child: Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.grey.shade200),
+            child: Icon(Icons.close_outlined)),
+      ),
+    );
+  }
+}
+
+class ConfirmDialog extends StatefulWidget {
+  final VoidCallback onPressed;
+  final String text;
+
+  const ConfirmDialog({
+    Key? key,
+    required this.onPressed,
+    this.text = "Apakah anda yakin akan menghapus data ini?",
+  }) : super(key: key);
+
+  @override
+  _ConfirmDialogState createState() => _ConfirmDialogState();
+}
+
+class _ConfirmDialogState extends State<ConfirmDialog> {
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20.0),
+      ),
+      title: Text("Konfirmasi", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+      content: Text(widget.text, style: TextStyle(fontSize: 14)),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Poppins(text: "Tidak", size: 16.0,),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+          onPressed: () {
+            widget.onPressed();
+            Navigator.pop(context);
+          },
+          child: Poppins(text: "Ya", size: 16.0, color: Colors.white,),
+        ),
+      ],
     );
   }
 }
