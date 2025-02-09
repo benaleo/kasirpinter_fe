@@ -405,6 +405,8 @@ class StackCloseButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,
           elevation: 0.0,
+          shape: const CircleBorder(),
+          splashFactory: NoSplash.splashFactory,
         ),
         child: Container(
             width: 40,

@@ -5,6 +5,7 @@ import 'package:flutter_dash/flutter_dash.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 import 'components.dart';
 
@@ -567,23 +568,24 @@ class _PostMenuSideBarDetailState extends State<PostMenuSideBarDetail> {
     );
   }
 
-  void _showBarcodePopup() {
+  void _showBarcodePopup({required int total}) {
     showDialog(
       context: context,
       builder: (context) {
         return BarcodePopupDialog(
-          targetTime: DateTime(2025, 02, 09, 15, 59), // Waktu target
+          targetTime: DateTime(2025, 02, 09, 17, 59), // Waktu target
+          total: total,
         );
       },
     );
-  }
+  } // SET BARCODE
 
   void _confirmCloseSideDetail() {
     showDialog(
       context: context,
       builder: (context) {
         return ConfirmDialog(
-          onPressed : () {
+          onPressed: () {
             setState(() {
               widget.setCrossAxisCount(5);
               widget.clearCart();
@@ -723,7 +725,7 @@ class _PostMenuSideBarDetailState extends State<PostMenuSideBarDetail> {
                                     ),
                                     GradientText(
                                       text:
-                                      "Rp ${widget.format((int.parse(item["price"].toString()) * int.parse(item["quantity"].toString())).toString())}",
+                                          "Rp ${widget.format((int.parse(item["price"].toString()) * int.parse(item["quantity"].toString())).toString())}",
                                       style: GoogleFonts.poppins(fontSize: 18.0),
                                     ),
                                   ],
@@ -842,7 +844,7 @@ class _PostMenuSideBarDetailState extends State<PostMenuSideBarDetail> {
                             if (_paymentMethod == "") {
                               _showErrorNeedSelectPaymentMethod();
                             } else {
-                              _paymentMethod == "cash" ? _showCheckoutPopup() : _showBarcodePopup();
+                              _paymentMethod == "cash" ? _showCheckoutPopup() : _showBarcodePopup(total: widget.getTotalPrice());
                             }
                           },
                           height: 40.0,
@@ -868,8 +870,9 @@ class _PostMenuSideBarDetailState extends State<PostMenuSideBarDetail> {
 
 class BarcodePopupDialog extends StatefulWidget {
   final DateTime targetTime;
+  final int total;
 
-  const BarcodePopupDialog({Key? key, required this.targetTime}) : super(key: key);
+  const BarcodePopupDialog({Key? key, required this.targetTime, required this.total}) : super(key: key);
 
   @override
   _BarcodePopupDialogState createState() => _BarcodePopupDialogState();
@@ -910,14 +913,21 @@ class _BarcodePopupDialogState extends State<BarcodePopupDialog> {
     return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
   }
 
+  static String format(String value) {
+    final formatter = NumberFormat("###,###", "id_ID");
+    return formatter.format(int.tryParse(value) ?? 0);
+  }
+
   @override
   Widget build(BuildContext context) {
+    double widthDevice = MediaQuery.of(context).size.width;
+
     return AlertDialog(
       backgroundColor: Colors.transparent,
       content: IntrinsicHeight(
         child: Container(
           width: 600.0,
-          padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
+          padding: EdgeInsets.only(top: 20.0),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20.0),
@@ -936,50 +946,142 @@ class _BarcodePopupDialogState extends State<BarcodePopupDialog> {
                 timer?.cancel();
                 Navigator.pop(context);
               }),
-              Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Poppins(
-                            text: "Selesaikan transaksi sebelum",
-                            size: 14.0,
-                            color: Color(0xff464646),
-                          ),
-                          SizedBox(height: 5.0),
-                          PoppinsBold(
-                            text:
-                                "${widget.targetTime.day} Oktober ${widget.targetTime.year}, ${widget.targetTime.hour}:${widget.targetTime.minute.toString().padLeft(2, '0')}",
-                            size: 20.0,
-                          ),
-                        ],
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(right: 100.0),
-                        child: Column(
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Poppins(
-                              text: "Waktu tersisa",
-                              size: 12.0,
-                              color: Colors.grey.shade600,
+                              text: "Selesaikan transaksi sebelum",
+                              size: 14.0,
+                              color: Color(0xff464646),
                             ),
                             SizedBox(height: 5.0),
                             PoppinsBold(
-                              text: formatTime(remainingSeconds),
+                              text:
+                                  "${widget.targetTime.day} Oktober ${widget.targetTime.year}, ${widget.targetTime.hour}:${widget.targetTime.minute.toString().padLeft(2, '0')}",
                               size: 20.0,
-                              color: Colors.red,
                             ),
                           ],
                         ),
+                        Container(
+                          margin: EdgeInsets.only(right: 100.0),
+                          child: Column(
+                            children: [
+                              Poppins(
+                                text: "Waktu tersisa",
+                                size: 12.0,
+                                color: Colors.grey.shade600,
+                              ),
+                              SizedBox(height: 5.0),
+                              PoppinsBold(
+                                text: formatTime(remainingSeconds),
+                                size: 20.0,
+                                color: Colors.red,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 20.0),
+                    Container(
+                      padding: EdgeInsets.only(top: 20.0, left: 20.0, right: 20.0, bottom: 100.0),
+                      width: widthDevice,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10.0),
+                        gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            Color(0xFF459CFF),
+                            Color(0xFF295FFE),
+                          ],
+                        ),
                       ),
-                    ],
+                      child: Stack(
+                        children: [
+                          Positioned(
+                            left: 30.0,
+                            child: SvgPicture.asset(
+                              "assets/images/icons/qris.svg",
+                              colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                              width: 100.0,
+                            ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(top: 50.0),
+                            width: widthDevice,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Poppins(text: "Kasir Pinter Indonesia", size: 24.0, color: Colors.white),
+                                SizedBox(height: 10.0),
+                                Poppins(text: "RAWKODADIWJAIEAE", size: 16.0, color: Colors.white),
+                                SizedBox(height: 10.0),
+                                Container(
+                                  padding: EdgeInsets.all(20.0),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                  child: Image.asset("assets/images/qr.png"),
+                                )
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              Positioned(
+                bottom: 0.0,
+                left: 0.0,
+                child: Container(
+                  width: 600.0,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(50.0),
+                      topRight: Radius.circular(50.0),
+                      bottomLeft: Radius.circular(20.0),
+                      bottomRight: Radius.circular(20.0),
+                    ),
                   ),
-                ],
+                  height: 100.0,
+                  child:Padding(
+                    padding: const EdgeInsets.only(left: 50.0, right: 50.0, top: 20.0),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            PoppinsBold(text: "Total", size: 24.0),
+                            GradientText(text: "Rp ${format(widget.total.toString())} ", style: GoogleFonts.poppins(fontSize: 24.0, fontWeight: FontWeight.bold),),
+                          ],
+                        ),
+                        SizedBox(height: 10.0),
+                        Dash(
+                          direction: Axis.horizontal,
+                          length: 500.0,
+                          dashLength: 5,
+                          dashColor: Colors.grey.shade600,
+                        ),
+                        Poppins(text: "Pastikan Nama dan nominal sama sebelum melakukan pembayaran", size: 12.0, color: Colors.red)
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
