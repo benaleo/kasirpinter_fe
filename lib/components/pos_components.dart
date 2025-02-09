@@ -97,7 +97,7 @@ class _PosMenuOrderTabsState extends State<PosMenuOrderTabs> {
                 child: PoppinsBold(
                   text: "Menu",
                   size: 12.0,
-                    color: currentRoute == "/pos-menu" ? Color(0xffE7772D) : Colors.black,
+                  color: currentRoute == "/pos-menu" ? Color(0xffE7772D) : Colors.black,
                 ),
               ),
             ),
@@ -1005,21 +1005,18 @@ class _BarcodePopupDialogState extends State<BarcodePopupDialog> {
                       ),
                       child: Stack(
                         children: [
-                          Positioned(
-                            left: 30.0,
-                            child: SvgPicture.asset(
-                              "assets/images/icons/qris.svg",
-                              colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
-                              width: 100.0,
-                            ),
-                          ),
                           Container(
-                            padding: EdgeInsets.only(top: 50.0),
                             width: widthDevice,
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
+                                SvgPicture.asset(
+                                  "assets/images/icons/qris.svg",
+                                  colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                                  width: 50.0,
+                                ),
+                                SizedBox(height: 10.0),
                                 Poppins(text: "Kasir Pinter Indonesia", size: 24.0, color: Colors.white),
                                 SizedBox(height: 10.0),
                                 Poppins(text: "RAWKODADIWJAIEAE", size: 16.0, color: Colors.white),
@@ -1031,6 +1028,14 @@ class _BarcodePopupDialogState extends State<BarcodePopupDialog> {
                                     borderRadius: BorderRadius.circular(10.0),
                                   ),
                                   child: Image.asset("assets/images/qr.png"),
+                                ),
+                                SizedBox(height: 10.0),
+                                ElevateButtonCustom(
+                                  text: "Check",
+                                  size: 16.0,
+                                  boxSize: 280.0,
+                                  bgColor: Colors.white,
+                                  boxHeight: 40.0,
                                 )
                               ],
                             ),

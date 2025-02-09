@@ -102,23 +102,38 @@ class ElevateButtonCustom extends StatelessWidget {
   final String? route;
   final Color? bgColor;
   final Color? color;
+  final double? boxSize;
+  final double? boxHeight;
 
-  const ElevateButtonCustom({super.key, required this.text, required this.size, this.onPressed, this.route, this.bgColor, this.color});
+  const ElevateButtonCustom({
+    super.key,
+    required this.text,
+    required this.size,
+    this.onPressed,
+    this.route,
+    this.bgColor,
+    this.color,
+    this.boxSize,
+    this.boxHeight,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: onPressed != null
-          ? onPressed
-          : () {
-              route != null ? Navigator.of(context).pushNamed(route ?? "") : null;
-            },
-      style: ElevatedButton.styleFrom(
-        minimumSize: Size(double.infinity, 50.0),
-        backgroundColor: bgColor != null ? bgColor : Color(0xFF723E29),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
+    return Container(
+      height: boxHeight ?? 50.0,
+      child: ElevatedButton(
+        onPressed: onPressed != null
+            ? onPressed
+            : () {
+                route != null ? Navigator.of(context).pushNamed(route ?? "") : null;
+              },
+        style: ElevatedButton.styleFrom(
+          minimumSize: Size(boxSize ?? double.infinity, 50.0),
+          backgroundColor: bgColor != null ? bgColor : Color(0xFF723E29),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
+        ),
+        child: Sans(text, size, color: color),
       ),
-      child: Sans(text, size, color: color),
     );
   }
 }
@@ -409,10 +424,7 @@ class StackCloseButton extends StatelessWidget {
           splashFactory: NoSplash.splashFactory,
         ),
         child: Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.grey.shade200),
-            child: Icon(Icons.close_outlined)),
+            width: 40, height: 40, decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.grey.shade200), child: Icon(Icons.close_outlined)),
       ),
     );
   }
@@ -444,7 +456,10 @@ class _ConfirmDialogState extends State<ConfirmDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Poppins(text: "Tidak", size: 16.0,),
+          child: Poppins(
+            text: "Tidak",
+            size: 16.0,
+          ),
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
@@ -452,7 +467,11 @@ class _ConfirmDialogState extends State<ConfirmDialog> {
             widget.onPressed();
             Navigator.pop(context);
           },
-          child: Poppins(text: "Ya", size: 16.0, color: Colors.white,),
+          child: Poppins(
+            text: "Ya",
+            size: 16.0,
+            color: Colors.white,
+          ),
         ),
       ],
     );
