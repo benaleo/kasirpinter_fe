@@ -75,6 +75,7 @@ class Routes {
         );
       case '/pos-order':
         return MaterialPageRoute(
+          settings: settings,
           builder: (_) => LayoutBuilder(
             builder: (context, constraits) {
               if (constraits.maxWidth > 800) {
@@ -87,6 +88,7 @@ class Routes {
         );
       case '/pos-menu':
         return MaterialPageRoute(
+          settings: settings,
           builder: (_) => LayoutBuilder(
             builder: (context, constraits) {
               if (constraits.maxWidth > 800) {

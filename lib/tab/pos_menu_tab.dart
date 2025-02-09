@@ -108,7 +108,6 @@ class _PosMenuTabState extends State<PosMenuTab> {
 
   @override
   Widget build(BuildContext context) {
-    double widthDevice = MediaQuery.of(context).size.width;
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(

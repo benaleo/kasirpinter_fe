@@ -11,8 +11,11 @@ class PosOrderTab extends StatefulWidget {
 }
 
 class _PosOrderTabState extends State<PosOrderTab> {
+
   @override
   Widget build(BuildContext context) {
+    print("Current Route: ${ModalRoute.of(context)?.settings.name}");
+
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -30,14 +33,33 @@ class _PosOrderTabState extends State<PosOrderTab> {
         ),
         drawer: DrawerElement(),
         backgroundColor: Colors.black12,
-        body: Container(
-          padding: EdgeInsets.symmetric(horizontal: 80.0, vertical: 20.0),
-          color: Colors.grey.shade200,
-          child: Column(
+        body: Padding(
+          padding: EdgeInsets.all(20.0),
+          child: Row(
             children: [
-              PosMenuOrderTabs(),
-              SizedBox(),
-              RowListCategoryMenu()
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.3),
+                        spreadRadius: 2,
+                        blurRadius: 5,
+                        offset: Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  padding: EdgeInsets.all(15.0),
+                  child: Column(
+                    children: [
+                      PosMenuOrderTabs(),
+                      SizedBox(height: 10.0),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),

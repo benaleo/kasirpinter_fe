@@ -92,14 +92,12 @@ class _PosMenuOrderTabsState extends State<PosMenuOrderTabs> {
                 onPressed: currentRoute == "/pos-menu" ? null : () => _navigateTo("/pos-menu"),
                 style: TextButton.styleFrom(
                   padding: EdgeInsets.zero,
-                  backgroundColor: currentRoute == "/pos-menu" ? Colors.orange : null,
+                  backgroundColor: currentRoute == "/pos-menu" ? Color(0xffE7772D).withOpacity(0.3) : null,
                 ),
-                child: Text(
-                  "Menu",
-                  style: TextStyle(
-                    fontSize: 12.0,
-                    color: currentRoute == "/pos-menu" ? Colors.white : Colors.black,
-                  ),
+                child: PoppinsBold(
+                  text: "Menu",
+                  size: 12.0,
+                    color: currentRoute == "/pos-menu" ? Color(0xffE7772D) : Colors.black,
                 ),
               ),
             ),
@@ -113,14 +111,12 @@ class _PosMenuOrderTabsState extends State<PosMenuOrderTabs> {
                 onPressed: currentRoute == "/pos-order" ? null : () => _navigateTo("/pos-order"),
                 style: TextButton.styleFrom(
                   padding: EdgeInsets.zero,
-                  backgroundColor: currentRoute == "/pos-order" ? Colors.orange : null,
+                  backgroundColor: currentRoute == "/pos-order" ? Color(0xffE7772D).withOpacity(0.3) : null,
                 ),
-                child: Text(
-                  "Order",
-                  style: TextStyle(
-                    fontSize: 12.0,
-                    color: currentRoute == "/pos-order" ? Colors.white : Colors.black,
-                  ),
+                child: PoppinsBold(
+                  text: "Order",
+                  size: 12.0,
+                  color: currentRoute == "/pos-order" ? Color(0xffE7772D) : Colors.black,
                 ),
               ),
             ),
@@ -272,9 +268,10 @@ class _PosMenuListState extends State<PosMenuList> {
                                 ),
                               ),
                               const Spacer(),
-                              Text(
-                                "Rp ${widget.format(item["price"].toString())}", // Menggunakan widget.format untuk formatting harga
-                                style: const TextStyle(fontSize: 18.0, color: Colors.orange, fontWeight: FontWeight.bold),
+                              PoppinsBold(
+                                text: "Rp ${widget.format(item["price"].toString())}", // Menggunakan widget.format untuk formatting harga
+                                size: 16.0,
+                                color: Color(0xffE7772D),
                               ),
                             ],
                           ),
@@ -290,7 +287,7 @@ class _PosMenuListState extends State<PosMenuList> {
                   child: Container(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.orange, width: 3),
+                      border: Border.all(color: Color(0xffE7772D), width: 3),
                     ),
                     child: CircleAvatar(
                       radius: 40,
@@ -1059,7 +1056,7 @@ class _BarcodePopupDialogState extends State<BarcodePopupDialog> {
                     ),
                   ),
                   height: 100.0,
-                  child:Padding(
+                  child: Padding(
                     padding: const EdgeInsets.only(left: 50.0, right: 50.0, top: 20.0),
                     child: Column(
                       children: [
@@ -1067,7 +1064,10 @@ class _BarcodePopupDialogState extends State<BarcodePopupDialog> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             PoppinsBold(text: "Total", size: 24.0),
-                            GradientText(text: "Rp ${format(widget.total.toString())} ", style: GoogleFonts.poppins(fontSize: 24.0, fontWeight: FontWeight.bold),),
+                            GradientText(
+                              text: "Rp ${format(widget.total.toString())} ",
+                              style: GoogleFonts.poppins(fontSize: 24.0, fontWeight: FontWeight.bold),
+                            ),
                           ],
                         ),
                         SizedBox(height: 10.0),
