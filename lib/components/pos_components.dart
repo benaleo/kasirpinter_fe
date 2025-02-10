@@ -379,186 +379,13 @@ class _PostMenuSideBarDetailState extends State<PostMenuSideBarDetail> {
           builder: (context, setState) {
             int totalPrice = widget.getTotalPrice();
             int change = _paymentAmount - totalPrice;
-            return AlertDialog(
-              backgroundColor: Colors.transparent,
-              content: IntrinsicHeight(
-                child: Stack(
-                  alignment: Alignment.topCenter,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.only(top: 50.0),
-                      decoration: BoxDecoration(
-                        color: Colors.transparent,
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                      child: Stack(
-                        alignment: Alignment.topCenter,
-                        children: [
-                          Container(
-                            width: 500.0,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20.0),
-                              color: Colors.white,
-                            ),
-                            padding: const EdgeInsets.only(top: 50.0),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.only(top: 20.0),
-                                  alignment: Alignment.center,
-                                  child: PoppinsBold(text: "Checkout", size: 16.0, color: Color(0xff723E29)),
-                                ),
-                                Container(
-                                  height: MediaQuery.of(context).viewInsets.bottom == 0 ? 200.0 : 0.0,
-                                  child: Scrollbar(
-                                    child: ListView(
-                                      children: [
-                                        ...widget.cartItems.map((item) => ListTile(
-                                            title: Row(
-                                              children: [
-                                                Poppins(text: item["name"], size: 14.0),
-                                                SizedBox(width: 10.0),
-                                                Poppins(text: "x ${item["quantity"]}", size: 12.0, color: Colors.grey.shade600)
-                                              ],
-                                            ),
-                                            trailing: PoppinsBold(
-                                                text:
-                                                    "Rp ${widget.format((int.parse(item["price"].toString()) * int.parse(item["quantity"].toString())).toString())}",
-                                                size: 16.0))),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                Dash(
-                                  direction: Axis.horizontal,
-                                  length: 460.0,
-                                  dashLength: 5,
-                                  dashColor: Colors.black12,
-                                ),
-                                Container(
-                                  height: MediaQuery.of(context).viewInsets.bottom == 0 ? 270.0 : 160.0,
-                                  padding: const EdgeInsets.only(left: 20.0, right: 20.0, bottom: 10.0),
-                                  child: ListView(
-                                    children: [
-                                      SizedBox(height: 10.0),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          PoppinsBold(text: "Total: ", size: 20.0),
-                                          GradientText(
-                                              text: "Rp ${widget.format(totalPrice.toString())}",
-                                              style: GoogleFonts.poppins(fontSize: 20.0, fontWeight: FontWeight.bold))
-                                        ],
-                                      ),
-                                      SizedBox(height: 10.0),
-                                      TextField(
-                                        textAlign: TextAlign.center,
-                                        decoration: InputDecoration(
-                                          border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(50.0),
-                                          ),
-                                          hintText: "Masukan nominal bayar",
-                                          hintStyle: TextStyle(color: Colors.grey.shade600, fontStyle: FontStyle.normal),
-                                          contentPadding: EdgeInsets.symmetric(vertical: 15.0),
-                                        ),
-                                        keyboardType: TextInputType.number,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            _paymentAmount = int.tryParse(value) ?? 0;
-                                          });
-                                        },
-                                      ),
-                                      SizedBox(height: 10),
-                                      Row(
-                                        children: [
-                                          Poppins(text: "Total Kembalian:", size: 12.0),
-                                          SizedBox(width: 10.0),
-                                          Expanded(
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                border: Border(
-                                                  bottom: BorderSide(
-                                                    width: 1.0,
-                                                    color: Colors.black12,
-                                                    style: BorderStyle.solid,
-                                                  ),
-                                                ),
-                                              ),
-                                              child: GradientText(
-                                                text: "Rp ${widget.format(change < 0 ? '0' : change.toString())}",
-                                                style: GoogleFonts.poppins(
-                                                  fontSize: 20.0,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(height: 10.0),
-                                      Dash(
-                                        direction: Axis.horizontal,
-                                        length: 460.0,
-                                        dashLength: 5,
-                                        dashColor: Colors.black12,
-                                      ),
-                                      SizedBox(height: 2.0),
-                                      ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          minimumSize: Size(400.0, 50.0),
-                                          backgroundColor: Color(0xff723E29),
-                                          elevation: 0.0,
-                                        ),
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        child: Poppins(text: "Bayar", size: 16.0, color: Colors.white),
-                                      ),
-                                      ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.transparent,
-                                            elevation: 0.0,
-                                          ),
-                                          onPressed: () {
-                                            change = 0;
-                                            Navigator.pop(context);
-                                          },
-                                          child: Poppins(
-                                            text: "Batalkan transaksi",
-                                            size: 16.0,
-                                            color: Colors.red,
-                                          )),
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                          StackCloseButton(
-                            onPressed: () {
-                              change = 0;
-                              Navigator.pop(context);
-                            },
-                          )
-                        ],
-                      ),
-                    ),
-                    Positioned(
-                      child: CircleAvatar(
-                        radius: 55.0,
-                        backgroundColor: Color(0xffE7772D),
-                        child: CircleAvatar(
-                          radius: 52.0,
-                          backgroundColor: Colors.white,
-                          child: SvgPicture.asset("assets/images/logo_black.svg", width: 90.0),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
+            return ShowCheckoutPopupDialog(
+                totalPrice: totalPrice,
+                format: widget.format,
+                cartItems: widget.cartItems,
+                paymentAmount: _paymentAmount,
+                paymentMethod: _paymentMethod,
+                change: change);
           },
         );
       },
@@ -575,7 +402,7 @@ class _PostMenuSideBarDetailState extends State<PostMenuSideBarDetail> {
         );
       },
     );
-  } // SET BARCODE
+  }
 
   void _confirmCloseSideDetail() {
     showDialog(
@@ -1093,5 +920,218 @@ class _BarcodePopupDialogState extends State<BarcodePopupDialog> {
         ),
       ),
     );
+  }
+}
+
+class ShowCheckoutPopupDialog extends StatefulWidget {
+  final int totalPrice;
+  final List<Map<String, dynamic>> cartItems;
+  final String Function(String value) format;
+  final int paymentAmount;
+  final String paymentMethod;
+  final int change;
+
+  const ShowCheckoutPopupDialog({
+    super.key,
+    required this.totalPrice,
+    required this.format,
+    required this.cartItems,
+    required this.paymentMethod,
+    required this.change,
+    required this.paymentAmount,
+  });
+
+  @override
+  State<ShowCheckoutPopupDialog> createState() => _ShowCheckoutPopupDialogState();
+}
+
+class _ShowCheckoutPopupDialogState extends State<ShowCheckoutPopupDialog> {
+  int _paymentAmount = 0; // Declare payment amount state
+  int change = 0; // Declare change state
+  
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: Colors.transparent,
+      content: IntrinsicHeight(
+        child: Stack(
+          alignment: Alignment.topCenter,
+          children: [
+            Container(
+              padding: EdgeInsets.only(top: 50.0),
+              decoration: BoxDecoration(
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+              child: Stack(
+                alignment: Alignment.topCenter,
+                children: [
+                  Container(
+                    width: 500.0,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20.0),
+                      color: Colors.white,
+                    ),
+                    padding: const EdgeInsets.only(top: 50.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.only(top: 20.0),
+                          alignment: Alignment.center,
+                          child: PoppinsBold(text: "Checkout", size: 16.0, color: Color(0xff723E29)),
+                        ),
+                        Container(
+                          height: MediaQuery.of(context).viewInsets.bottom == 0 ? 200.0 : 0.0,
+                          child: Scrollbar(
+                            child: ListView(
+                              children: [
+                                ...widget.cartItems.map((item) => ListTile(
+                                    // TODO : fix this
+                                    title: Row(
+                                      children: [
+                                        Poppins(text: item["name"], size: 14.0),
+                                        SizedBox(width: 10.0),
+                                        Poppins(text: "x ${item["quantity"]}", size: 12.0, color: Colors.grey.shade600)
+                                      ],
+                                    ),
+                                    trailing: PoppinsBold(
+                                        text:
+                                            "Rp ${widget.format((int.parse(item["price"].toString()) * int.parse(item["quantity"].toString())).toString())}",
+                                        size: 16.0))),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Dash(
+                          direction: Axis.horizontal,
+                          length: 460.0,
+                          dashLength: 5,
+                          dashColor: Colors.black12,
+                        ),
+                        Container(
+                          height: MediaQuery.of(context).viewInsets.bottom == 0 ? 270.0 : 160.0,
+                          padding: const EdgeInsets.only(left: 20.0, right: 20.0, bottom: 10.0),
+                          child: ListView(
+                            children: [
+                              SizedBox(height: 10.0),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  PoppinsBold(text: "Total: ", size: 20.0),
+                                  GradientText(
+                                      text: "Rp ${widget.format(widget.totalPrice.toString())}",
+                                      style: GoogleFonts.poppins(fontSize: 20.0, fontWeight: FontWeight.bold))
+                                ],
+                              ),
+                              SizedBox(height: 10.0),
+                              TextField(
+                                textAlign: TextAlign.center,
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(50.0),
+                                  ),
+                                  hintText: "Masukan nominal bayar",
+                                  hintStyle: TextStyle(color: Colors.grey.shade600, fontStyle: FontStyle.normal),
+                                  contentPadding: EdgeInsets.symmetric(vertical: 15.0),
+                                ),
+                                keyboardType: TextInputType.number,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _paymentAmount = int.tryParse(value) ?? 0; // TODO Need fix state
+                                  });
+                                },
+                              ),
+                              SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  Poppins(text: "Total Kembalian:", size: 12.0),
+                                  SizedBox(width: 10.0),
+                                  Expanded(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        border: Border(
+                                          bottom: BorderSide(
+                                            width: 1.0,
+                                            color: Colors.black12,
+                                            style: BorderStyle.solid,
+                                          ),
+                                        ),
+                                      ),
+                                      child: GradientText(
+                                        text: "Rp ${widget.format(change < 0 ? '0' : change.toString())}", // TODO Need fix state
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 20.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 10.0),
+                              Dash(
+                                direction: Axis.horizontal,
+                                length: 460.0,
+                                dashLength: 5,
+                                dashColor: Colors.black12,
+                              ),
+                              SizedBox(height: 2.0),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  minimumSize: Size(400.0, 50.0),
+                                  backgroundColor: Color(0xff723E29),
+                                  elevation: 0.0,
+                                ),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Poppins(text: "Bayar", size: 16.0, color: Colors.white),
+                              ),
+                              ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.transparent,
+                                    elevation: 0.0,
+                                  ),
+                                  onPressed: () {
+                                    change = 0; // TODO Need fix state
+                                    Navigator.pop(context);
+                                  },
+                                  child: Poppins(
+                                    text: "Batalkan transaksi",
+                                    size: 16.0,
+                                    color: Colors.red,
+                                  )),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  StackCloseButton(
+                    onPressed: () {
+                      change = 0; // TODO Need fix state
+                      Navigator.pop(context);
+                    },
+                  )
+                ],
+              ),
+            ),
+            Positioned(
+              child: CircleAvatar(
+                radius: 55.0,
+                backgroundColor: Color(0xffE7772D),
+                child: CircleAvatar(
+                  radius: 52.0,
+                  backgroundColor: Colors.white,
+                  child: SvgPicture.asset("assets/images/logo_black.svg", width: 90.0),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+    ;
   }
 }

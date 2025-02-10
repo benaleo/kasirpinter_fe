@@ -144,8 +144,17 @@ class TextInputCustom extends StatefulWidget {
   final TextEditingController? controller;
   final bool? isPassword;
   final double? height;
+  final String? customerName;
 
-  const TextInputCustom({super.key, required this.text, this.icon, this.controller, this.isPassword, this.height});
+  const TextInputCustom({
+    super.key,
+    required this.text,
+    this.icon,
+    this.controller,
+    this.isPassword,
+    this.height,
+    this.customerName,
+  });
 
   @override
   _TextInputCustomState createState() => _TextInputCustomState();
@@ -159,6 +168,10 @@ class _TextInputCustomState extends State<TextInputCustom> {
     super.initState();
     if (widget.isPassword != null && widget.isPassword!) {
       _obscureText = true;
+    }
+
+    if (widget.customerName != null) {
+      widget.controller?.text = widget.customerName!;
     }
   }
 
