@@ -132,7 +132,7 @@ class ElevateButtonCustom extends StatelessWidget {
           backgroundColor: bgColor != null ? bgColor : Color(0xFF723E29),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
         ),
-        child: Sans(text, size, color: color),
+        child: Sans(text, size, color: color != null ? color : Colors.black),
       ),
     );
   }

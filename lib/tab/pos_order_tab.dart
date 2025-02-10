@@ -1,4 +1,3 @@
-// order.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -24,7 +23,7 @@ class _PosOrderTabState extends State<PosOrderTab> {
       ]
     },
     {
-      'order_no': 'A343',
+      'order_no': 'A344',
       'customer': 'Putri',
       'items': 2,
       'total_price': 34000,
@@ -35,7 +34,7 @@ class _PosOrderTabState extends State<PosOrderTab> {
       ]
     },
     {
-      'order_no': 'A343',
+      'order_no': 'A345',
       'customer': 'Imam',
       'items': 2,
       'total_price': 43000,
@@ -48,6 +47,17 @@ class _PosOrderTabState extends State<PosOrderTab> {
   ];
 
   Map<String, dynamic>? selectedOrder;
+  String _paymentMethod = "";
+  String _paymentStatus = "";
+
+  // Fungsi untuk mendapatkan daftar pesanan yang difilter
+  List<Map<String, dynamic>> getFilteredOrders() {
+    return orders.where((order) {
+      bool matchesPaymentStatus = _paymentStatus.isEmpty || order['payment_status'] == _paymentStatus;
+      bool matchesPaymentMethod = _paymentMethod.isEmpty || order['payment_method'] == _paymentMethod;
+      return matchesPaymentStatus && matchesPaymentMethod;
+    }).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -92,9 +102,59 @@ class _PosOrderTabState extends State<PosOrderTab> {
                     children: [
                       PosMenuOrderTabs(),
                       SizedBox(height: 10.0),
-                      SizedBox(height: 500.0,
+                      Row(
+                        children: [
+                          OrderFilterCategory(
+                            text: "All",
+                            onPressed: () {
+                              setState(() {
+                                _paymentMethod = "";
+                                _paymentStatus = "";
+                              });
+                            },
+                          ),
+                          OrderFilterCategory(
+                            text: "Lunas",
+                            onPressed: () {
+                              setState(() {
+                                _paymentMethod = "";
+                                _paymentStatus = "Lunas";
+                              });
+                            },
+                          ),
+                          OrderFilterCategory(
+                            text: "Nanti",
+                            onPressed: () {
+                              setState(() {
+                                _paymentMethod = "";
+                                _paymentStatus = "Nanti";
+                              });
+                            },
+                          ),
+                          OrderFilterCategory(
+                            text: "Cash",
+                            onPressed: () {
+                              setState(() {
+                                _paymentMethod = "Cash";
+                                _paymentStatus = "";
+                              });
+                            },
+                          ),
+                          OrderFilterCategory(
+                            text: "QRIS",
+                            onPressed: () {
+                              setState(() {
+                                _paymentMethod = "QRIS";
+                                _paymentStatus = "";
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 500.0,
                         child: ListView(
-                          children: orders.map((order) {
+                          children: getFilteredOrders().map((order) {
                             return GestureDetector(
                               onTap: () {
                                 setState(() {
@@ -121,48 +181,67 @@ class _PosOrderTabState extends State<PosOrderTab> {
                 ),
               ),
               if (selectedOrder != null)
-              Expanded(
-                child: selectedOrder != null && selectedOrder!['payment_status'] == 'Lunas'
-                    ? Card(
-                  margin: EdgeInsets.only(top: 0.0, left: 10.0),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Detail Pesanan', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                        SizedBox(height: 10),
-                        Text('No. Pesanan: ${selectedOrder!['order_no']}',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                        Text('Nama: ${selectedOrder!['customer']}'),
-                        Divider(),
-                        ...selectedOrder!['details'].map<Widget>((item) {
-                          return ListTile(
-                            title: Text(item['name']),
-                            subtitle: Text('${item['quantity']} item'),
-                            trailing: Text('Rp. ${item['price'] * item['quantity']}'),
-                          );
-                        }).toList(),
-                        Divider(),
-                        Text('Total: Rp. ${selectedOrder!['total_price']}',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                        Text('Metode Pembayaran: ${selectedOrder!['payment_method']}'),
-                        SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: () {
-                            // Fungsi print nota bisa diimplementasikan di sini
-                          },
-                          child: Text('Print Nota'),
-                        ),
-                      ],
+                Expanded(
+                  child: selectedOrder != null && selectedOrder!['payment_status'] == 'Lunas'
+                      ? Card(
+                    margin: EdgeInsets.only(top: 0.0, left: 10.0),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Detail Pesanan', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                          SizedBox(height: 10),
+                          Text('No. Pesanan: ${selectedOrder!['order_no']}', style: TextStyle(fontWeight: FontWeight.bold)),
+                          Text('Nama: ${selectedOrder!['customer']}'),
+                          Divider(),
+                          ...selectedOrder!['details'].map<Widget>((item) {
+                            return ListTile(
+                              title: Text(item['name']),
+                              subtitle: Text('${item['quantity']} item'),
+                              trailing: Text('Rp. ${item['price'] * item['quantity']}'),
+                            );
+                          }).toList(),
+                          Divider(),
+                          Text('Total: Rp. ${selectedOrder!['total_price']}', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                          Text('Metode Pembayaran: ${selectedOrder!['payment_method']}'),
+                          SizedBox(height: 20),
+                          ElevatedButton(
+                            onPressed: () {
+                              // Fungsi print nota bisa diimplementasikan di sini
+                            },
+                            child: Text('Print Nota'),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                )
-                    : Center(child: Text('Pilih pesanan untuk melihat detail.')),
-              ),
+                  )
+                      : Center(child: Text('Pilih pesanan untuk melihat detail.')),
+                ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class OrderFilterCategory extends StatelessWidget {
+  final String text;
+  final VoidCallback onPressed;
+
+  const OrderFilterCategory({super.key, required this.text, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 2.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(5.0),
+      ),
+      child: ElevatedButton(
+        onPressed: onPressed,
+        child: Text(text),
       ),
     );
   }
