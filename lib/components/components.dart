@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SansBold extends StatelessWidget {
   final text;
@@ -95,7 +96,7 @@ class DividerBorder extends StatelessWidget {
   }
 }
 
-class ElevateButtonCustom extends StatelessWidget {
+class ElevatedButtonCustom extends StatelessWidget {
   final String text;
   final double size;
   final VoidCallback? onPressed;
@@ -104,8 +105,9 @@ class ElevateButtonCustom extends StatelessWidget {
   final Color? color;
   final double? boxSize;
   final double? boxHeight;
+  final Widget? child;
 
-  const ElevateButtonCustom({
+  const ElevatedButtonCustom({
     super.key,
     required this.text,
     required this.size,
@@ -115,6 +117,7 @@ class ElevateButtonCustom extends StatelessWidget {
     this.color,
     this.boxSize,
     this.boxHeight,
+    this.child,
   });
 
   @override
@@ -132,7 +135,7 @@ class ElevateButtonCustom extends StatelessWidget {
           backgroundColor: bgColor != null ? bgColor : Color(0xFF723E29),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
         ),
-        child: Sans(text, size, color: color != null ? color : Colors.black),
+        child: child ?? Sans(text, size, color: color != null ? color : Colors.black),
       ),
     );
   }
@@ -245,9 +248,19 @@ class _DrawerElementState extends State<DrawerElement> {
   int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    if (index == 4) {
+      _onLogout();
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
+  }
+
+  Future<void> _onLogout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('token'); // Hapus token
+    Navigator.pushNamedAndRemoveUntil(context, "/login", (route) => false); // Kembali ke login
   }
 
   @override
@@ -300,7 +313,13 @@ class _DrawerElementState extends State<DrawerElement> {
                   ],
                 ),
                 DrawerListTile(
-                    index: 4, icon: Icons.logout, title: "Logout", selectedIndex: _selectedIndex, onItemTapped: _onItemTapped, routeName: "/"),
+                  index: 4,
+                  icon: Icons.logout,
+                  title: "Logout",
+                  selectedIndex: _selectedIndex,
+                  onItemTapped: _onItemTapped,
+                  routeName: "/",
+                ),
               ],
             ),
           )
@@ -488,5 +507,37 @@ class _ConfirmDialogState extends State<ConfirmDialog> {
         ),
       ],
     );
+  }
+}
+
+class InformationDialog extends StatelessWidget {
+  final String text;
+
+  const InformationDialog(this.text, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: Colors.white,
+      content: Container(
+        padding: EdgeInsets.only(top: 20.0),
+        height: 110.0,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Poppins(text: "Email atau password salah!", size: 16.0),
+            SizedBox(height: 10.0),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Poppins(text: "OK", size: 14.0),
+            ),
+          ],
+        ),
+      ),
+    );
+    ;
   }
 }

@@ -53,7 +53,7 @@ class _AuthForgotPasswordTabState extends State<AuthForgotPasswordTab> {
                           SizedBox(height: 20.0),
                           Divider(),
                           SizedBox(height: 20.0),
-                          ElevateButtonCustom(
+                          ElevatedButtonCustom(
                             text: "Reset Password",
                             size: 18,
                             color: Colors.white,

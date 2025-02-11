@@ -77,7 +77,7 @@ class _AuthOtpTabState extends State<AuthOtpTab> {
                       SizedBox(height: 20.0),
                       DividerBorder(),
                       SizedBox(height: 20.0),
-                      ElevateButtonCustom(
+                      ElevatedButtonCustom(
                         text: "Verifikasi kode",
                         size: 18.0,
                         route: '/change-password',

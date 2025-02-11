@@ -857,7 +857,7 @@ class _BarcodePopupDialogState extends State<BarcodePopupDialog> {
                                   child: Image.asset("assets/images/qr.png"),
                                 ),
                                 SizedBox(height: 10.0),
-                                ElevateButtonCustom(
+                                ElevatedButtonCustom(
                                   text: "Check",
                                   size: 16.0,
                                   boxSize: 280.0,

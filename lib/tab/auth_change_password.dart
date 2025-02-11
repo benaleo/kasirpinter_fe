@@ -57,7 +57,7 @@ class AuthChangePasswordTab extends StatelessWidget {
                           SizedBox(height: 20.0),
                           DividerBorder(),
                           SizedBox(height: 20.0),
-                          ElevateButtonCustom(
+                          ElevatedButtonCustom(
                             onPressed: _successPopup,
                             text: "Simpan",
                             size: 18.0,

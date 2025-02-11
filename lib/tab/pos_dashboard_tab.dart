@@ -13,6 +13,7 @@ class PosDashboardTab extends StatefulWidget {
 class _PosDashboardTabState extends State<PosDashboardTab> {
   @override
   Widget build(BuildContext context) {
+    double widthDevice = MediaQuery.of(context).size.width;
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -31,10 +32,18 @@ class _PosDashboardTabState extends State<PosDashboardTab> {
         drawer: DrawerElement(),
         backgroundColor: Colors.black12,
         body: Container(
-          padding: EdgeInsets.symmetric(horizontal: 80.0, vertical: 20.0),
-          color: Colors.grey.shade200,
+          width: widthDevice,
+          margin: EdgeInsets.all(20.0),
+          padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade200,
+            borderRadius: BorderRadius.circular(10.0),
+          ),
           child: Column(
-            children: [SansBold("Dashboard", 36.0)],
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SansBold("Dashboard", 16.0),
+            ],
           ),
         ),
       ),
