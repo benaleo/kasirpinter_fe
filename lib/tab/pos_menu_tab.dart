@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:kasirpinter_fe/components/components.dart';
 import 'package:kasirpinter_fe/components/pos_components.dart';
+import 'package:kasirpinter_fe/services/menu_service.dart';
 
 class PosMenuTab extends StatefulWidget {
   const PosMenuTab({super.key});
@@ -13,39 +14,16 @@ class PosMenuTab extends StatefulWidget {
 }
 
 class _PosMenuTabState extends State<PosMenuTab> {
-  final List<Map<String, dynamic>> menuItems = [
-    {
-      "name": "Caffe Latte",
-      "availability": "5 gelas",
-      "price": "20000",
-      "image": "assets/images/menu/coffee.png",
-    },
-    {
-      "name": "Green Tea",
-      "availability": "5 gelas",
-      "price": "18000",
-      "image": "assets/images/menu/pudding.png",
-    },
-    {
-      "name": "Chicken BBQ",
-      "availability": "5 porsi",
-      "price": "23000",
-      "image": "assets/images/menu/chicken.png",
-    },
-    {
-      "name": "Croissant Keju",
-      "availability": "5 porsi",
-      "price": "20000",
-      "image": "assets/images/menu/crossaint.png",
-    },
-    {
-      "name": "Fried Fries",
-      "availability": "5 porsi",
-      "price": "20000",
-      "image": "assets/images/menu/fried_fries.png",
-    },
-  ];
+  late Future<List<Map<String, dynamic>>> futureMenuItems;
 
+  @override
+  void initState() {
+    super.initState();
+    futureMenuItems = MenuService().fetchMenuItems().then((value) {
+      print("futureMenuItems is : $value");
+      return value;
+    }); // Panggil API saat widget diinisialisasi
+  }
   List<Map<String, dynamic>> cartItems = [];
   int crossAxisCount = 5;
 
@@ -152,7 +130,7 @@ class _PosMenuTabState extends State<PosMenuTab> {
                       RowListCategoryMenu(),
                       SizedBox(height: 10.0),
                       PosMenuList(
-                        menuItems: menuItems,
+                        menuItems: futureMenuItems,
                         crossAxisCount: crossAxisCount,
                         format: format,
                         addToCart: addToCart,

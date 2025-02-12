@@ -6,6 +6,7 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:kasirpinter_fe/services/menu_service.dart';
 
 import 'components.dart';
 
@@ -133,45 +134,75 @@ class RowListCategoryMenu extends StatefulWidget {
 }
 
 class _RowListCategoryMenuState extends State<RowListCategoryMenu> {
+  late Future<List<Map<String, dynamic>>> categories;
+
   // Variabel untuk melacak indeks tombol yang aktif
   int _selectedIndex = 0;
 
-  final List<String> categories = ["All", "Coffee based", "Milk based", "Tea", "Rice", "Bread", "Pastry", "Burger", "Snack"];
+  @override
+  void initState() {
+    super.initState();
+    // Fetch data dari API atau layanan lainnya
+    categories = MenuService().fetchMenuCategories().then((value) {
+      print("categories is : $value");
+      return value;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 30.0, // Tinggi tetap untuk ListView horizontal
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: categories.length,
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: ElevatedButton(
-              onPressed: () {
-                // Update indeks tombol yang aktif
-                setState(() {
-                  _selectedIndex = index;
-                });
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: categories,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          // Tampilkan loading indicator saat data sedang di-fetch
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          // Tampilkan pesan error jika terjadi kesalahan
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          // Tampilkan pesan jika tidak ada data
+          return Center(child: Text('No categories available.'));
+        } else {
+          // Gunakan data yang berhasil di-fetch
+          final List<Map<String, dynamic>> fetchedCategories = snapshot.data!;
+          final List<String> categoryNames = fetchedCategories.map((category) => category['name'] as String).toList();
+
+          return Container(
+            height: 30.0, // Tinggi tetap untuk ListView horizontal
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: categoryNames.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Update indeks tombol yang aktif
+                      setState(() {
+                        _selectedIndex = index;
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _selectedIndex == index
+                          ? Color(0xffE7772D) // Warna aktif
+                          : Colors.grey.shade200, // Warna tidak aktif
+                      foregroundColor: _selectedIndex == index
+                          ? Colors.white // Warna teks aktif
+                          : Colors.black, // Warna teks tidak aktif
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      elevation: 0.0,
+                    ),
+                    child: Text(categoryNames[index]),
+                  ),
+                );
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: _selectedIndex == index
-                    ? Color(0xffE7772D) // Warna aktif
-                    : Colors.grey.shade200, // Warna tidak aktif
-                foregroundColor: _selectedIndex == index
-                    ? Colors.white // Warna teks aktif
-                    : Colors.black, // Warna teks tidak aktif
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                elevation: 0.0,
-              ),
-              child: RowListCategory(text: categories[index]),
             ),
           );
-        },
-      ),
+        }
+      },
     );
   }
 }
@@ -197,17 +228,17 @@ class RowListCategory extends StatelessWidget {
 }
 
 class PosMenuList extends StatefulWidget {
-  final List<Map<String, dynamic>> menuItems;
+  final Future<List<Map<String, dynamic>>> menuItems;
   final int crossAxisCount;
   final String Function(String value) format;
   final void Function(Map<String, dynamic> item) addToCart;
 
   const PosMenuList({
     super.key,
-    required this.menuItems,
     required this.crossAxisCount,
     required this.format,
     required this.addToCart,
+    required this.menuItems,
   });
 
   @override
@@ -218,87 +249,98 @@ class _PosMenuListState extends State<PosMenuList> {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: GridView.builder(
-        itemCount: widget.menuItems.length,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: widget.crossAxisCount, // Mengakses crossAxisCount dengan widget.
-          mainAxisSpacing: 16.0,
-          crossAxisSpacing: 12.0,
-          childAspectRatio: 1.8,
-        ),
-        itemBuilder: (context, index) {
-          final item = widget.menuItems[index];
-          return GestureDetector(
-            onTap: () {
-              widget.addToCart(item);
-            }, // Memastikan fungsi addToCart tersedia
-            child: Stack(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 40.0),
-                  child: Container(
-                    height: 120.0,
-                    decoration: BoxDecoration(
-                      border: Border.all(width: 1.0, color: Colors.grey.shade300),
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                    padding: const EdgeInsets.all(12.0),
-                    child: Row(
-                      children: [
-                        Flexible(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
+      child: FutureBuilder<List<Map<String, dynamic>>>(
+        future: widget.menuItems,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return GridView.builder(
+              itemCount: snapshot.data?.length, // The getter 'length' isn't defined for the type 'Future<List<Map<String, dynamic>>>'.
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: widget.crossAxisCount, // Mengakses crossAxisCount dengan widget.
+                mainAxisSpacing: 16.0,
+                crossAxisSpacing: 12.0,
+                childAspectRatio: 1.8,
+              ),
+              itemBuilder: (context, index) {
+                final item = snapshot.data![index];
+                return GestureDetector(
+                  onTap: () {
+                    widget.addToCart(item);
+                  }, // Memastikan fungsi addToCart tersedia
+                  child: Stack(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(right: 40.0),
+                        child: Container(
+                          height: 120.0,
+                          decoration: BoxDecoration(
+                            border: Border.all(width: 1.0, color: Colors.grey.shade300),
+                            borderRadius: BorderRadius.circular(12.0),
+                          ),
+                          padding: const EdgeInsets.all(12.0),
+                          child: Row(
                             children: [
-                              Text(
-                                item["name"],
-                                style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 4.0),
-                              RichText(
-                                text: TextSpan(
-                                  text: "Tersedia: ",
-                                  style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                              Flexible(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    TextSpan(
-                                      text: item["availability"].toString(),
-                                      style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                                    Text(
+                                      item["name"],
+                                      style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                                    ),
+                                    const SizedBox(height: 4.0),
+                                    RichText(
+                                      text: TextSpan(
+                                        text: "Tersedia: ",
+                                        style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                                        children: [
+                                          TextSpan(
+                                            text: item["stock"].toString(),
+                                            style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                    PoppinsBold(
+                                      text: "Rp ${widget.format(item["price"].toString())}", // Menggunakan widget.format untuk formatting harga
+                                      size: 16.0,
+                                      color: Color(0xffE7772D),
                                     ),
                                   ],
                                 ),
                               ),
-                              const Spacer(),
-                              PoppinsBold(
-                                text: "Rp ${widget.format(item["price"].toString())}", // Menggunakan widget.format untuk formatting harga
-                                size: 16.0,
-                                color: Color(0xffE7772D),
-                              ),
+                              const SizedBox(width: 8.0),
                             ],
                           ),
                         ),
-                        const SizedBox(width: 8.0),
-                      ],
-                    ),
+                      ),
+                      Positioned(
+                        right: 0.0,
+                        top: 20.0,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Color(0xffE7772D), width: 3),
+                          ),
+                          child: CircleAvatar(
+                            radius: 40,
+                            backgroundImage: item["image"] == null ? AssetImage('assets/images/empty.png') : AssetImage(item["image"]),
+                            backgroundColor: Colors.transparent,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                Positioned(
-                  right: 0.0,
-                  top: 20.0,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Color(0xffE7772D), width: 3),
-                    ),
-                    child: CircleAvatar(
-                      radius: 40,
-                      backgroundImage: AssetImage(item["image"]),
-                      backgroundColor: Colors.transparent,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
+                );
+              },
+            );
+          } else {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
         },
       ),
     );
@@ -505,7 +547,7 @@ class _PostMenuSideBarDetailState extends State<PostMenuSideBarDetail> {
                                 border: Border.all(color: Colors.grey.shade200, width: 2),
                               ),
                               child: CircleAvatar(
-                                backgroundImage: AssetImage(item["image"]),
+                                backgroundImage: item["image"] == null ? AssetImage('assets/images/empty.png') : AssetImage(item["image"]),
                               ),
                             ),
                             Flexible(
@@ -948,7 +990,7 @@ class ShowCheckoutPopupDialog extends StatefulWidget {
 class _ShowCheckoutPopupDialogState extends State<ShowCheckoutPopupDialog> {
   int _paymentAmount = 0; // Declare payment amount state
   int change = 0; // Declare change state
-  
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -1038,7 +1080,7 @@ class _ShowCheckoutPopupDialogState extends State<ShowCheckoutPopupDialog> {
                                 keyboardType: TextInputType.number,
                                 onChanged: (value) {
                                   setState(() {
-                                    _paymentAmount = int.tryParse(value) ?? 0; // TODO Need fix state
+                                    _paymentAmount = int.tryParse(value) ?? 0;
                                   });
                                 },
                               ),
@@ -1059,7 +1101,7 @@ class _ShowCheckoutPopupDialogState extends State<ShowCheckoutPopupDialog> {
                                         ),
                                       ),
                                       child: GradientText(
-                                        text: "Rp ${widget.format(change < 0 ? '0' : change.toString())}", // TODO Need fix state
+                                        text: "Rp ${widget.format(change < 0 ? '0' : change.toString())}",
                                         style: GoogleFonts.poppins(
                                           fontSize: 20.0,
                                           fontWeight: FontWeight.bold,
@@ -1080,11 +1122,11 @@ class _ShowCheckoutPopupDialogState extends State<ShowCheckoutPopupDialog> {
                               ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   minimumSize: Size(400.0, 50.0),
-                                  backgroundColor: Color(0xff723E29),
+                                  backgroundColor: _paymentAmount > widget.totalPrice ? Color(0xff723E29) : Colors.grey.shade600,
                                   elevation: 0.0,
                                 ),
                                 onPressed: () {
-                                  Navigator.pop(context);
+                                  _paymentAmount > widget.totalPrice ? Navigator.pop(context) : null;
                                 },
                                 child: Poppins(text: "Bayar", size: 16.0, color: Colors.white),
                               ),
@@ -1094,7 +1136,7 @@ class _ShowCheckoutPopupDialogState extends State<ShowCheckoutPopupDialog> {
                                     elevation: 0.0,
                                   ),
                                   onPressed: () {
-                                    change = 0; // TODO Need fix state
+                                    change = 0;
                                     Navigator.pop(context);
                                   },
                                   child: Poppins(
@@ -1110,7 +1152,7 @@ class _ShowCheckoutPopupDialogState extends State<ShowCheckoutPopupDialog> {
                   ),
                   StackCloseButton(
                     onPressed: () {
-                      change = 0; // TODO Need fix state
+                      change = 0;
                       Navigator.pop(context);
                     },
                   )

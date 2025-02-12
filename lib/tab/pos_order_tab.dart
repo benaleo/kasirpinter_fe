@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 
 import '../components/components.dart';
 import '../components/pos_components.dart';
+import '../services/menu_service.dart';
 
 class PosOrderTab extends StatefulWidget {
   @override
@@ -13,6 +14,22 @@ class PosOrderTab extends StatefulWidget {
 }
 
 class _PosOrderTabState extends State<PosOrderTab> {
+  late Future<List<Map<String, dynamic>>> futureMenuItems;
+  late Future<List<Map<String, dynamic>>> categories;
+
+  @override
+  void initState() {
+    super.initState();
+    futureMenuItems = MenuService().fetchMenuItems().then((value) {
+      print("futureMenuItems is : $value");
+      return value;
+    }); // Panggil API saat widget diinisialisasi
+    categories = MenuService().fetchMenuCategories().then((value){
+      print("categories is : $value");
+      return value;
+    });
+  }
+
   List<Map<String, dynamic>> orders = [
     {
       'order_no': 'A343',
