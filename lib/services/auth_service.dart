@@ -2,21 +2,25 @@ import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class AuthService {
   final String _baseUrl = dotenv.get('BASE_URL');
   final String _mainUrl = 'api/auth';
 
   Future<bool> login(String email, String password) async {
+    print("api url is : $_baseUrl");
     try {
       final response = await http.post(
         Uri.parse('$_baseUrl/$_mainUrl/login'),
-        headers: {"Content-Type": "application/json"},
+        headers: {"Content-Type": "application/json", "accept": "*/*"},
         body: jsonEncode(<String, String>{
           'email': email,
           'password': password,
         }),
       );
+      print("api url is : $response");
+
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);

@@ -24,7 +24,7 @@ class _PosOrderTabState extends State<PosOrderTab> {
       print("futureMenuItems is : $value");
       return value;
     }); // Panggil API saat widget diinisialisasi
-    categories = MenuService().fetchMenuCategories().then((value){
+    categories = MenuService().fetchMenuCategories().then((value) {
       print("categories is : $value");
       return value;
     });
@@ -343,12 +343,14 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
           builder: (context, setState) {
             int change = _paymentAmount - totalPrice;
             return ShowCheckoutPopupDialog(
-                totalPrice: totalPrice,
-                format: widget.format,
-                cartItems: widget.cartItems,
-                paymentAmount: _paymentAmount,
-                paymentMethod: _paymentMethod,
-                change: change);
+              totalPrice: totalPrice,
+              format: widget.format,
+              cartItems: widget.cartItems,
+              paymentAmount: _paymentAmount,
+              paymentMethod: _paymentMethod,
+              change: change,
+              customerName: widget.customerName,
+            );
           },
         );
       },
@@ -509,116 +511,116 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
             Spacer(),
             Divider(),
             if (status != "Lunas")
-            KeyboardVisibilityBuilder(
-              builder: (context, visible) {
-                return AnimatedContainer(
-                  duration: Duration(milliseconds: 300),
-                  height: visible ? 30.0 : 180.0,
-                  child: ListView(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Poppins(text: "Total: ", size: 18.0),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
+              KeyboardVisibilityBuilder(
+                builder: (context, visible) {
+                  return AnimatedContainer(
+                    duration: Duration(milliseconds: 300),
+                    height: visible ? 30.0 : 180.0,
+                    child: ListView(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Poppins(text: "Total: ", size: 18.0),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Poppins(text: "${widget.getTotalItem()} Pcs", size: 12.0),
+                                SizedBox(width: 5.0),
+                                Poppins(text: "-", size: 12.0),
+                                SizedBox(width: 5.0),
+                                GradientText(
+                                  text: "Rp ${widget.format(totalPrice.toString())}",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 4.0),
+                        Poppins(text: "Pilih pembayaran", size: 16.0),
+                        SizedBox(height: 4.0),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
+                          decoration: BoxDecoration(
+                            border: Border.all(width: 2.0, color: Colors.grey.shade200, style: BorderStyle.solid),
+                            borderRadius: BorderRadius.circular(50.0),
+                          ),
+                          child: Row(
                             children: [
-                              Poppins(text: "${widget.getTotalItem()} Pcs", size: 12.0),
+                              IconBoxText(
+                                "Cash",
+                                12.0,
+                                color: _paymentMethod == "cash" ? Colors.white : Colors.grey.shade600,
+                                boxColor: _paymentMethodColorCash,
+                                onPresses: () {
+                                  setState(() {
+                                    _paymentMethodColorCash = Colors.blue;
+                                    _paymentMethodColorQris = Colors.white;
+                                    _paymentMethod = "cash";
+                                    print(_paymentMethod);
+                                  });
+                                },
+                                height: 45.0,
+                                icon: SvgPicture.asset(
+                                  "assets/images/icons/payments.svg",
+                                  colorFilter: ColorFilter.mode(_paymentMethod == "cash" ? Colors.white : Colors.grey.shade600, BlendMode.srcIn),
+                                ),
+                              ),
                               SizedBox(width: 5.0),
-                              Poppins(text: "-", size: 12.0),
-                              SizedBox(width: 5.0),
-                              GradientText(
-                                text: "Rp ${widget.format(totalPrice.toString())}",
-                                style: GoogleFonts.poppins(
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.bold,
+                              IconBoxText(
+                                "QRIS",
+                                12.0,
+                                color: _paymentMethod == "qris" ? Colors.white : Colors.grey.shade600,
+                                boxColor: _paymentMethodColorQris,
+                                onPresses: () {
+                                  setState(() {
+                                    _paymentMethodColorCash = Colors.white;
+                                    _paymentMethodColorQris = Colors.blue;
+                                    _paymentMethod = "qris";
+                                    print(_paymentMethod);
+                                  });
+                                },
+                                height: 45.0,
+                                icon: SvgPicture.asset(
+                                  "assets/images/icons/barcode.svg",
+                                  colorFilter: ColorFilter.mode(_paymentMethod == "qris" ? Colors.white : Colors.grey.shade600, BlendMode.srcIn),
                                 ),
                               ),
                             ],
                           ),
-                        ],
-                      ),
-                      SizedBox(height: 4.0),
-                      Poppins(text: "Pilih pembayaran", size: 16.0),
-                      SizedBox(height: 4.0),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
-                        decoration: BoxDecoration(
-                          border: Border.all(width: 2.0, color: Colors.grey.shade200, style: BorderStyle.solid),
-                          borderRadius: BorderRadius.circular(50.0),
                         ),
-                        child: Row(
+                        SizedBox(height: 10.0),
+                        Row(
                           children: [
                             IconBoxText(
-                              "Cash",
+                              "Checkout",
                               12.0,
-                              color: _paymentMethod == "cash" ? Colors.white : Colors.grey.shade600,
-                              boxColor: _paymentMethodColorCash,
                               onPresses: () {
-                                setState(() {
-                                  _paymentMethodColorCash = Colors.blue;
-                                  _paymentMethodColorQris = Colors.white;
-                                  _paymentMethod = "cash";
-                                  print(_paymentMethod);
-                                });
+                                if (_paymentMethod == "") {
+                                  _showErrorNeedSelectPaymentMethod();
+                                } else {
+                                  _paymentMethod == "cash" ? _showCheckoutPopup(totalPrice: totalPrice) : _showBarcodePopup(total: totalPrice);
+                                }
                               },
-                              height: 45.0,
+                              height: 40.0,
+                              color: Colors.white,
+                              boxColor: Color(0xff723E29),
                               icon: SvgPicture.asset(
-                                "assets/images/icons/payments.svg",
-                                colorFilter: ColorFilter.mode(_paymentMethod == "cash" ? Colors.white : Colors.grey.shade600, BlendMode.srcIn),
-                              ),
-                            ),
-                            SizedBox(width: 5.0),
-                            IconBoxText(
-                              "QRIS",
-                              12.0,
-                              color: _paymentMethod == "qris" ? Colors.white : Colors.grey.shade600,
-                              boxColor: _paymentMethodColorQris,
-                              onPresses: () {
-                                setState(() {
-                                  _paymentMethodColorCash = Colors.white;
-                                  _paymentMethodColorQris = Colors.blue;
-                                  _paymentMethod = "qris";
-                                  print(_paymentMethod);
-                                });
-                              },
-                              height: 45.0,
-                              icon: SvgPicture.asset(
-                                "assets/images/icons/barcode.svg",
-                                colorFilter: ColorFilter.mode(_paymentMethod == "qris" ? Colors.white : Colors.grey.shade600, BlendMode.srcIn),
+                                "assets/images/icons/cart.svg",
+                                colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
                               ),
                             ),
                           ],
                         ),
-                      ),
-                      SizedBox(height: 10.0),
-                      Row(
-                        children: [
-                          IconBoxText(
-                            "Checkout",
-                            12.0,
-                            onPresses: () {
-                              if (_paymentMethod == "") {
-                                _showErrorNeedSelectPaymentMethod();
-                              } else {
-                                _paymentMethod == "cash" ? _showCheckoutPopup(totalPrice: totalPrice) : _showBarcodePopup(total: totalPrice);
-                              }
-                            },
-                            height: 40.0,
-                            color: Colors.white,
-                            boxColor: Color(0xff723E29),
-                            icon: SvgPicture.asset(
-                              "assets/images/icons/cart.svg",
-                              colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
+                      ],
+                    ),
+                  );
+                },
+              ),
             if (status != "Nanti")
               KeyboardVisibilityBuilder(
                 builder: (context, visible) {
@@ -673,7 +675,6 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
                   );
                 },
               ),
-
           ],
         ),
       ),

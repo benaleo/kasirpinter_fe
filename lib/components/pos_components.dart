@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:kasirpinter_fe/services/menu_service.dart';
 
+import '../services/transaction_service.dart';
 import 'components.dart';
 
 class PosAppBar extends StatefulWidget implements PreferredSizeWidget {
@@ -90,15 +92,21 @@ class _PosMenuOrderTabsState extends State<PosMenuOrderTabs> {
             child: SizedBox(
               height: 30.0,
               child: TextButton(
-                onPressed: currentRoute == "/pos-menu" ? null : () => _navigateTo("/pos-menu"),
+                onPressed: currentRoute == "/pos-menu"
+                    ? null
+                    : () => _navigateTo("/pos-menu"),
                 style: TextButton.styleFrom(
                   padding: EdgeInsets.zero,
-                  backgroundColor: currentRoute == "/pos-menu" ? Color(0xffE7772D).withOpacity(0.3) : null,
+                  backgroundColor: currentRoute == "/pos-menu"
+                      ? Color(0xffE7772D).withOpacity(0.3)
+                      : null,
                 ),
                 child: PoppinsBold(
                   text: "Menu",
                   size: 12.0,
-                  color: currentRoute == "/pos-menu" ? Color(0xffE7772D) : Colors.black,
+                  color: currentRoute == "/pos-menu"
+                      ? Color(0xffE7772D)
+                      : Colors.black,
                 ),
               ),
             ),
@@ -109,15 +117,21 @@ class _PosMenuOrderTabsState extends State<PosMenuOrderTabs> {
             child: SizedBox(
               height: 30.0,
               child: TextButton(
-                onPressed: currentRoute == "/pos-order" ? null : () => _navigateTo("/pos-order"),
+                onPressed: currentRoute == "/pos-order"
+                    ? null
+                    : () => _navigateTo("/pos-order"),
                 style: TextButton.styleFrom(
                   padding: EdgeInsets.zero,
-                  backgroundColor: currentRoute == "/pos-order" ? Color(0xffE7772D).withOpacity(0.3) : null,
+                  backgroundColor: currentRoute == "/pos-order"
+                      ? Color(0xffE7772D).withOpacity(0.3)
+                      : null,
                 ),
                 child: PoppinsBold(
                   text: "Order",
                   size: 12.0,
-                  color: currentRoute == "/pos-order" ? Color(0xffE7772D) : Colors.black,
+                  color: currentRoute == "/pos-order"
+                      ? Color(0xffE7772D)
+                      : Colors.black,
                 ),
               ),
             ),
@@ -129,6 +143,10 @@ class _PosMenuOrderTabsState extends State<PosMenuOrderTabs> {
 }
 
 class RowListCategoryMenu extends StatefulWidget {
+  final Function(String?) onCategorySelected;
+
+  RowListCategoryMenu({required this.onCategorySelected});
+
   @override
   _RowListCategoryMenuState createState() => _RowListCategoryMenuState();
 }
@@ -166,7 +184,9 @@ class _RowListCategoryMenuState extends State<RowListCategoryMenu> {
         } else {
           // Gunakan data yang berhasil di-fetch
           final List<Map<String, dynamic>> fetchedCategories = snapshot.data!;
-          final List<String> categoryNames = fetchedCategories.map((category) => category['name'] as String).toList();
+          final List<String> categoryNames = fetchedCategories
+              .map((category) => category['name'] as String)
+              .toList();
 
           return Container(
             height: 30.0, // Tinggi tetap untuk ListView horizontal
@@ -181,6 +201,8 @@ class _RowListCategoryMenuState extends State<RowListCategoryMenu> {
                       // Update indeks tombol yang aktif
                       setState(() {
                         _selectedIndex = index;
+                        widget.onCategorySelected(categoryNames[index]);
+                        print("clicked category is : ${categoryNames[index]}");
                       });
                     },
                     style: ElevatedButton.styleFrom(
@@ -246,27 +268,48 @@ class PosMenuList extends StatefulWidget {
 }
 
 class _PosMenuListState extends State<PosMenuList> {
+  late Future<List<Map<String, dynamic>>> _futureMenuItems;
+
+  @override
+  void initState() {
+    super.initState();
+    _futureMenuItems = widget.menuItems;
+  }
+
+  @override
+  void didUpdateWidget(PosMenuList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.menuItems != oldWidget.menuItems) {
+      _futureMenuItems = widget.menuItems; // Perbarui Future jika prop berubah
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: FutureBuilder<List<Map<String, dynamic>>>(
-        future: widget.menuItems,
+        future: widget.menuItems, // Gunakan widget.menuItems langsung
         builder: (context, snapshot) {
-          if (snapshot.hasData) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(child: Text('No menu items available.'));
+          } else {
+            final List<Map<String, dynamic>> items = snapshot.data!;
             return GridView.builder(
-              itemCount: snapshot.data?.length, // The getter 'length' isn't defined for the type 'Future<List<Map<String, dynamic>>>'.
+              itemCount: items.length,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: widget.crossAxisCount, // Mengakses crossAxisCount dengan widget.
+                crossAxisCount: widget.crossAxisCount,
                 mainAxisSpacing: 16.0,
                 crossAxisSpacing: 12.0,
                 childAspectRatio: 1.8,
               ),
               itemBuilder: (context, index) {
-                final item = snapshot.data![index];
+                final item = items[index];
                 return GestureDetector(
-                  onTap: () {
-                    widget.addToCart(item);
-                  }, // Memastikan fungsi addToCart tersedia
+                  onTap: () => widget.addToCart(item),
                   child: Stack(
                     children: [
                       Padding(
@@ -274,7 +317,8 @@ class _PosMenuListState extends State<PosMenuList> {
                         child: Container(
                           height: 120.0,
                           decoration: BoxDecoration(
-                            border: Border.all(width: 1.0, color: Colors.grey.shade300),
+                            border: Border.all(
+                                width: 1.0, color: Colors.grey.shade300),
                             borderRadius: BorderRadius.circular(12.0),
                           ),
                           padding: const EdgeInsets.all(12.0),
@@ -287,24 +331,31 @@ class _PosMenuListState extends State<PosMenuList> {
                                   children: [
                                     Text(
                                       item["name"],
-                                      style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                                      style: const TextStyle(
+                                          fontSize: 16.0,
+                                          fontWeight: FontWeight.bold),
                                     ),
                                     const SizedBox(height: 4.0),
                                     RichText(
                                       text: TextSpan(
                                         text: "Tersedia: ",
-                                        style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                                        style: TextStyle(
+                                            color: Colors.grey.shade600,
+                                            fontSize: 12),
                                         children: [
                                           TextSpan(
                                             text: item["stock"].toString(),
-                                            style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                                            style: const TextStyle(
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.bold),
                                           ),
                                         ],
                                       ),
                                     ),
                                     const Spacer(),
                                     PoppinsBold(
-                                      text: "Rp ${widget.format(item["price"].toString())}", // Menggunakan widget.format untuk formatting harga
+                                      text:
+                                          "Rp ${widget.format(item["price"].toString())}",
                                       size: 16.0,
                                       color: Color(0xffE7772D),
                                     ),
@@ -322,11 +373,15 @@ class _PosMenuListState extends State<PosMenuList> {
                         child: Container(
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            border: Border.all(color: Color(0xffE7772D), width: 3),
+                            border:
+                                Border.all(color: Color(0xffE7772D), width: 3),
                           ),
                           child: CircleAvatar(
                             radius: 40,
-                            backgroundImage: item["image"] == null ? AssetImage('assets/images/empty.png') : AssetImage(item["image"]),
+                            backgroundImage: item["image"] == null
+                                ? AssetImage('assets/images/empty.png')
+                                    as ImageProvider
+                                : NetworkImage(item["image"]),
                             backgroundColor: Colors.transparent,
                           ),
                         ),
@@ -335,10 +390,6 @@ class _PosMenuListState extends State<PosMenuList> {
                   ),
                 );
               },
-            );
-          } else {
-            return Center(
-              child: CircularProgressIndicator(),
             );
           }
         },
@@ -374,12 +425,14 @@ class PostMenuSideBarDetail extends StatefulWidget {
 }
 
 class _PostMenuSideBarDetailState extends State<PostMenuSideBarDetail> {
+  final TextEditingController _customerName = TextEditingController();
+
   int _paymentAmount = 0;
   String _paymentMethod = "";
   Color _paymentMethodColorCash = Colors.white;
   Color _paymentMethodColorQris = Colors.white;
 
-  void _showErrorNeedSelectPaymentMethod() {
+  void _showErrorNeedSelectPaymentMethod(String text) {
     showDialog(
       context: context,
       builder: (context) {
@@ -390,14 +443,15 @@ class _PostMenuSideBarDetailState extends State<PostMenuSideBarDetail> {
             height: 110.0,
             child: Column(
               children: [
-                Poppins(text: "Harap pilih method pembayaran terlebih dahulu!", size: 16.0),
+                Poppins(text: text, size: 16.0),
                 SizedBox(height: 10.0),
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
                     decoration: BoxDecoration(
                       color: Colors.grey.shade200,
                       borderRadius: BorderRadius.circular(10.0),
@@ -422,12 +476,14 @@ class _PostMenuSideBarDetailState extends State<PostMenuSideBarDetail> {
             int totalPrice = widget.getTotalPrice();
             int change = _paymentAmount - totalPrice;
             return ShowCheckoutPopupDialog(
-                totalPrice: totalPrice,
-                format: widget.format,
-                cartItems: widget.cartItems,
-                paymentAmount: _paymentAmount,
-                paymentMethod: _paymentMethod,
-                change: change);
+              totalPrice: totalPrice,
+              format: widget.format,
+              cartItems: widget.cartItems,
+              paymentAmount: _paymentAmount,
+              paymentMethod: _paymentMethod,
+              change: change,
+              customerName: _customerName.text,
+            );
           },
         );
       },
@@ -513,12 +569,14 @@ class _PostMenuSideBarDetailState extends State<PostMenuSideBarDetail> {
             ),
             SizedBox(height: 5.0),
             SizedBox(
-              height: MediaQuery.of(context).viewInsets.bottom == 0 ? 90.0 : 40.0,
+              height:
+                  MediaQuery.of(context).viewInsets.bottom == 0 ? 90.0 : 40.0,
               child: ListView(
                 children: [
                   Poppins(text: "Form data", size: 14.0),
                   SizedBox(height: 10.0),
                   TextInputCustom(
+                    controller: _customerName,
                     text: "Nama Pelanggan",
                     height: 40.0,
                   ),
@@ -544,16 +602,21 @@ class _PostMenuSideBarDetailState extends State<PostMenuSideBarDetail> {
                               height: 60.0,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                border: Border.all(color: Colors.grey.shade200, width: 2),
+                                border: Border.all(
+                                    color: Colors.grey.shade200, width: 2),
                               ),
                               child: CircleAvatar(
-                                backgroundImage: item["image"] == null ? AssetImage('assets/images/empty.png') : AssetImage(item["image"]),
+                                backgroundImage: item["image"] == null
+                                    ? AssetImage('assets/images/empty.png')
+                                    : NetworkImage(item["image"]),
                               ),
                             ),
                             Flexible(
                               fit: FlexFit.tight,
                               child: ListTile(
-                                contentPadding: EdgeInsets.zero, // Menghapus padding bawaan ListTile
+                                // TODO list items
+                                contentPadding: EdgeInsets
+                                    .zero, // Menghapus padding bawaan ListTile
                                 title: Text(item["name"]),
                                 subtitle: Row(
                                   mainAxisSize: MainAxisSize.min,
@@ -582,17 +645,21 @@ class _PostMenuSideBarDetailState extends State<PostMenuSideBarDetail> {
                                   ],
                                 ),
                                 trailing: Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     GradientText(
-                                      text: "Rp ${widget.format(item["price"].toString())}",
-                                      style: GoogleFonts.poppins(fontSize: 12.0),
+                                      text:
+                                          "Rp ${widget.format(item["price"].toString())}",
+                                      style:
+                                          GoogleFonts.poppins(fontSize: 12.0),
                                     ),
                                     GradientText(
                                       text:
                                           "Rp ${widget.format((int.parse(item["price"].toString()) * int.parse(item["quantity"].toString())).toString())}",
-                                      style: GoogleFonts.poppins(fontSize: 18.0),
+                                      style:
+                                          GoogleFonts.poppins(fontSize: 18.0),
                                     ),
                                   ],
                                 ),
@@ -621,12 +688,15 @@ class _PostMenuSideBarDetailState extends State<PostMenuSideBarDetail> {
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Poppins(text: "${widget.getTotalItem()} Pcs", size: 12.0),
+                            Poppins(
+                                text: "${widget.getTotalItem()} Pcs",
+                                size: 12.0),
                             SizedBox(width: 5.0),
                             Poppins(text: "-", size: 12.0),
                             SizedBox(width: 5.0),
                             GradientText(
-                              text: "Rp ${widget.format(widget.getTotalPrice().toString())}",
+                              text:
+                                  "Rp ${widget.format(widget.getTotalPrice().toString())}",
                               style: GoogleFonts.poppins(
                                 fontSize: 18.0,
                                 fontWeight: FontWeight.bold,
@@ -640,9 +710,13 @@ class _PostMenuSideBarDetailState extends State<PostMenuSideBarDetail> {
                     Poppins(text: "Pilih pembayaran", size: 16.0),
                     SizedBox(height: 4.0),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 4.0, vertical: 2.0),
                       decoration: BoxDecoration(
-                        border: Border.all(width: 2.0, color: Colors.grey.shade200, style: BorderStyle.solid),
+                        border: Border.all(
+                            width: 2.0,
+                            color: Colors.grey.shade200,
+                            style: BorderStyle.solid),
                         borderRadius: BorderRadius.circular(50.0),
                       ),
                       child: Row(
@@ -650,7 +724,9 @@ class _PostMenuSideBarDetailState extends State<PostMenuSideBarDetail> {
                           IconBoxText(
                             "Cash",
                             12.0,
-                            color: _paymentMethod == "cash" ? Colors.white : Colors.grey.shade600,
+                            color: _paymentMethod == "cash"
+                                ? Colors.white
+                                : Colors.grey.shade600,
                             boxColor: _paymentMethodColorCash,
                             onPresses: () {
                               setState(() {
@@ -663,14 +739,20 @@ class _PostMenuSideBarDetailState extends State<PostMenuSideBarDetail> {
                             height: 45.0,
                             icon: SvgPicture.asset(
                               "assets/images/icons/payments.svg",
-                              colorFilter: ColorFilter.mode(_paymentMethod == "cash" ? Colors.white : Colors.grey.shade600, BlendMode.srcIn),
+                              colorFilter: ColorFilter.mode(
+                                  _paymentMethod == "cash"
+                                      ? Colors.white
+                                      : Colors.grey.shade600,
+                                  BlendMode.srcIn),
                             ),
                           ),
                           SizedBox(width: 5.0),
                           IconBoxText(
                             "QRIS",
                             12.0,
-                            color: _paymentMethod == "qris" ? Colors.white : Colors.grey.shade600,
+                            color: _paymentMethod == "qris"
+                                ? Colors.white
+                                : Colors.grey.shade600,
                             boxColor: _paymentMethodColorQris,
                             onPresses: () {
                               setState(() {
@@ -683,7 +765,11 @@ class _PostMenuSideBarDetailState extends State<PostMenuSideBarDetail> {
                             height: 45.0,
                             icon: SvgPicture.asset(
                               "assets/images/icons/barcode.svg",
-                              colorFilter: ColorFilter.mode(_paymentMethod == "qris" ? Colors.white : Colors.grey.shade600, BlendMode.srcIn),
+                              colorFilter: ColorFilter.mode(
+                                  _paymentMethod == "qris"
+                                      ? Colors.white
+                                      : Colors.grey.shade600,
+                                  BlendMode.srcIn),
                             ),
                           ),
                         ],
@@ -700,7 +786,8 @@ class _PostMenuSideBarDetailState extends State<PostMenuSideBarDetail> {
                           boxColor: Color(0xffE7772D),
                           icon: SvgPicture.asset(
                             "assets/images/icons/paylater.svg",
-                            colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                            colorFilter:
+                                ColorFilter.mode(Colors.white, BlendMode.srcIn),
                           ),
                         ),
                         IconBoxText(
@@ -708,9 +795,16 @@ class _PostMenuSideBarDetailState extends State<PostMenuSideBarDetail> {
                           12.0,
                           onPresses: () {
                             if (_paymentMethod == "") {
-                              _showErrorNeedSelectPaymentMethod();
+                              _showErrorNeedSelectPaymentMethod(
+                                  "Harap pilih method pembayaran terlebih dahulu!");
+                            } else if (_customerName.text == "") {
+                              _showErrorNeedSelectPaymentMethod(
+                                  "Harap pilih masukan nama pelanggan terlebih dahulu!");
                             } else {
-                              _paymentMethod == "cash" ? _showCheckoutPopup() : _showBarcodePopup(total: widget.getTotalPrice());
+                              _paymentMethod == "cash"
+                                  ? _showCheckoutPopup()
+                                  : _showBarcodePopup(
+                                      total: widget.getTotalPrice());
                             }
                           },
                           height: 40.0,
@@ -718,7 +812,8 @@ class _PostMenuSideBarDetailState extends State<PostMenuSideBarDetail> {
                           boxColor: Color(0xff723E29),
                           icon: SvgPicture.asset(
                             "assets/images/icons/cart.svg",
-                            colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                            colorFilter:
+                                ColorFilter.mode(Colors.white, BlendMode.srcIn),
                           ),
                         ),
                       ],
@@ -738,7 +833,9 @@ class BarcodePopupDialog extends StatefulWidget {
   final DateTime targetTime;
   final int total;
 
-  const BarcodePopupDialog({Key? key, required this.targetTime, required this.total}) : super(key: key);
+  const BarcodePopupDialog(
+      {Key? key, required this.targetTime, required this.total})
+      : super(key: key);
 
   @override
   _BarcodePopupDialogState createState() => _BarcodePopupDialogState();
@@ -859,7 +956,8 @@ class _BarcodePopupDialogState extends State<BarcodePopupDialog> {
                     ),
                     SizedBox(height: 20.0),
                     Container(
-                      padding: EdgeInsets.only(top: 20.0, left: 20.0, right: 20.0, bottom: 100.0),
+                      padding: EdgeInsets.only(
+                          top: 20.0, left: 20.0, right: 20.0, bottom: 100.0),
                       width: widthDevice,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10.0),
@@ -882,13 +980,20 @@ class _BarcodePopupDialogState extends State<BarcodePopupDialog> {
                               children: [
                                 SvgPicture.asset(
                                   "assets/images/icons/qris.svg",
-                                  colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                                  colorFilter: ColorFilter.mode(
+                                      Colors.white, BlendMode.srcIn),
                                   width: 50.0,
                                 ),
                                 SizedBox(height: 10.0),
-                                Poppins(text: "Kasir Pinter Indonesia", size: 24.0, color: Colors.white),
+                                Poppins(
+                                    text: "Kasir Pinter Indonesia",
+                                    size: 24.0,
+                                    color: Colors.white),
                                 SizedBox(height: 10.0),
-                                Poppins(text: "RAWKODADIWJAIEAE", size: 16.0, color: Colors.white),
+                                Poppins(
+                                    text: "RAWKODADIWJAIEAE",
+                                    size: 16.0,
+                                    color: Colors.white),
                                 SizedBox(height: 10.0),
                                 Container(
                                   padding: EdgeInsets.all(20.0),
@@ -931,7 +1036,8 @@ class _BarcodePopupDialogState extends State<BarcodePopupDialog> {
                   ),
                   height: 100.0,
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 50.0, right: 50.0, top: 20.0),
+                    padding: const EdgeInsets.only(
+                        left: 50.0, right: 50.0, top: 20.0),
                     child: Column(
                       children: [
                         Row(
@@ -940,7 +1046,8 @@ class _BarcodePopupDialogState extends State<BarcodePopupDialog> {
                             PoppinsBold(text: "Total", size: 24.0),
                             GradientText(
                               text: "Rp ${format(widget.total.toString())} ",
-                              style: GoogleFonts.poppins(fontSize: 24.0, fontWeight: FontWeight.bold),
+                              style: GoogleFonts.poppins(
+                                  fontSize: 24.0, fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),
@@ -951,7 +1058,11 @@ class _BarcodePopupDialogState extends State<BarcodePopupDialog> {
                           dashLength: 5,
                           dashColor: Colors.grey.shade600,
                         ),
-                        Poppins(text: "Pastikan Nama dan nominal sama sebelum melakukan pembayaran", size: 12.0, color: Colors.red)
+                        Poppins(
+                            text:
+                                "Pastikan Nama dan nominal sama sebelum melakukan pembayaran",
+                            size: 12.0,
+                            color: Colors.red)
                       ],
                     ),
                   ),
@@ -972,6 +1083,7 @@ class ShowCheckoutPopupDialog extends StatefulWidget {
   final int paymentAmount;
   final String paymentMethod;
   final int change;
+  final String customerName;
 
   const ShowCheckoutPopupDialog({
     super.key,
@@ -981,15 +1093,18 @@ class ShowCheckoutPopupDialog extends StatefulWidget {
     required this.paymentMethod,
     required this.change,
     required this.paymentAmount,
+    required this.customerName,
   });
 
   @override
-  State<ShowCheckoutPopupDialog> createState() => _ShowCheckoutPopupDialogState();
+  State<ShowCheckoutPopupDialog> createState() =>
+      _ShowCheckoutPopupDialogState();
 }
 
 class _ShowCheckoutPopupDialogState extends State<ShowCheckoutPopupDialog> {
   int _paymentAmount = 0; // Declare payment amount state
-  int change = 0; // Declare change state
+  int _change = 0; // Declare change state
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -1021,20 +1136,27 @@ class _ShowCheckoutPopupDialogState extends State<ShowCheckoutPopupDialog> {
                         Container(
                           padding: EdgeInsets.only(top: 20.0),
                           alignment: Alignment.center,
-                          child: PoppinsBold(text: "Checkout", size: 16.0, color: Color(0xff723E29)),
+                          child: PoppinsBold(
+                              text: "Checkout",
+                              size: 16.0,
+                              color: Color(0xff723E29)),
                         ),
                         Container(
-                          height: MediaQuery.of(context).viewInsets.bottom == 0 ? 200.0 : 0.0,
+                          height: MediaQuery.of(context).viewInsets.bottom == 0
+                              ? 200.0
+                              : 0.0,
                           child: Scrollbar(
                             child: ListView(
                               children: [
                                 ...widget.cartItems.map((item) => ListTile(
-                                    // TODO : fix this
                                     title: Row(
                                       children: [
                                         Poppins(text: item["name"], size: 14.0),
                                         SizedBox(width: 10.0),
-                                        Poppins(text: "x ${item["quantity"]}", size: 12.0, color: Colors.grey.shade600)
+                                        Poppins(
+                                            text: "x ${item["quantity"]}",
+                                            size: 12.0,
+                                            color: Colors.grey.shade600)
                                       ],
                                     ),
                                     trailing: PoppinsBold(
@@ -1052,18 +1174,25 @@ class _ShowCheckoutPopupDialogState extends State<ShowCheckoutPopupDialog> {
                           dashColor: Colors.black12,
                         ),
                         Container(
-                          height: MediaQuery.of(context).viewInsets.bottom == 0 ? 270.0 : 160.0,
-                          padding: const EdgeInsets.only(left: 20.0, right: 20.0, bottom: 10.0),
+                          height: MediaQuery.of(context).viewInsets.bottom == 0
+                              ? 270.0
+                              : 160.0,
+                          padding: const EdgeInsets.only(
+                              left: 20.0, right: 20.0, bottom: 10.0),
                           child: ListView(
                             children: [
                               SizedBox(height: 10.0),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   PoppinsBold(text: "Total: ", size: 20.0),
                                   GradientText(
-                                      text: "Rp ${widget.format(widget.totalPrice.toString())}",
-                                      style: GoogleFonts.poppins(fontSize: 20.0, fontWeight: FontWeight.bold))
+                                      text:
+                                          "Rp ${widget.format(widget.totalPrice.toString())}",
+                                      style: GoogleFonts.poppins(
+                                          fontSize: 20.0,
+                                          fontWeight: FontWeight.bold))
                                 ],
                               ),
                               SizedBox(height: 10.0),
@@ -1074,13 +1203,18 @@ class _ShowCheckoutPopupDialogState extends State<ShowCheckoutPopupDialog> {
                                     borderRadius: BorderRadius.circular(50.0),
                                   ),
                                   hintText: "Masukan nominal bayar",
-                                  hintStyle: TextStyle(color: Colors.grey.shade600, fontStyle: FontStyle.normal),
-                                  contentPadding: EdgeInsets.symmetric(vertical: 15.0),
+                                  hintStyle: TextStyle(
+                                      color: Colors.grey.shade600,
+                                      fontStyle: FontStyle.normal),
+                                  contentPadding:
+                                      EdgeInsets.symmetric(vertical: 15.0),
                                 ),
                                 keyboardType: TextInputType.number,
                                 onChanged: (value) {
                                   setState(() {
                                     _paymentAmount = int.tryParse(value) ?? 0;
+                                    _change =
+                                        _paymentAmount - widget.totalPrice;
                                   });
                                 },
                               ),
@@ -1101,7 +1235,8 @@ class _ShowCheckoutPopupDialogState extends State<ShowCheckoutPopupDialog> {
                                         ),
                                       ),
                                       child: GradientText(
-                                        text: "Rp ${widget.format(change < 0 ? '0' : change.toString())}",
+                                        text:
+                                            "Rp ${widget.format(_change < 0 ? '0' : _change.toString())}",
                                         style: GoogleFonts.poppins(
                                           fontSize: 20.0,
                                           fontWeight: FontWeight.bold,
@@ -1122,13 +1257,103 @@ class _ShowCheckoutPopupDialogState extends State<ShowCheckoutPopupDialog> {
                               ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   minimumSize: Size(400.0, 50.0),
-                                  backgroundColor: _paymentAmount > widget.totalPrice ? Color(0xff723E29) : Colors.grey.shade600,
+                                  backgroundColor:
+                                      (_paymentAmount >= widget.totalPrice ||
+                                              _isLoading)
+                                          ? Color(0xff723E29)
+                                          : Colors.grey.shade600,
                                   elevation: 0.0,
                                 ),
-                                onPressed: () {
-                                  _paymentAmount > widget.totalPrice ? Navigator.pop(context) : null;
-                                },
-                                child: Poppins(text: "Bayar", size: 16.0, color: Colors.white),
+                                onPressed: _isLoading
+                                    ? null
+                                    : () async {
+                                        if (_paymentAmount >=
+                                            widget.totalPrice) {
+                                          setState(() {
+                                            _isLoading =
+                                                true; // Set loading state to true
+                                          });
+
+                                          // Prepare transaction data
+                                          final customerName = widget
+                                              .customerName; // Replace with actual customer name from input
+                                          final typePayment =
+                                              "CASH"; // CASH or QRIS
+                                          final status =
+                                              "PAID"; // Default status
+                                          final items = widget.cartItems
+                                              .map((item) => {
+                                                    "productId": item[
+                                                        "id"], // Assuming each item has an "id"
+                                                    "quantity":
+                                                        item["quantity"],
+                                                  })
+                                              .toList();
+
+                                          // Call TransactionService to create the transaction
+                                          try {
+                                            final transactionService =
+                                                TransactionService();
+                                            final response =
+                                                await transactionService
+                                                    .createTransaction(
+                                              customerName,
+                                              _paymentAmount,
+                                              typePayment,
+                                              status,
+                                              items: items,
+                                            );
+
+                                            print(
+                                                "Transaction created: $response");
+
+                                            // Close the dialog and show success message
+                                            Navigator.of(context)
+                                                .pushNamed("/pos-order");
+
+                                                // add toas
+                                            Fluttertoast.showToast(
+                                              msg: "Transaksi berhasil!",
+                                              toastLength: Toast.LENGTH_SHORT,
+                                              gravity: ToastGravity.BOTTOM,
+                                              timeInSecForIosWeb: 1,
+                                              backgroundColor: Colors.green,
+                                              textColor: Colors.white,
+                                              fontSize: 16.0,
+                                            );
+                                          } catch (e) {
+                                            print(
+                                                "Error creating transaction: $e");
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                  content: Text(
+                                                      "Gagal membuat transaksi. Silakan coba lagi.")),
+                                            );
+                                          } finally {
+                                            setState(() {
+                                              _isLoading =
+                                                  false; // Set loading state to false after transaction
+                                            });
+                                          }
+                                        } else {
+                                          Fluttertoast.showToast(
+                                            msg: "Transaksi gagal!",
+                                            toastLength: Toast.LENGTH_SHORT,
+                                            gravity: ToastGravity.BOTTOM,
+                                            timeInSecForIosWeb: 1,
+                                            backgroundColor: Colors.orange,
+                                            textColor: Colors.white,
+                                            fontSize: 16.0,
+                                          );
+                                        }
+                                      },
+                                child: _isLoading
+                                    ? CircularProgressIndicator()
+                                    : Poppins(
+                                        text: "Bayar",
+                                        size: 16.0,
+                                        color: Colors.white),
                               ),
                               ElevatedButton(
                                   style: ElevatedButton.styleFrom(
@@ -1136,7 +1361,7 @@ class _ShowCheckoutPopupDialogState extends State<ShowCheckoutPopupDialog> {
                                     elevation: 0.0,
                                   ),
                                   onPressed: () {
-                                    change = 0;
+                                    _change = 0;
                                     Navigator.pop(context);
                                   },
                                   child: Poppins(
@@ -1152,7 +1377,7 @@ class _ShowCheckoutPopupDialogState extends State<ShowCheckoutPopupDialog> {
                   ),
                   StackCloseButton(
                     onPressed: () {
-                      change = 0;
+                      _change = 0;
                       Navigator.pop(context);
                     },
                   )
@@ -1166,7 +1391,8 @@ class _ShowCheckoutPopupDialogState extends State<ShowCheckoutPopupDialog> {
                 child: CircleAvatar(
                   radius: 52.0,
                   backgroundColor: Colors.white,
-                  child: SvgPicture.asset("assets/images/logo_black.svg", width: 90.0),
+                  child: SvgPicture.asset("assets/images/logo_black.svg",
+                      width: 90.0),
                 ),
               ),
             ),
@@ -1174,6 +1400,5 @@ class _ShowCheckoutPopupDialogState extends State<ShowCheckoutPopupDialog> {
         ),
       ),
     );
-    ;
   }
 }

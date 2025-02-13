@@ -15,6 +15,7 @@ class PosMenuTab extends StatefulWidget {
 
 class _PosMenuTabState extends State<PosMenuTab> {
   late Future<List<Map<String, dynamic>>> futureMenuItems;
+  String? selectedCategory;
 
   @override
   void initState() {
@@ -24,6 +25,19 @@ class _PosMenuTabState extends State<PosMenuTab> {
       return value;
     }); // Panggil API saat widget diinisialisasi
   }
+
+  // for filter category
+  void updateSelectedCategory(String? categoryName) {
+    setState(() {
+      selectedCategory = categoryName;
+      futureMenuItems = MenuService().fetchMenuItems(categoryName: categoryName).then((value){
+        print("futureMenuItems is : $value");
+        return value;
+      });
+      print("updated category filter");
+    });
+  }
+
   List<Map<String, dynamic>> cartItems = [];
   int crossAxisCount = 5;
 
@@ -127,7 +141,11 @@ class _PosMenuTabState extends State<PosMenuTab> {
                     children: [
                       PosMenuOrderTabs(),
                       SizedBox(height: 10.0),
-                      RowListCategoryMenu(),
+                      RowListCategoryMenu(
+                        onCategorySelected: (categoryName) {
+                          updateSelectedCategory(categoryName);
+                        },
+                      ),
                       SizedBox(height: 10.0),
                       PosMenuList(
                         menuItems: futureMenuItems,
