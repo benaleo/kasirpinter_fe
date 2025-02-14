@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kasirpinter_fe/components/auth_components.dart';
 import 'package:kasirpinter_fe/services/auth_service.dart';
+import 'package:kasirpinter_fe/splash_screen.dart';
 
 import '../components/components.dart';
 
@@ -31,7 +32,7 @@ class _LoginTabState extends State<LoginTab> {
     });
 
     if (success) {
-      Navigator.of(context).pushReplacementNamed("/dashboard");
+      Navigator.of(context).pushReplacementNamed("/splash-screen");
     } else {
       showDialog(
         context: context,

@@ -161,10 +161,7 @@ class _RowListCategoryMenuState extends State<RowListCategoryMenu> {
   void initState() {
     super.initState();
     // Fetch data dari API atau layanan lainnya
-    categories = MenuService().fetchMenuCategories().then((value) {
-      print("categories is : $value");
-      return value;
-    });
+    categories = MenuService().getSavedMenuCategories();
   }
 
   @override
@@ -426,11 +423,30 @@ class PostMenuSideBarDetail extends StatefulWidget {
 
 class _PostMenuSideBarDetailState extends State<PostMenuSideBarDetail> {
   final TextEditingController _customerName = TextEditingController();
-
+  late BuildContext _stableContext;
+  bool _isMounted = false;
   int _paymentAmount = 0;
   String _paymentMethod = "";
   Color _paymentMethodColorCash = Colors.white;
   Color _paymentMethodColorQris = Colors.white;
+
+  @override
+  void initState() {
+    super.initState();
+    _isMounted = true;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _stableContext = context;
+  }
+
+  @override
+  void dispose() {
+    _isMounted = false;
+    super.dispose();
+  }
 
   void _showErrorNeedSelectPaymentMethod(String text) {
     showDialog(
@@ -514,6 +530,87 @@ class _PostMenuSideBarDetailState extends State<PostMenuSideBarDetail> {
             });
           },
           text: "Apakah kamu yakin akan menghapus detail pesanan ini?",
+        );
+      },
+    );
+  }
+
+  Future<void> _confirmPendingOrderPopup() async {
+    showDialog(
+      context: _stableContext,
+      builder: (context) {
+        return ConfirmDialog(
+          onPressed: () async {
+            final items = widget.cartItems
+                .map((item) => {
+                      "productId": item["id"],
+                      "quantity": item["quantity"],
+                    })
+                .toList();
+            final totalPrice = widget.cartItems.fold<int>(
+              0,
+              (sum, item) =>
+                  sum + ((item["price"] as int) * (item["quantity"] as int)),
+            );
+            if (totalPrice <= 0) {
+              print('Invalid total price: $totalPrice');
+              return;
+            }
+
+            try {
+              final transactionService = TransactionService();
+              final response = await transactionService.createTransaction(
+                _customerName.text,
+                0,
+                (_paymentMethod.isNotEmpty ? _paymentMethod : 'CASH')
+                    .toUpperCase(),
+                'PENDING',
+                items: items,
+              );
+
+              print('Transaction response: $response');
+
+              if (response == null || response['success'] != true) {
+                throw Exception(response?['message'] ?? 'Transaction failed');
+              }
+
+              if (mounted) {
+                Navigator.pop(_stableContext);
+                Navigator.pushReplacementNamed(_stableContext, '/pos-menu');
+                print('Transaction created successfully: ${response['data']}');
+
+                Fluttertoast.showToast(
+                  msg: "Simpan transaksi berhasil!",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.green,
+                  textColor: Colors.white,
+                  fontSize: 16.0,
+                );
+              }
+            } catch (e) {
+              print('Full error details: $e');
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (_isMounted) {
+                  showDialog(
+                    context: _stableContext,
+                    builder: (ctx) => AlertDialog(
+                      title: Text('Transaction Failed'),
+                      content: Text(e.toString()),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(ctx).pop(),
+                          child: Text('OK'),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              });
+            }
+          },
+          text: "Apakah kamu yakin untuk melakukan order nanti?",
         );
       },
     );
@@ -789,6 +886,14 @@ class _PostMenuSideBarDetailState extends State<PostMenuSideBarDetail> {
                             colorFilter:
                                 ColorFilter.mode(Colors.white, BlendMode.srcIn),
                           ),
+                          onPresses: () {
+                            if (_customerName.text == "") {
+                              _showErrorNeedSelectPaymentMethod(
+                                  "Harap pilih masukan nama pelanggan terlebih dahulu!");
+                            } else {
+                              _confirmPendingOrderPopup();
+                            }
+                          },
                         ),
                         IconBoxText(
                           "Checkout",
@@ -1102,8 +1207,8 @@ class ShowCheckoutPopupDialog extends StatefulWidget {
 }
 
 class _ShowCheckoutPopupDialogState extends State<ShowCheckoutPopupDialog> {
-  int _paymentAmount = 0; // Declare payment amount state
-  int _change = 0; // Declare change state
+  int _paymentAmount = 0;
+  int _change = 0;
   bool _isLoading = false;
 
   @override
@@ -1309,9 +1414,9 @@ class _ShowCheckoutPopupDialogState extends State<ShowCheckoutPopupDialog> {
 
                                             // Close the dialog and show success message
                                             Navigator.of(context)
-                                                .pushNamed("/pos-order");
+                                                .pushNamed("/pos-menu");
 
-                                                // add toas
+                                            // add toas
                                             Fluttertoast.showToast(
                                               msg: "Transaksi berhasil!",
                                               toastLength: Toast.LENGTH_SHORT,
@@ -1324,11 +1429,14 @@ class _ShowCheckoutPopupDialogState extends State<ShowCheckoutPopupDialog> {
                                           } catch (e) {
                                             print(
                                                 "Error creating transaction: $e");
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              SnackBar(
-                                                  content: Text(
-                                                      "Gagal membuat transaksi. Silakan coba lagi.")),
+                                            Fluttertoast.showToast(
+                                              msg: "Transaksi gagal!",
+                                              toastLength: Toast.LENGTH_SHORT,
+                                              gravity: ToastGravity.BOTTOM,
+                                              timeInSecForIosWeb: 1,
+                                              backgroundColor: Colors.orange,
+                                              textColor: Colors.white,
+                                              fontSize: 16.0,
                                             );
                                           } finally {
                                             setState(() {

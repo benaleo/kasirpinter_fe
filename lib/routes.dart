@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kasirpinter_fe/splash_screen.dart';
 import 'package:kasirpinter_fe/tab/auth_change_password.dart';
 import 'package:kasirpinter_fe/tab/auth_forgot_password_tab.dart';
 import 'package:kasirpinter_fe/tab/auth_login_tab.dart';
@@ -25,6 +26,33 @@ class Routes {
             },
           ),
         );
+      case '/login':
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth > 800) {
+                return LoginTab();
+              } else {
+                return LoginTab();
+              }
+            },
+          ),
+        );
+      case '/splash-screen':
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth > 800) {
+                return SplashScreen();
+              } else {
+                return SplashScreen();
+              }
+            },
+          ),
+        );
+
       case '/otp':
         return MaterialPageRoute(
           builder: (_) => LayoutBuilder(

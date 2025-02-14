@@ -8,7 +8,7 @@ class TransactionService {
   final String _mainUrl = 'api/v1/pos';
 
   Future<Map<String, dynamic>> createTransaction(
-      String customerName, int amountPayment, String typePayment, String status,
+      String customerName, int amountPayment, String? typePayment, String status,
       {List<Map<String, dynamic>> items = const []}) async {
     final AuthService authService = AuthService();
     final String? token = await authService.getToken();
@@ -65,7 +65,7 @@ class TransactionService {
 
     try {
       String apiUrl =
-          '$_baseUrl/$_mainUrl/transaction?pages=0&limit=1000&sortBy=id&direction=asc';
+          '$_baseUrl/$_mainUrl/transaction?pages=0&limit=1000&sortBy=id&direction=desc';
 
       if (paymentMethod != null && paymentMethod.isNotEmpty) {
         if (paymentMethod != 'all') {

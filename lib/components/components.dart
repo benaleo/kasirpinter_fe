@@ -338,7 +338,7 @@ class _DrawerElementState extends State<DrawerElement> {
                   title: "Logout",
                   selectedIndex: _selectedIndex,
                   onItemTapped: _onItemTapped,
-                  routeName: "/",
+                  routeName: "/login",
                   onPressed: () async {
                     final AuthService authService = AuthService();
                     await authService.logout();

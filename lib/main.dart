@@ -27,6 +27,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        brightness: Brightness.light,
+        pageTransitionsTheme: const PageTransitionsTheme(
+          builders: {
+            // Use PredictiveBackPageTransitionsBuilder to get the predictive back route transition!
+            TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
+          },
+        ),
+      ),
       debugShowCheckedModeBanner: false,
       title: "Login Kasir Pinter",
       onGenerateRoute: (settings) => Routes.generateRoute(settings),
