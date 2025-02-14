@@ -1,8 +1,8 @@
 import 'dart:convert';
+
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class AuthService {
   final String _baseUrl = dotenv.get('BASE_URL');
@@ -19,16 +19,13 @@ class AuthService {
           'password': password,
         }),
       );
-      print("api url is : $response");
 
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        if (data['success']) {
-          String token = data['data']['token'];
-          await _saveToken(token);
-          return true;
-        }
+      final data = jsonDecode(response.body);
+      print("Response data: $data");
+      if (data['success']) {
+        String token = data['data']['token'];
+        await _saveToken(token);
+        return true;
       }
       return false;
     } catch (e) {
@@ -51,5 +48,4 @@ class AuthService {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
   }
-
 }

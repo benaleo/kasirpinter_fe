@@ -3,6 +3,7 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:kasirpinter_fe/services/transaction_service.dart';
 
 import '../components/components.dart';
 import '../components/pos_components.dart';
@@ -14,62 +15,18 @@ class PosOrderTab extends StatefulWidget {
 }
 
 class _PosOrderTabState extends State<PosOrderTab> {
-  late Future<List<Map<String, dynamic>>> futureMenuItems;
-  late Future<List<Map<String, dynamic>>> categories;
+  late Future<List<Map<String, dynamic>>> futureTransactions;
 
   @override
   void initState() {
     super.initState();
-    futureMenuItems = MenuService().fetchMenuItems().then((value) {
-      print("futureMenuItems is : $value");
-      return value;
-    }); // Panggil API saat widget diinisialisasi
-    categories = MenuService().fetchMenuCategories().then((value) {
-      print("categories is : $value");
-      return value;
-    });
+    futureTransactions = TransactionService().getTransactions(
+        paymentMethod: _paymentMethod,
+        paymentStatus:
+            _paymentStatus); // Panggil API saat widget diinisialisasi
   }
 
-  List<Map<String, dynamic>> orders = [
-    {
-      'order_no': 'A343',
-      'customer': 'Rifqi',
-      'items': 2,
-      'total_price': 40000,
-      'payment_status': 'Lunas',
-      'payment_method': 'Cash',
-      'payment_amount': 40000,
-      'details': [
-        {'image': 'assets/images/menu/coffee.png', 'name': 'Caffe Latte', 'price': 20000, 'quantity': 2},
-        {'image': 'assets/images/menu/coffee.png', 'name': 'Tea Leaf', 'price': 22000, 'quantity': 2}
-      ]
-    },
-    {
-      'order_no': 'A344',
-      'customer': 'Putri',
-      'items': 2,
-      'total_price': 34000,
-      'payment_status': 'Lunas',
-      'payment_method': 'QRIS',
-      'payment_amount': 34000,
-      'details': [
-        {'image': 'assets/images/menu/coffee.png', 'name': 'Espresso', 'price': 17000, 'quantity': 2}
-      ]
-    },
-    {
-      'order_no': 'A345',
-      'customer': 'Imam',
-      'items': 2,
-      'total_price': 43000,
-      'payment_status': 'Nanti',
-      'payment_method': 'Cash',
-      'payment_amount': 43000,
-      'details': [
-        {'image': 'assets/images/menu/coffee.png', 'name': 'Mocha', 'price': 21500, 'quantity': 2},
-        {'image': 'assets/images/menu/coffee.png', 'name': 'Coffe Latte', 'price': 21500, 'quantity': 1}
-      ]
-    },
-  ];
+  List<Map<String, dynamic>> orders = [];
 
   Map<String, dynamic>? selectedOrder;
   String _paymentMethod = "";
@@ -78,8 +35,10 @@ class _PosOrderTabState extends State<PosOrderTab> {
   // Fungsi untuk mendapatkan daftar pesanan yang difilter
   List<Map<String, dynamic>> getFilteredOrders() {
     return orders.where((order) {
-      bool matchesPaymentStatus = _paymentStatus.isEmpty || order['payment_status'] == _paymentStatus;
-      bool matchesPaymentMethod = _paymentMethod.isEmpty || order['payment_method'] == _paymentMethod;
+      bool matchesPaymentStatus =
+          _paymentStatus.isEmpty || order['payment_status'] == _paymentStatus;
+      bool matchesPaymentMethod =
+          _paymentMethod.isEmpty || order['payment_method'] == _paymentMethod;
       return matchesPaymentStatus && matchesPaymentMethod;
     }).toList();
   }
@@ -127,9 +86,12 @@ class _PosOrderTabState extends State<PosOrderTab> {
           child: Row(
             children: [
               Expanded(
-                flex: selectedOrder == null ? 1 : 2, // TODO why not be null after closeSide
+                flex: selectedOrder == null
+                    ? 1
+                    : 2, // TODO why not be null after closeSide
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20.0),
@@ -154,6 +116,10 @@ class _PosOrderTabState extends State<PosOrderTab> {
                               setState(() {
                                 _paymentMethod = "";
                                 _paymentStatus = "";
+                                futureTransactions = TransactionService()
+                                    .getTransactions(
+                                        paymentMethod: _paymentMethod,
+                                        paymentStatus: _paymentStatus);
                               });
                             },
                           ),
@@ -162,7 +128,11 @@ class _PosOrderTabState extends State<PosOrderTab> {
                             onPressed: () {
                               setState(() {
                                 _paymentMethod = "";
-                                _paymentStatus = "Lunas";
+                                _paymentStatus = "PAID";
+                                futureTransactions = TransactionService()
+                                    .getTransactions(
+                                        paymentMethod: _paymentMethod,
+                                        paymentStatus: _paymentStatus);
                               });
                             },
                           ),
@@ -171,7 +141,11 @@ class _PosOrderTabState extends State<PosOrderTab> {
                             onPressed: () {
                               setState(() {
                                 _paymentMethod = "";
-                                _paymentStatus = "Nanti";
+                                _paymentStatus = "PENDING";
+                                futureTransactions = TransactionService()
+                                    .getTransactions(
+                                        paymentMethod: _paymentMethod,
+                                        paymentStatus: _paymentStatus);
                               });
                             },
                           ),
@@ -179,8 +153,12 @@ class _PosOrderTabState extends State<PosOrderTab> {
                             text: "Cash",
                             onPressed: () {
                               setState(() {
-                                _paymentMethod = "Cash";
+                                _paymentMethod = "CASH";
                                 _paymentStatus = "";
+                                futureTransactions = TransactionService()
+                                    .getTransactions(
+                                        paymentMethod: _paymentMethod,
+                                        paymentStatus: _paymentStatus);
                               });
                             },
                           ),
@@ -190,59 +168,78 @@ class _PosOrderTabState extends State<PosOrderTab> {
                               setState(() {
                                 _paymentMethod = "QRIS";
                                 _paymentStatus = "";
+                                futureTransactions = TransactionService()
+                                    .getTransactions(
+                                        paymentMethod: _paymentMethod,
+                                        paymentStatus: _paymentStatus);
                               });
                             },
                           ),
                         ],
                       ),
-                      SizedBox(
-                        height: 500.0,
-                        child: ListView(
-                          children: getFilteredOrders().map((order) {
-                            return GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  selectedOrder = order;
-                                });
-                              },
-                              child: Card(
-                                color: order['payment_status'] == 'Lunas' ? Colors.white : Colors.grey[300],
-                                child: ListTile(
-                                  title: Text('No. Pesanan: ${order['order_no']}'),
-                                  subtitle: Text('Nama: ${order['customer']}\nTotal: Rp. ${order['total_price']}'),
-                                  trailing: Chip(
-                                    label: Text(order['payment_status']),
-                                    backgroundColor: order['payment_status'] == 'Lunas' ? Colors.green : Colors.red,
-                                  ),
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
+                      KeyboardVisibilityBuilder(builder: (context, visible){
+                        return AnimatedContainer(
+                          duration: Duration(milliseconds: 300),
+                          height: visible ? 170.0 : 500.0,
+                          child: FutureBuilder<List<Map<String, dynamic>>>(
+                            future: futureTransactions,
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                // Safely cast the data to List<Map<String, dynamic>>
+                                orders = List<Map<String, dynamic>>.from(
+                                    snapshot.data!);
+                                return ListView(
+                                  children: getFilteredOrders().map((order) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          selectedOrder = order;
+                                        });
+                                      },
+                                      child: Card(
+                                        color: order['payment_status'] == 'Lunas'
+                                            ? Colors.white
+                                            : Colors.grey[300],
+                                        child: ListTile(
+                                          title: Text(
+                                              'No. Pesanan: ${order['order_no']}'),
+                                          subtitle: Text(
+                                              'Nama: ${order['customer']}\nTotal: Rp. ${order['total_price']}'),
+                                          trailing: Chip(
+                                            label: Text(order['payment_status']),
+                                            backgroundColor:
+                                            order['payment_status'] == 'Lunas'
+                                                ? Colors.green
+                                                : Colors.red,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                );
+                              } else if (snapshot.hasError) {
+                                return Text('${snapshot.error}');
+                              }
+
+                              return Center(child: CircularProgressIndicator());
+                            },
+                          ),
+                        );
+                      })
                     ],
                   ),
                 ),
               ),
               if (selectedOrder != null)
                 Expanded(
-                  child: selectedOrder != null && selectedOrder!['payment_status'] == 'Lunas'
-                      ? PosOrderSideBarDetail(
-                          cartItems: selectedOrder!['details'],
-                          format: format,
-                          getTotalItem: getTotalItem,
-                          close: _closeSide,
-                          customerName: selectedOrder!['customer'],
-                          status: selectedOrder!['payment_status'],
-                        )
-                      : PosOrderSideBarDetail(
-                          cartItems: selectedOrder!['details'],
-                          format: format,
-                          getTotalItem: getTotalItem,
-                          close: _closeSide,
-                          customerName: selectedOrder!['customer'],
-                          status: selectedOrder!['payment_status'],
-                        ),
+                  child: PosOrderSideBarDetail(
+                    cartItems: List<Map<String, dynamic>>.from(selectedOrder!['details']), // Explicit cast
+                    format: format,
+                    getTotalItem: getTotalItem,
+                    close: _closeSide,
+                    customerName: selectedOrder!['customer'],
+                    status: selectedOrder!['payment_status'],
+                  ),
                 ),
             ],
           ),
@@ -256,7 +253,8 @@ class OrderFilterCategory extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
 
-  const OrderFilterCategory({super.key, required this.text, required this.onPressed});
+  const OrderFilterCategory(
+      {super.key, required this.text, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -312,14 +310,17 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
             height: 110.0,
             child: Column(
               children: [
-                Poppins(text: "Harap pilih method pembayaran terlebih dahulu!", size: 16.0),
+                Poppins(
+                    text: "Harap pilih method pembayaran terlebih dahulu!",
+                    size: 16.0),
                 SizedBox(height: 10.0),
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
                     decoration: BoxDecoration(
                       color: Colors.grey.shade200,
                       borderRadius: BorderRadius.circular(10.0),
@@ -430,18 +431,23 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
             ),
             SizedBox(height: 5.0),
             SizedBox(
-              height: MediaQuery.of(context).viewInsets.bottom == 0 ? 90.0 : 40.0,
+              height:
+                  MediaQuery.of(context).viewInsets.bottom == 0 ? 90.0 : 40.0,
               child: ListView(
                 children: [
                   Poppins(text: "Form data", size: 14.0),
                   SizedBox(height: 10.0),
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10.0),
-                      border: Border.all(width: 1.0, style: BorderStyle.solid, color: Colors.grey.shade600),
+                      border: Border.all(
+                          width: 1.0,
+                          style: BorderStyle.solid,
+                          color: Colors.grey.shade600),
                     ),
-                    child: Poppins(text: widget.customerName, size: 16.0),
+                    child: widget.customerName == null ? null : Poppins(text: widget.customerName, size: 16.0),
                   ),
                   SizedBox(height: 10.0),
                   Divider(height: 1.0, color: Colors.grey.shade200),
@@ -465,16 +471,18 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
                               height: 60.0,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                border: Border.all(color: Colors.grey.shade200, width: 2),
+                                border: Border.all(
+                                    color: Colors.grey.shade200, width: 2),
                               ),
                               child: CircleAvatar(
-                                backgroundImage: AssetImage(item["image"]),
+                                backgroundImage: NetworkImage(item["image"]),
                               ),
                             ),
                             Flexible(
                               fit: FlexFit.tight,
                               child: ListTile(
-                                contentPadding: EdgeInsets.zero, // Menghapus padding bawaan ListTile
+                                contentPadding: EdgeInsets
+                                    .zero, // Menghapus padding bawaan ListTile
                                 title: Text(item["name"]),
                                 subtitle: Row(
                                   mainAxisSize: MainAxisSize.min,
@@ -483,17 +491,21 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
                                   ],
                                 ),
                                 trailing: Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     GradientText(
-                                      text: "Rp ${widget.format(item["price"].toString())}",
-                                      style: GoogleFonts.poppins(fontSize: 12.0),
+                                      text:
+                                          "Rp ${widget.format(item["price"].toString())}",
+                                      style:
+                                          GoogleFonts.poppins(fontSize: 12.0),
                                     ),
                                     GradientText(
                                       text:
                                           "Rp ${widget.format((int.parse(item["price"].toString()) * int.parse(item["quantity"].toString())).toString())}",
-                                      style: GoogleFonts.poppins(fontSize: 18.0),
+                                      style:
+                                          GoogleFonts.poppins(fontSize: 18.0),
                                     ),
                                   ],
                                 ),
@@ -510,7 +522,7 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
             }),
             Spacer(),
             Divider(),
-            if (status != "Lunas")
+            if (status != "PAID")
               KeyboardVisibilityBuilder(
                 builder: (context, visible) {
                   return AnimatedContainer(
@@ -525,12 +537,15 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Poppins(text: "${widget.getTotalItem()} Pcs", size: 12.0),
+                                Poppins(
+                                    text: "${widget.getTotalItem()} Pcs",
+                                    size: 12.0),
                                 SizedBox(width: 5.0),
                                 Poppins(text: "-", size: 12.0),
                                 SizedBox(width: 5.0),
                                 GradientText(
-                                  text: "Rp ${widget.format(totalPrice.toString())}",
+                                  text:
+                                      "Rp ${widget.format(totalPrice.toString())}",
                                   style: GoogleFonts.poppins(
                                     fontSize: 18.0,
                                     fontWeight: FontWeight.bold,
@@ -544,9 +559,13 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
                         Poppins(text: "Pilih pembayaran", size: 16.0),
                         SizedBox(height: 4.0),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 4.0, vertical: 2.0),
                           decoration: BoxDecoration(
-                            border: Border.all(width: 2.0, color: Colors.grey.shade200, style: BorderStyle.solid),
+                            border: Border.all(
+                                width: 2.0,
+                                color: Colors.grey.shade200,
+                                style: BorderStyle.solid),
                             borderRadius: BorderRadius.circular(50.0),
                           ),
                           child: Row(
@@ -554,7 +573,9 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
                               IconBoxText(
                                 "Cash",
                                 12.0,
-                                color: _paymentMethod == "cash" ? Colors.white : Colors.grey.shade600,
+                                color: _paymentMethod == "cash"
+                                    ? Colors.white
+                                    : Colors.grey.shade600,
                                 boxColor: _paymentMethodColorCash,
                                 onPresses: () {
                                   setState(() {
@@ -567,14 +588,20 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
                                 height: 45.0,
                                 icon: SvgPicture.asset(
                                   "assets/images/icons/payments.svg",
-                                  colorFilter: ColorFilter.mode(_paymentMethod == "cash" ? Colors.white : Colors.grey.shade600, BlendMode.srcIn),
+                                  colorFilter: ColorFilter.mode(
+                                      _paymentMethod == "cash"
+                                          ? Colors.white
+                                          : Colors.grey.shade600,
+                                      BlendMode.srcIn),
                                 ),
                               ),
                               SizedBox(width: 5.0),
                               IconBoxText(
                                 "QRIS",
                                 12.0,
-                                color: _paymentMethod == "qris" ? Colors.white : Colors.grey.shade600,
+                                color: _paymentMethod == "qris"
+                                    ? Colors.white
+                                    : Colors.grey.shade600,
                                 boxColor: _paymentMethodColorQris,
                                 onPresses: () {
                                   setState(() {
@@ -587,7 +614,11 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
                                 height: 45.0,
                                 icon: SvgPicture.asset(
                                   "assets/images/icons/barcode.svg",
-                                  colorFilter: ColorFilter.mode(_paymentMethod == "qris" ? Colors.white : Colors.grey.shade600, BlendMode.srcIn),
+                                  colorFilter: ColorFilter.mode(
+                                      _paymentMethod == "qris"
+                                          ? Colors.white
+                                          : Colors.grey.shade600,
+                                      BlendMode.srcIn),
                                 ),
                               ),
                             ],
@@ -603,7 +634,10 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
                                 if (_paymentMethod == "") {
                                   _showErrorNeedSelectPaymentMethod();
                                 } else {
-                                  _paymentMethod == "cash" ? _showCheckoutPopup(totalPrice: totalPrice) : _showBarcodePopup(total: totalPrice);
+                                  _paymentMethod == "cash"
+                                      ? _showCheckoutPopup(
+                                          totalPrice: totalPrice)
+                                      : _showBarcodePopup(total: totalPrice);
                                 }
                               },
                               height: 40.0,
@@ -611,7 +645,8 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
                               boxColor: Color(0xff723E29),
                               icon: SvgPicture.asset(
                                 "assets/images/icons/cart.svg",
-                                colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                                colorFilter: ColorFilter.mode(
+                                    Colors.white, BlendMode.srcIn),
                               ),
                             ),
                           ],
@@ -621,7 +656,7 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
                   );
                 },
               ),
-            if (status != "Nanti")
+            if (status != "PENDING")
               KeyboardVisibilityBuilder(
                 builder: (context, visible) {
                   return AnimatedContainer(
@@ -636,12 +671,15 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Poppins(text: "${widget.getTotalItem()} Pcs", size: 12.0),
+                                Poppins(
+                                    text: "${widget.getTotalItem()} Pcs",
+                                    size: 12.0),
                                 SizedBox(width: 5.0),
                                 Poppins(text: "-", size: 12.0),
                                 SizedBox(width: 5.0),
                                 GradientText(
-                                  text: "Rp ${widget.format(totalPrice.toString())}",
+                                  text:
+                                      "Rp ${widget.format(totalPrice.toString())}",
                                   style: GoogleFonts.poppins(
                                     fontSize: 18.0,
                                     fontWeight: FontWeight.bold,
@@ -665,7 +703,8 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
                               boxColor: Color(0xff723E29),
                               icon: SvgPicture.asset(
                                 "assets/images/icons/cart.svg",
-                                colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                                colorFilter: ColorFilter.mode(
+                                    Colors.white, BlendMode.srcIn),
                               ),
                             ),
                           ],

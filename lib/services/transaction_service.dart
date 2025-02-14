@@ -47,7 +47,6 @@ class TransactionService {
       final Map<String, dynamic> responseData = json.decode(response.body);
 
       if (responseData['success']) {
-        print("response data: ${responseData['data']}");
         return responseData;
       } else {
         print("Error response body: ${response.body}"); // Log the response body
@@ -56,6 +55,57 @@ class TransactionService {
     } catch (e) {
       print("Error: $e");
       throw Exception("Failed to create transaction");
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getTransactions(
+      {String? paymentMethod, String? paymentStatus}) async {
+    final AuthService authService = AuthService();
+    final String? token = await authService.getToken();
+
+    try {
+      String apiUrl =
+          '$_baseUrl/$_mainUrl/transaction?pages=0&limit=1000&sortBy=id&direction=asc';
+
+      if (paymentMethod != null && paymentMethod.isNotEmpty) {
+        if (paymentMethod != 'all') {
+          apiUrl += '&paymentMethod=$paymentMethod';
+        }
+      }
+
+      if (paymentStatus != null && paymentStatus.isNotEmpty) {
+        if (paymentStatus != 'all') {
+          apiUrl += '&paymentStatus=$paymentStatus';
+        }
+      }
+
+      print("URL is: $apiUrl");
+      print("Authorization Token: $token");
+
+      final response = await http.get(
+        Uri.parse(apiUrl),
+        headers: {
+          'accept': '*/*',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
+
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      if (responseData['success'] != null && responseData['success']) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        final List<dynamic> transactions = responseData['data']['result'];
+
+        print("Transactions: $transactions");
+        return transactions.cast<Map<String, dynamic>>();
+      } else {
+        throw Exception('Failed to load transactions');
+      }
+    } catch (error) {
+      print("Error occurred: $error");
+      throw error; // Re-throw the error after logging
     }
   }
 }
