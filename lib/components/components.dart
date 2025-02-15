@@ -308,6 +308,13 @@ class _DrawerElementState extends State<DrawerElement> {
                     DrawerListTile(
                         index: 3,
                         icon: Icons.settings,
+                        title: "Product Category",
+                        selectedIndex: _selectedIndex,
+                        onItemTapped: _onItemTapped,
+                        routeName: "/setting/product-category"),
+                    DrawerListTile(
+                        index: 4,
+                        icon: Icons.settings,
                         title: "Setting",
                         selectedIndex: _selectedIndex,
                         onItemTapped: _onItemTapped,
@@ -315,7 +322,7 @@ class _DrawerElementState extends State<DrawerElement> {
                   ],
                 ),
                 DrawerListTile(
-                  index: 4,
+                  index: 5,
                   icon: Icons.logout,
                   title: "Logout",
                   selectedIndex: _selectedIndex,
