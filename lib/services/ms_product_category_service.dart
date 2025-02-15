@@ -25,6 +25,7 @@ class MsProductCategoryService {
     final response = await http.get(
       Uri.parse(url),
       headers: {
+        'Content-Type': 'application/json',
         'accept': '*/*',
         'Authorization': 'Bearer $token',
       },
@@ -45,8 +46,9 @@ class MsProductCategoryService {
       throw Exception("Token not found");
     }
 
+    String url = '$_baseUrl/$_mainUrl';
     final response = await http.post(
-      Uri.parse('$_baseUrl/$_mainUrl'),
+      Uri.parse(url),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
@@ -56,6 +58,10 @@ class MsProductCategoryService {
         'isActive': true,
       }),
     );
+
+    print("url is: $url");
+    print("Response status: ${response.statusCode}");
+    print("Response body: ${response.body}"); // Add this line
 
     if (response.statusCode != 201) {
       throw Exception('Failed to create product category');

@@ -108,6 +108,7 @@ class ElevatedButtonCustom extends StatelessWidget {
   final double? boxSize;
   final double? boxHeight;
   final Widget? child;
+  final double? width;
 
   const ElevatedButtonCustom({
     super.key,
@@ -119,12 +120,14 @@ class ElevatedButtonCustom extends StatelessWidget {
     this.color,
     this.boxSize,
     this.boxHeight,
-    this.child,
+    this.child, this.width,
   });
 
   @override
   Widget build(BuildContext context) {
+    double widthDevice = MediaQuery.of(context).size.width;
     return Container(
+      width: width != null ? width : null,
       height: boxHeight ?? 50.0,
       child: ElevatedButton(
         onPressed: onPressed != null
