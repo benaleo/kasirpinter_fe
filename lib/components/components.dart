@@ -300,11 +300,11 @@ class _DrawerElementState extends State<DrawerElement> {
                         routeName: "/pos-menu"),
                     DrawerListTile(
                         index: 2,
-                        icon: Icons.shopping_cart,
+                        icon: Icons.history_outlined,
                         title: "Order",
                         selectedIndex: _selectedIndex,
                         onItemTapped: _onItemTapped,
-                        routeName: "/pos-menu"),
+                        routeName: "/pos-order"),
                     DrawerListTile(
                         index: 3,
                         icon: Icons.settings,
