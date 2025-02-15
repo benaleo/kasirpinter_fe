@@ -202,99 +202,109 @@ class _PosOrderTabState extends State<PosOrderTab> {
                                         });
                                       },
                                       child: Card(
-                                        color: order['payment_status'] == 'Lunas' ? Colors.white : Colors.grey[300],
-                                        child: ListTile(
-                                          title: Row(
-                                            children: [
-                                              Poppins(
-                                                text: 'No. Pesanan: ',
-                                                size: 12,
-                                                color: Colors.grey.shade600,
-                                              ),
-                                              PoppinsBold(
-                                                text: '${order['order_no']}',
-                                                size: 14,
-                                              ),
-                                            ],
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(10.0), side: BorderSide(color: Color(0xffE7772D))),
+                                        color: order['payment_status'] == 'CANCELLED' ? Colors.red[50] : Colors.white,
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10.0,
+                                            vertical: 10.0,
                                           ),
-                                          subtitle: Column(
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Poppins(
-                                                    text: 'Nama pelanggan: ',
-                                                    size: 12,
-                                                    color: Colors.grey.shade600,
-                                                  ),
-                                                  PoppinsBold(
-                                                    text: '${order['customer']}',
-                                                    size: 14,
-                                                  ),
-                                                ],
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Poppins(
-                                                    text: 'Jml item: ',
-                                                    size: 12,
-                                                    color: Colors.grey.shade600,
-                                                  ),
-                                                  PoppinsBold(
-                                                    text: (order['details'] as List<dynamic>)
-                                                        .map<int>(
-                                                            (item) => (item['quantity'] as int? ?? 0)) // Ensure int type and default to 0 if null
-                                                        .fold<int>(0, (sum, quantity) => sum + quantity) // Sum all quantities
-                                                        .toString(),
-                                                    size: 14,
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                          trailing: SizedBox(
-                                            width: 150.0,
-                                            child: Column(
-                                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                              crossAxisAlignment: CrossAxisAlignment.end,
+                                          child: ListTile(
+                                            title: Row(
+                                              children: [
+                                                Poppins(
+                                                  text: 'No. Pesanan: ',
+                                                  size: 12,
+                                                  color: Colors.grey.shade600,
+                                                ),
+                                                PoppinsBold(
+                                                  text: '${order['order_no']}',
+                                                  size: 14,
+                                                ),
+                                              ],
+                                            ),
+                                            subtitle: Column(
                                               children: [
                                                 Row(
-                                                  spacing: 4.0,
-                                                  mainAxisAlignment: MainAxisAlignment.end,
                                                   children: [
-                                                    Center(
-                                                      child: Container(
-                                                        padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-                                                        decoration: BoxDecoration(
-                                                          color: order['payment_status'] == "PAID"
-                                                              ? Color(0xffE7772D)
-                                                              : (order['payment_status'] == "PENDING" ? Colors.transparent : Colors.red),
-                                                          borderRadius: BorderRadius.circular(10.0),
-                                                          border: order['payment_status'] == "PENDING"
-                                                              ? Border.all(color: Color(0xffE7772D), width: 2.0)
-                                                              : (order['payment_status'] == "PAID" ? Border.all(color: Color(0xffE7772D), width: 2.0) : Border.all(color: Colors.red, width: 2.0)),
-                                                        ),
-                                                        child: Poppins(
-                                                            text: order['payment_status'] == "PAID"
-                                                                ? "Lunas"
-                                                                : (order['payment_status'] == "PENDING" ? "Nanti" : "Batal"),
-                                                            size: 12,
-                                                            color: order['payment_status'] == "PENDING" ? Color(0xffE7772D) : Colors.white),
-                                                      ),
+                                                    Poppins(
+                                                      text: 'Nama pelanggan: ',
+                                                      size: 12,
+                                                      color: Colors.grey.shade600,
                                                     ),
-                                                    if (order['payment_status'] == 'PAID')
+                                                    PoppinsBold(
+                                                      text: '${order['customer']}',
+                                                      size: 14,
+                                                    ),
+                                                  ],
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Poppins(
+                                                      text: 'Jml item: ',
+                                                      size: 12,
+                                                      color: Colors.grey.shade600,
+                                                    ),
+                                                    PoppinsBold(
+                                                      text: (order['details'] as List<dynamic>)
+                                                          .map<int>(
+                                                              (item) => (item['quantity'] as int? ?? 0)) // Ensure int type and default to 0 if null
+                                                          .fold<int>(0, (sum, quantity) => sum + quantity) // Sum all quantities
+                                                          .toString(),
+                                                      size: 14,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                            trailing: SizedBox(
+                                              width: 150.0,
+                                              child: Column(
+                                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                crossAxisAlignment: CrossAxisAlignment.end,
+                                                children: [
+                                                  Row(
+                                                    spacing: 4.0,
+                                                    mainAxisAlignment: MainAxisAlignment.end,
+                                                    children: [
                                                       Center(
                                                         child: Container(
-                                                          decoration: BoxDecoration(
-                                                            borderRadius: BorderRadius.circular(10.0),
-                                                            border: Border.all(color: Color(0XFF369AEC), width: 1.0),
-                                                          ),
                                                           padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-                                                          child: Poppins(text: order['payment_method'], size: 12, color: Color(0XFF369AEC)),
+                                                          decoration: BoxDecoration(
+                                                            color: order['payment_status'] == "PAID"
+                                                                ? Color(0xffE7772D)
+                                                                : (order['payment_status'] == "PENDING" ? Colors.transparent : Colors.red),
+                                                            borderRadius: BorderRadius.circular(10.0),
+                                                            border: order['payment_status'] == "PENDING"
+                                                                ? Border.all(color: Color(0xffE7772D), width: 2.0)
+                                                                : (order['payment_status'] == "PAID"
+                                                                    ? Border.all(color: Color(0xffE7772D), width: 2.0)
+                                                                    : Border.all(color: Colors.red, width: 2.0)),
+                                                          ),
+                                                          child: Poppins(
+                                                              text: order['payment_status'] == "PAID"
+                                                                  ? "Lunas"
+                                                                  : (order['payment_status'] == "PENDING" ? "Nanti" : "Batal"),
+                                                              size: 12,
+                                                              color: order['payment_status'] == "PENDING" ? Color(0xffE7772D) : Colors.white),
                                                         ),
-                                                      )
-                                                  ],
-                                                )
-                                              ],
+                                                      ),
+                                                      if (order['payment_status'] == 'PAID')
+                                                        Center(
+                                                          child: Container(
+                                                            decoration: BoxDecoration(
+                                                              borderRadius: BorderRadius.circular(10.0),
+                                                              border: Border.all(color: Color(0XFF369AEC), width: 1.0),
+                                                            ),
+                                                            padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                                                            child: Poppins(text: order['payment_method'], size: 12, color: Color(0XFF369AEC)),
+                                                          ),
+                                                        )
+                                                    ],
+                                                  )
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -325,6 +335,7 @@ class _PosOrderTabState extends State<PosOrderTab> {
                     customerName: selectedOrder!['customer'],
                     status: selectedOrder!['payment_status'],
                     transactionId: selectedOrder!['transaction_id'],
+                    invoice: selectedOrder!['order_no'],
                   ),
                 ),
             ],
@@ -388,6 +399,7 @@ class PosOrderSideBarDetail extends StatefulWidget {
   final String customerName;
   final String status;
   final String transactionId;
+  final String invoice;
 
   const PosOrderSideBarDetail({
     super.key,
@@ -398,6 +410,7 @@ class PosOrderSideBarDetail extends StatefulWidget {
     required this.customerName,
     required this.status,
     required this.transactionId,
+    required this.invoice,
   });
 
   @override
@@ -564,7 +577,7 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
               width: widthDevice,
               padding: EdgeInsets.only(right: 10.0),
               child: Poppins(
-                text: "No.123",
+                text: "Order id : ${widget.invoice.split('/').last}",
                 size: 16.0,
                 textAlign: TextAlign.end,
               ),
@@ -592,7 +605,7 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
             KeyboardVisibilityBuilder(builder: (context, visible) {
               return AnimatedContainer(
                 duration: Duration(milliseconds: 300),
-                height: visible ? 0.0 : 250.0,
+                height: visible ? 0.0 : (status == "PAID" ? 355.0 : (status == "PENDING" ? 250.0 : 400.0)),
                 child: ListView.builder(
                   itemCount: cartItems.length,
                   itemBuilder: (context, index) {
