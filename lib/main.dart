@@ -12,7 +12,7 @@ void main() async {
 
   try {
     final result = await InternetAddress.lookup(
-        'https://confused-whippet-benaleo-dev-aa750ae1.koyeb.app');
+        'solid-silvie-kopibery-872edbea.koyeb.app');
     print("Success: $result");
   } on SocketException catch (e) {
     print("Error: $e");

@@ -19,9 +19,11 @@ class _MsProductCategoryTabState extends State<MsProductCategoryTab> {
 
   Future<void> _fetchCategories() async {
     try {
-      final response = await _service.fetchProductCategories(page: _currentPage, keyword: _searchKeyword);
+      final response = await _service.fetchProductCategories(
+          page: _currentPage, keyword: _searchKeyword);
       setState(() {
-        _categories = List<Map<String, dynamic>>.from(response['data']['result']);
+        _categories =
+            List<Map<String, dynamic>>.from(response['data']['result']);
       });
     } catch (e) {
       print('Error fetching categories: $e');
@@ -172,7 +174,8 @@ class _MsProductCategoryTabState extends State<MsProductCategoryTab> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  PoppinsBold(text: "Daftar Kategori", size: 24.0, color: Colors.black),
+                  PoppinsBold(
+                      text: "Daftar Kategori", size: 24.0, color: Colors.black),
                   ElevatedButtonCustom(
                     text: "Tambah",
                     size: 16.0,
@@ -212,26 +215,45 @@ class _MsProductCategoryTabState extends State<MsProductCategoryTab> {
                         child: Container(
                           width: widthDevice,
                           child: DataTable(
-                            headingRowColor: MaterialStateColor.resolveWith((states) => Color(0xFF464646)),
+                            headingRowColor: MaterialStateColor.resolveWith(
+                                (states) => Color(0xFF464646)),
                             columnSpacing: 20.0,
                             columns: [
                               DataColumn(
-                                label: PoppinsBold(text: 'ID', size: 16.0, color: Colors.white),
+                                label: PoppinsBold(
+                                    text: 'ID',
+                                    size: 16.0,
+                                    color: Colors.white),
                               ),
                               DataColumn(
-                                label: PoppinsBold(text: 'Name', size: 16.0, color: Colors.white),
+                                label: PoppinsBold(
+                                    text: 'Name',
+                                    size: 16.0,
+                                    color: Colors.white),
                               ),
                               DataColumn(
-                                label: PoppinsBold(text: 'Status', size: 16.0, color: Colors.white),
+                                label: PoppinsBold(
+                                    text: 'Status',
+                                    size: 16.0,
+                                    color: Colors.white),
                               ),
                               DataColumn(
-                                label: PoppinsBold(text: 'Type', size: 16.0, color: Colors.white),
+                                label: PoppinsBold(
+                                    text: 'Type',
+                                    size: 16.0,
+                                    color: Colors.white),
                               ),
                               DataColumn(
-                                label: PoppinsBold(text: 'Total Data', size: 16.0, color: Colors.white),
+                                label: PoppinsBold(
+                                    text: 'Total Data',
+                                    size: 16.0,
+                                    color: Colors.white),
                               ),
                               DataColumn(
-                                label: PoppinsBold(text: 'Action', size: 16.0, color: Colors.white),
+                                label: PoppinsBold(
+                                    text: 'Action',
+                                    size: 16.0,
+                                    color: Colors.white),
                               ),
                             ],
                             rows: List<DataRow>.generate(
@@ -240,14 +262,30 @@ class _MsProductCategoryTabState extends State<MsProductCategoryTab> {
                                 final category = _categories[index];
                                 return DataRow(
                                   color: MaterialStateColor.resolveWith(
-                                    (states) => index.isOdd ? Colors.grey.shade50 : Colors.white,
+                                    (states) => index.isOdd
+                                        ? Colors.grey.shade50
+                                        : Colors.white,
                                   ),
                                   cells: [
-                                    DataCell(Poppins(text: (index + 1 + _currentPage * 10).toString(), size: 14)),
-                                    DataCell(Poppins(text: category['name'], size: 14)),
-                                    DataCell(Poppins(text: category['isActive'] ? 'Active' : 'Inactive', size: 14)),
-                                    DataCell(Poppins(text: 'Menu', size: 14)), // Assuming type is always 'Menu'
-                                    DataCell(Poppins(text: '${category['totalProducts']} item', size: 14)),
+                                    DataCell(Poppins(
+                                        text: (index + 1 + _currentPage * 10)
+                                            .toString(),
+                                        size: 14)),
+                                    DataCell(Poppins(
+                                        text: category['name'], size: 14)),
+                                    DataCell(Poppins(
+                                        text: category['isActive']
+                                            ? 'Active'
+                                            : 'Inactive',
+                                        size: 14)),
+                                    DataCell(Poppins(
+                                        text: 'Menu',
+                                        size:
+                                            14)), // Assuming type is always 'Menu'
+                                    DataCell(Poppins(
+                                        text:
+                                            '${category['totalProducts']} item',
+                                        size: 14)),
                                     DataCell(
                                       Row(
                                         children: [
@@ -282,7 +320,9 @@ class _MsProductCategoryTabState extends State<MsProductCategoryTab> {
                     child: Text('Previous'),
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.resolveWith(
-                        (states) => _currentPage == 0 ? Colors.grey.shade50 : Colors.blue,
+                        (states) => _currentPage == 0
+                            ? Colors.grey.shade50
+                            : Colors.blue,
                       ),
                     ),
                   ),

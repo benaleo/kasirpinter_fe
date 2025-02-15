@@ -19,8 +19,10 @@ class _PosOrderTabState extends State<PosOrderTab> {
   @override
   void initState() {
     super.initState();
-    futureTransactions =
-        TransactionService().getTransactions(paymentMethod: _paymentMethod, paymentStatus: _paymentStatus); // Panggil API saat widget diinisialisasi
+    futureTransactions = TransactionService().getTransactions(
+        paymentMethod: _paymentMethod,
+        paymentStatus:
+            _paymentStatus); // Panggil API saat widget diinisialisasi
   }
 
   List<Map<String, dynamic>> orders = [];
@@ -33,8 +35,10 @@ class _PosOrderTabState extends State<PosOrderTab> {
   // Fungsi untuk mendapatkan daftar pesanan yang difilter
   List<Map<String, dynamic>> getFilteredOrders() {
     return orders.where((order) {
-      bool matchesPaymentStatus = _paymentStatus.isEmpty || order['payment_status'] == _paymentStatus;
-      bool matchesPaymentMethod = _paymentMethod.isEmpty || order['payment_method'] == _paymentMethod;
+      bool matchesPaymentStatus =
+          _paymentStatus.isEmpty || order['payment_status'] == _paymentStatus;
+      bool matchesPaymentMethod =
+          _paymentMethod.isEmpty || order['payment_method'] == _paymentMethod;
       return matchesPaymentStatus && matchesPaymentMethod;
     }).toList();
   }
@@ -50,6 +54,14 @@ class _PosOrderTabState extends State<PosOrderTab> {
     return orders.fold(0, (total, item) {
       int quantity = item["quantity"] ?? 1;
       return total + quantity;
+    });
+  }
+
+  int getTotalPrice(Map<String, dynamic> order) {
+    return (order['details'] as List<dynamic>).fold(0, (subtotal, item) {
+      int price = item['price'] ?? 0;
+      int quantity = item['quantity'] ?? 1;
+      return subtotal + (price * quantity);
     });
   }
 
@@ -84,7 +96,8 @@ class _PosOrderTabState extends State<PosOrderTab> {
               Expanded(
                 flex: selectedOrder == null ? 1 : 2,
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20.0),
@@ -110,8 +123,10 @@ class _PosOrderTabState extends State<PosOrderTab> {
                                 _paymentMethod = "";
                                 _paymentStatus = "";
                                 _selectedFilterIndex = 0;
-                                futureTransactions =
-                                    TransactionService().getTransactions(paymentMethod: _paymentMethod, paymentStatus: _paymentStatus);
+                                futureTransactions = TransactionService()
+                                    .getTransactions(
+                                        paymentMethod: _paymentMethod,
+                                        paymentStatus: _paymentStatus);
                               });
                             },
                             isActive: _selectedFilterIndex == 0,
@@ -123,8 +138,10 @@ class _PosOrderTabState extends State<PosOrderTab> {
                                 _paymentMethod = "";
                                 _paymentStatus = "PAID";
                                 _selectedFilterIndex = 1;
-                                futureTransactions =
-                                    TransactionService().getTransactions(paymentMethod: _paymentMethod, paymentStatus: _paymentStatus);
+                                futureTransactions = TransactionService()
+                                    .getTransactions(
+                                        paymentMethod: _paymentMethod,
+                                        paymentStatus: _paymentStatus);
                               });
                             },
                             isActive: _selectedFilterIndex == 1,
@@ -136,8 +153,10 @@ class _PosOrderTabState extends State<PosOrderTab> {
                                 _paymentMethod = "";
                                 _paymentStatus = "PENDING";
                                 _selectedFilterIndex = 2;
-                                futureTransactions =
-                                    TransactionService().getTransactions(paymentMethod: _paymentMethod, paymentStatus: _paymentStatus);
+                                futureTransactions = TransactionService()
+                                    .getTransactions(
+                                        paymentMethod: _paymentMethod,
+                                        paymentStatus: _paymentStatus);
                               });
                             },
                             isActive: _selectedFilterIndex == 2,
@@ -149,8 +168,10 @@ class _PosOrderTabState extends State<PosOrderTab> {
                                 _paymentMethod = "";
                                 _paymentStatus = "CANCELLED";
                                 _selectedFilterIndex = 3;
-                                futureTransactions =
-                                    TransactionService().getTransactions(paymentMethod: _paymentMethod, paymentStatus: _paymentStatus);
+                                futureTransactions = TransactionService()
+                                    .getTransactions(
+                                        paymentMethod: _paymentMethod,
+                                        paymentStatus: _paymentStatus);
                               });
                             },
                             isActive: _selectedFilterIndex == 3,
@@ -162,8 +183,10 @@ class _PosOrderTabState extends State<PosOrderTab> {
                                 _paymentMethod = "CASH";
                                 _paymentStatus = "";
                                 _selectedFilterIndex = 4;
-                                futureTransactions =
-                                    TransactionService().getTransactions(paymentMethod: _paymentMethod, paymentStatus: _paymentStatus);
+                                futureTransactions = TransactionService()
+                                    .getTransactions(
+                                        paymentMethod: _paymentMethod,
+                                        paymentStatus: _paymentStatus);
                               });
                             },
                             isActive: _selectedFilterIndex == 4,
@@ -175,8 +198,10 @@ class _PosOrderTabState extends State<PosOrderTab> {
                                 _paymentMethod = "QRIS";
                                 _paymentStatus = "";
                                 _selectedFilterIndex = 5;
-                                futureTransactions =
-                                    TransactionService().getTransactions(paymentMethod: _paymentMethod, paymentStatus: _paymentStatus);
+                                futureTransactions = TransactionService()
+                                    .getTransactions(
+                                        paymentMethod: _paymentMethod,
+                                        paymentStatus: _paymentStatus);
                               });
                             },
                             isActive: _selectedFilterIndex == 5,
@@ -192,7 +217,8 @@ class _PosOrderTabState extends State<PosOrderTab> {
                             builder: (context, snapshot) {
                               if (snapshot.hasData) {
                                 // Safely cast the data to List<Map<String, dynamic>>
-                                orders = List<Map<String, dynamic>>.from(snapshot.data!);
+                                orders = List<Map<String, dynamic>>.from(
+                                    snapshot.data!);
                                 return ListView(
                                   children: getFilteredOrders().map((order) {
                                     return GestureDetector(
@@ -203,108 +229,245 @@ class _PosOrderTabState extends State<PosOrderTab> {
                                       },
                                       child: Card(
                                         shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(10.0), side: BorderSide(color: Color(0xffE7772D))),
-                                        color: order['payment_status'] == 'CANCELLED' ? Colors.red[50] : Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                          side: BorderSide(
+                                            color: Color(0xffE7772D),
+                                          ),
+                                        ),
+                                        color: order['payment_status'] ==
+                                                'CANCELLED'
+                                            ? Colors.red[50]
+                                            : Colors.white,
                                         child: Padding(
                                           padding: const EdgeInsets.symmetric(
                                             horizontal: 10.0,
                                             vertical: 10.0,
                                           ),
                                           child: ListTile(
-                                            title: Row(
+                                            subtitle: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
                                               children: [
-                                                Poppins(
-                                                  text: 'No. Pesanan: ',
-                                                  size: 12,
-                                                  color: Colors.grey.shade600,
-                                                ),
-                                                PoppinsBold(
-                                                  text: '${order['order_no']}',
-                                                  size: 14,
-                                                ),
-                                              ],
-                                            ),
-                                            subtitle: Column(
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    Poppins(
-                                                      text: 'Nama pelanggan: ',
-                                                      size: 12,
-                                                      color: Colors.grey.shade600,
-                                                    ),
-                                                    PoppinsBold(
-                                                      text: '${order['customer']}',
-                                                      size: 14,
-                                                    ),
-                                                  ],
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Poppins(
-                                                      text: 'Jml item: ',
-                                                      size: 12,
-                                                      color: Colors.grey.shade600,
-                                                    ),
-                                                    PoppinsBold(
-                                                      text: (order['details'] as List<dynamic>)
-                                                          .map<int>(
-                                                              (item) => (item['quantity'] as int? ?? 0)) // Ensure int type and default to 0 if null
-                                                          .fold<int>(0, (sum, quantity) => sum + quantity) // Sum all quantities
-                                                          .toString(),
-                                                      size: 14,
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                            trailing: SizedBox(
-                                              width: 150.0,
-                                              child: Column(
-                                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                crossAxisAlignment: CrossAxisAlignment.end,
-                                                children: [
-                                                  Row(
-                                                    spacing: 4.0,
-                                                    mainAxisAlignment: MainAxisAlignment.end,
+                                                Expanded(
+                                                  child: Column(
+                                                    spacing: 10.0,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
                                                     children: [
-                                                      Center(
-                                                        child: Container(
-                                                          padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-                                                          decoration: BoxDecoration(
-                                                            color: order['payment_status'] == "PAID"
-                                                                ? Color(0xffE7772D)
-                                                                : (order['payment_status'] == "PENDING" ? Colors.transparent : Colors.red),
-                                                            borderRadius: BorderRadius.circular(10.0),
-                                                            border: order['payment_status'] == "PENDING"
-                                                                ? Border.all(color: Color(0xffE7772D), width: 2.0)
-                                                                : (order['payment_status'] == "PAID"
-                                                                    ? Border.all(color: Color(0xffE7772D), width: 2.0)
-                                                                    : Border.all(color: Colors.red, width: 2.0)),
+                                                      Row(
+                                                        children: [
+                                                          Poppins(
+                                                            text:
+                                                                'No. Pesanan: ',
+                                                            size: 12,
+                                                            color: Colors
+                                                                .grey.shade600,
                                                           ),
-                                                          child: Poppins(
-                                                              text: order['payment_status'] == "PAID"
-                                                                  ? "Lunas"
-                                                                  : (order['payment_status'] == "PENDING" ? "Nanti" : "Batal"),
-                                                              size: 12,
-                                                              color: order['payment_status'] == "PENDING" ? Color(0xffE7772D) : Colors.white),
-                                                        ),
+                                                          PoppinsBold(
+                                                            text:
+                                                                '${order['order_no']}',
+                                                            size: 14,
+                                                          ),
+                                                        ],
                                                       ),
-                                                      if (order['payment_status'] == 'PAID')
-                                                        Center(
-                                                          child: Container(
-                                                            decoration: BoxDecoration(
-                                                              borderRadius: BorderRadius.circular(10.0),
-                                                              border: Border.all(color: Color(0XFF369AEC), width: 1.0),
-                                                            ),
-                                                            padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-                                                            child: Poppins(text: order['payment_method'], size: 12, color: Color(0XFF369AEC)),
+                                                      Row(
+                                                        children: [
+                                                          Poppins(
+                                                            text:
+                                                                'Nama pelanggan: ',
+                                                            size: 12,
+                                                            color: Colors
+                                                                .grey.shade600,
                                                           ),
-                                                        )
+                                                          PoppinsBold(
+                                                            text:
+                                                                '${order['customer']}',
+                                                            size: 14,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      Row(
+                                                        children: [
+                                                          Poppins(
+                                                            text: 'Jml item: ',
+                                                            size: 12,
+                                                            color: Colors
+                                                                .grey.shade600,
+                                                          ),
+                                                          PoppinsBold(
+                                                            text: (order[
+                                                                        'details']
+                                                                    as List<
+                                                                        dynamic>)
+                                                                .map<int>((item) =>
+                                                                    (item['quantity']
+                                                                            as int? ??
+                                                                        0)) // Ensure int type and default to 0 if null
+                                                                .fold<int>(
+                                                                    0,
+                                                                    (sum, quantity) =>
+                                                                        sum +
+                                                                        quantity) // Sum all quantities
+                                                                .toString(),
+                                                            size: 14,
+                                                          ),
+                                                        ],
+                                                      ),
                                                     ],
-                                                  )
-                                                ],
-                                              ),
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  width: 150.0,
+                                                  child: Column(
+                                                    spacing: 5.0,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment.end,
+                                                    children: [
+                                                      Row(
+                                                        spacing: 4.0,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .end,
+                                                        children: [
+                                                          Center(
+                                                            child: Container(
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                      horizontal:
+                                                                          10.0,
+                                                                      vertical:
+                                                                          5.0),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color: order[
+                                                                            'payment_status'] ==
+                                                                        "PAID"
+                                                                    ? Color(
+                                                                        0xffE7772D)
+                                                                    : (order['payment_status'] ==
+                                                                            "PENDING"
+                                                                        ? Colors
+                                                                            .transparent
+                                                                        : Colors
+                                                                            .red),
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            10.0),
+                                                                border: order[
+                                                                            'payment_status'] ==
+                                                                        "PENDING"
+                                                                    ? Border.all(
+                                                                        color: Color(
+                                                                            0xffE7772D),
+                                                                        width:
+                                                                            2.0)
+                                                                    : (order['payment_status'] ==
+                                                                            "PAID"
+                                                                        ? Border.all(
+                                                                            color: Color(
+                                                                                0xffE7772D),
+                                                                            width:
+                                                                                2.0)
+                                                                        : Border.all(
+                                                                            color:
+                                                                                Colors.red,
+                                                                            width: 2.0)),
+                                                              ),
+                                                              child: Poppins(
+                                                                  text: order['payment_status'] ==
+                                                                          "PAID"
+                                                                      ? "Lunas"
+                                                                      : (order['payment_status'] ==
+                                                                              "PENDING"
+                                                                          ? "Nanti"
+                                                                          : "Batal"),
+                                                                  size: 12,
+                                                                  color: order[
+                                                                              'payment_status'] ==
+                                                                          "PENDING"
+                                                                      ? Color(
+                                                                          0xffE7772D)
+                                                                      : Colors
+                                                                          .white),
+                                                            ),
+                                                          ),
+                                                          if (order[
+                                                                  'payment_status'] ==
+                                                              'PAID')
+                                                            Center(
+                                                              child: Container(
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              10.0),
+                                                                  border: Border.all(
+                                                                      color: Color(
+                                                                          0XFF369AEC),
+                                                                      width:
+                                                                          1.0),
+                                                                ),
+                                                                padding: EdgeInsets
+                                                                    .symmetric(
+                                                                        horizontal:
+                                                                            10.0,
+                                                                        vertical:
+                                                                            5.0),
+                                                                child: Poppins(
+                                                                    text: order[
+                                                                        'payment_method'],
+                                                                    size: 12,
+                                                                    color: Color(
+                                                                        0XFF369AEC)),
+                                                              ),
+                                                            )
+                                                        ],
+                                                      ),
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .end,
+                                                        children: [
+                                                          Icon(
+                                                              Icons
+                                                                  .schedule_outlined,
+                                                              size: 20.0),
+                                                          Poppins(
+                                                            text: order['created_at'] ==
+                                                                    null
+                                                                ? "-"
+                                                                : DateFormat(
+                                                                        'dd-MM-yyyy HH:mm')
+                                                                    .format(DateTime
+                                                                        .parse(order[
+                                                                            'created_at'])),
+                                                            size: 14.0,
+                                                            color: Colors
+                                                                .grey.shade600,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      GradientText(
+                                                        text:
+                                                            "Rp. ${format(getTotalPrice(order).toString())}",
+                                                        style:
+                                                            GoogleFonts.poppins(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
                                         ),
@@ -328,7 +491,8 @@ class _PosOrderTabState extends State<PosOrderTab> {
               if (selectedOrder != null)
                 Expanded(
                   child: PosOrderSideBarDetail(
-                    cartItems: List<Map<String, dynamic>>.from(selectedOrder!['details']),
+                    cartItems: List<Map<String, dynamic>>.from(
+                        selectedOrder!['details']),
                     format: format,
                     getTotalItem: getTotalItem,
                     close: _closeSide,
@@ -434,14 +598,17 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
             height: 110.0,
             child: Column(
               children: [
-                Poppins(text: "Harap pilih method pembayaran terlebih dahulu!", size: 16.0),
+                Poppins(
+                    text: "Harap pilih method pembayaran terlebih dahulu!",
+                    size: 16.0),
                 SizedBox(height: 10.0),
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
                   child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
                     decoration: BoxDecoration(
                       color: Colors.grey.shade200,
                       borderRadius: BorderRadius.circular(10.0),
@@ -457,7 +624,8 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
     );
   }
 
-  void _showCheckoutPopup({required int totalPrice, required String transactionId}) {
+  void _showCheckoutPopup(
+      {required int totalPrice, required String transactionId}) {
     showDialog(
       context: context,
       builder: (context) {
@@ -500,7 +668,8 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
         return ConfirmDialog(
           onPressed: () async {
             final TransactionService transactionService = TransactionService();
-            final response = await transactionService.cancelTransaction(transactionId);
+            final response =
+                await transactionService.cancelTransaction(transactionId);
             if (response['success']) {
               print("Berhasil membatalkan pesanan print toast");
               ToastCustom(
@@ -584,18 +753,25 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
             ),
             SizedBox(height: 5.0),
             SizedBox(
-              height: MediaQuery.of(context).viewInsets.bottom == 0 ? 90.0 : 40.0,
+              height:
+                  MediaQuery.of(context).viewInsets.bottom == 0 ? 90.0 : 40.0,
               child: ListView(
                 children: [
                   Poppins(text: "Form data", size: 14.0),
                   SizedBox(height: 10.0),
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10.0),
-                      border: Border.all(width: 1.0, style: BorderStyle.solid, color: Colors.grey.shade600),
+                      border: Border.all(
+                          width: 1.0,
+                          style: BorderStyle.solid,
+                          color: Colors.grey.shade600),
                     ),
-                    child: widget.customerName == null ? null : Poppins(text: widget.customerName, size: 16.0),
+                    child: widget.customerName == null
+                        ? null
+                        : Poppins(text: widget.customerName, size: 16.0),
                   ),
                   SizedBox(height: 10.0),
                   Divider(height: 1.0, color: Colors.grey.shade200),
@@ -605,7 +781,11 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
             KeyboardVisibilityBuilder(builder: (context, visible) {
               return AnimatedContainer(
                 duration: Duration(milliseconds: 300),
-                height: visible ? 0.0 : (status == "PAID" ? 355.0 : (status == "PENDING" ? 250.0 : 400.0)),
+                height: visible
+                    ? 0.0
+                    : (status == "PAID"
+                        ? 355.0
+                        : (status == "PENDING" ? 250.0 : 400.0)),
                 child: ListView.builder(
                   itemCount: cartItems.length,
                   itemBuilder: (context, index) {
@@ -619,7 +799,8 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
                               height: 60.0,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                border: Border.all(color: Colors.grey.shade200, width: 2),
+                                border: Border.all(
+                                    color: Colors.grey.shade200, width: 2),
                               ),
                               child: CircleAvatar(
                                 backgroundImage: NetworkImage(item["image"]),
@@ -628,7 +809,8 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
                             Flexible(
                               fit: FlexFit.tight,
                               child: ListTile(
-                                contentPadding: EdgeInsets.zero, // Menghapus padding bawaan ListTile
+                                contentPadding: EdgeInsets
+                                    .zero, // Menghapus padding bawaan ListTile
                                 title: Text(item["name"]),
                                 subtitle: Row(
                                   mainAxisSize: MainAxisSize.min,
@@ -637,17 +819,21 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
                                   ],
                                 ),
                                 trailing: Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     GradientText(
-                                      text: "Rp ${widget.format(item["price"].toString())}",
-                                      style: GoogleFonts.poppins(fontSize: 12.0),
+                                      text:
+                                          "Rp ${widget.format(item["price"].toString())}",
+                                      style:
+                                          GoogleFonts.poppins(fontSize: 12.0),
                                     ),
                                     GradientText(
                                       text:
                                           "Rp ${widget.format((int.parse(item["price"].toString()) * int.parse(item["quantity"].toString())).toString())}",
-                                      style: GoogleFonts.poppins(fontSize: 18.0),
+                                      style:
+                                          GoogleFonts.poppins(fontSize: 18.0),
                                     ),
                                   ],
                                 ),
@@ -679,12 +865,15 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Poppins(text: "${widget.getTotalItem()} Pcs", size: 12.0),
+                                Poppins(
+                                    text: "${widget.getTotalItem()} Pcs",
+                                    size: 12.0),
                                 SizedBox(width: 5.0),
                                 Poppins(text: "-", size: 12.0),
                                 SizedBox(width: 5.0),
                                 GradientText(
-                                  text: "Rp ${widget.format(totalPrice.toString())}",
+                                  text:
+                                      "Rp ${widget.format(totalPrice.toString())}",
                                   style: GoogleFonts.poppins(
                                     fontSize: 18.0,
                                     fontWeight: FontWeight.bold,
@@ -698,9 +887,13 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
                         Poppins(text: "Pilih pembayaran", size: 16.0),
                         SizedBox(height: 4.0),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 4.0, vertical: 2.0),
                           decoration: BoxDecoration(
-                            border: Border.all(width: 2.0, color: Colors.grey.shade200, style: BorderStyle.solid),
+                            border: Border.all(
+                                width: 2.0,
+                                color: Colors.grey.shade200,
+                                style: BorderStyle.solid),
                             borderRadius: BorderRadius.circular(50.0),
                           ),
                           child: Row(
@@ -708,7 +901,9 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
                               IconBoxText(
                                 "Cash",
                                 12.0,
-                                color: _paymentMethod == "cash" ? Colors.white : Colors.grey.shade600,
+                                color: _paymentMethod == "cash"
+                                    ? Colors.white
+                                    : Colors.grey.shade600,
                                 boxColor: _paymentMethodColorCash,
                                 onPresses: () {
                                   setState(() {
@@ -721,14 +916,20 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
                                 height: 45.0,
                                 icon: SvgPicture.asset(
                                   "assets/images/icons/payments.svg",
-                                  colorFilter: ColorFilter.mode(_paymentMethod == "cash" ? Colors.white : Colors.grey.shade600, BlendMode.srcIn),
+                                  colorFilter: ColorFilter.mode(
+                                      _paymentMethod == "cash"
+                                          ? Colors.white
+                                          : Colors.grey.shade600,
+                                      BlendMode.srcIn),
                                 ),
                               ),
                               SizedBox(width: 5.0),
                               IconBoxText(
                                 "QRIS",
                                 12.0,
-                                color: _paymentMethod == "qris" ? Colors.white : Colors.grey.shade600,
+                                color: _paymentMethod == "qris"
+                                    ? Colors.white
+                                    : Colors.grey.shade600,
                                 boxColor: _paymentMethodColorQris,
                                 onPresses: () {
                                   setState(() {
@@ -741,7 +942,11 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
                                 height: 45.0,
                                 icon: SvgPicture.asset(
                                   "assets/images/icons/barcode.svg",
-                                  colorFilter: ColorFilter.mode(_paymentMethod == "qris" ? Colors.white : Colors.grey.shade600, BlendMode.srcIn),
+                                  colorFilter: ColorFilter.mode(
+                                      _paymentMethod == "qris"
+                                          ? Colors.white
+                                          : Colors.grey.shade600,
+                                      BlendMode.srcIn),
                                 ),
                               ),
                             ],
@@ -758,7 +963,9 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
                                   _showErrorNeedSelectPaymentMethod();
                                 } else {
                                   _paymentMethod == "cash"
-                                      ? _showCheckoutPopup(totalPrice: totalPrice, transactionId: widget.transactionId)
+                                      ? _showCheckoutPopup(
+                                          totalPrice: totalPrice,
+                                          transactionId: widget.transactionId)
                                       : _showBarcodePopup(total: totalPrice);
                                 }
                               },
@@ -767,19 +974,22 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
                               boxColor: Color(0xff723E29),
                               icon: SvgPicture.asset(
                                 "assets/images/icons/cart.svg",
-                                colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                                colorFilter: ColorFilter.mode(
+                                    Colors.white, BlendMode.srcIn),
                               ),
                             ),
                             IconBoxText(
                               "Batalkan",
                               12.0,
                               onPresses: () {
-                                _confirmCancelOrder(transactionId: widget.transactionId);
+                                _confirmCancelOrder(
+                                    transactionId: widget.transactionId);
                               },
                               height: 40.0,
                               color: Colors.white,
                               boxColor: Colors.red.shade600,
-                              icon: Icon(Icons.cancel_outlined, color: Colors.white),
+                              icon: Icon(Icons.cancel_outlined,
+                                  color: Colors.white),
                             ),
                           ],
                         ),
@@ -803,12 +1013,15 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Poppins(text: "${widget.getTotalItem()} Pcs", size: 12.0),
+                                Poppins(
+                                    text: "${widget.getTotalItem()} Pcs",
+                                    size: 12.0),
                                 SizedBox(width: 5.0),
                                 Poppins(text: "-", size: 12.0),
                                 SizedBox(width: 5.0),
                                 GradientText(
-                                  text: "Rp ${widget.format(totalPrice.toString())}",
+                                  text:
+                                      "Rp ${widget.format(totalPrice.toString())}",
                                   style: GoogleFonts.poppins(
                                     fontSize: 18.0,
                                     fontWeight: FontWeight.bold,
@@ -832,7 +1045,8 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
                               boxColor: Color(0xff723E29),
                               icon: SvgPicture.asset(
                                 "assets/images/icons/cart.svg",
-                                colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                                colorFilter: ColorFilter.mode(
+                                    Colors.white, BlendMode.srcIn),
                               ),
                             ),
                           ],

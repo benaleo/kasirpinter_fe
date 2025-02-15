@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:kasirpinter_fe/services/menu_service.dart';
+import 'package:kasirpinter_fe/services/user_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -21,7 +22,8 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
 
-    MenuService().fetchMenuCategories();
+    _fetchUserInfoWithRetry();
+    _fetchMenuCategoriesWithRetry();
 
     // Initialize the animation controller
     _controller = AnimationController(
@@ -31,6 +33,46 @@ class _SplashScreenState extends State<SplashScreen>
 
     // Start the animation loop
     _animateLogo();
+  }
+
+  // Function to fetch user info with retry mechanism
+  Future<void> _fetchUserInfoWithRetry() async {
+    bool success = false;
+    int retryCount = 0;
+    const maxRetries = 5;
+    while (!success && retryCount < maxRetries) {
+      try {
+        await UserService().fetchUserInfo();
+        success = true;
+      } catch (e) {
+        retryCount++;
+        print("Retry $retryCount: Error fetching user info: $e");
+        await Future.delayed(const Duration(seconds: 2));
+      }
+    }
+    if (!success) {
+      print("Failed to fetch user info after $maxRetries retries.");
+    }
+  }
+
+  // Function to fetch user info with retry mechanism
+  Future<void> _fetchMenuCategoriesWithRetry() async {
+    bool success = false;
+    int retryCount = 0;
+    const maxRetries = 5;
+    while (!success && retryCount < maxRetries) {
+      try {
+        await MenuService().fetchMenuCategories();
+        success = true;
+      } catch (e) {
+        retryCount++;
+        print("Retry $retryCount: Error fetching menu categories: $e");
+        await Future.delayed(const Duration(seconds: 2));
+      }
+    }
+    if (!success) {
+      print("Failed to fetch user info after $maxRetries retries.");
+    }
   }
 
   // Function to animate the logo with a looping effect
@@ -51,7 +93,6 @@ class _SplashScreenState extends State<SplashScreen>
       if (!_isVisible) {
         Navigator.of(context).pushNamed("/dashboard");
       }
-
     });
   }
 
@@ -68,7 +109,8 @@ class _SplashScreenState extends State<SplashScreen>
       body: Center(
         child: AnimatedOpacity(
           opacity: _isVisible ? 1.0 : 0.0, // Toggle opacity between 1.0 and 0.0
-          duration: const Duration(seconds: 1), // Duration of the opacity change
+          duration:
+              const Duration(seconds: 1), // Duration of the opacity change
           child: SvgPicture.asset(
             'assets/images/logo_black.svg', // Path to your SVG image
             width: 100.0, // Adjust the size as needed

@@ -30,7 +30,9 @@ class _PosMenuTabState extends State<PosMenuTab> {
   void updateSelectedCategory(String? categoryName) {
     setState(() {
       selectedCategory = categoryName;
-      futureMenuItems = MenuService().fetchMenuItems(categoryName: categoryName).then((value){
+      futureMenuItems = MenuService()
+          .fetchMenuItems(categoryName: categoryName)
+          .then((value) {
         print("futureMenuItems is : $value");
         return value;
       });
@@ -44,7 +46,7 @@ class _PosMenuTabState extends State<PosMenuTab> {
   void addToCart(Map<String, dynamic> item) {
     setState(() {
       var existingItem = cartItems.firstWhere(
-            (cartItem) => cartItem["name"] == item["name"],
+        (cartItem) => cartItem["name"] == item["name"],
         orElse: () => {},
       );
       if (existingItem.isNotEmpty) {
@@ -175,4 +177,3 @@ class _PosMenuTabState extends State<PosMenuTab> {
     );
   }
 }
-

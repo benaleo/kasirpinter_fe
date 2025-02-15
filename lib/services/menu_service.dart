@@ -47,13 +47,19 @@ class MenuService {
       throw Exception("Token not found");
     }
     try {
+      final String _baseUrl = dotenv.get('BASE_URL');
+      final String _mainUrl = 'api/v1/user';
+
+      String url = '$_baseUrl/$_mainUrl/menu/category';
       final response = await http.get(
-        Uri.parse('$_baseUrl/$_mainUrl/menu/category'),
+        Uri.parse(url),
         headers: {
           'accept': '*/*',
           'Authorization': 'Bearer $token',
         },
       );
+
+      print("url is :" + url);
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
         final List<dynamic> categories = responseData['data'];
