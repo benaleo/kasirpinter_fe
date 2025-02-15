@@ -169,7 +169,11 @@ class _RowListCategoryMenuState extends State<RowListCategoryMenu> {
         } else {
           // Gunakan data yang berhasil di-fetch
           final List<Map<String, dynamic>> fetchedCategories = snapshot.data!;
-          final List<String> categoryNames = fetchedCategories.map((category) => category['name'] as String).toList();
+          final List<String> categoryNames = fetchedCategories
+              .map((category) => (category['name'] as String))
+              .map((name) => name[0].toUpperCase() + name.substring(1))
+              .toList();
+
 
           return Container(
             height: 30.0, // Tinggi tetap untuk ListView horizontal

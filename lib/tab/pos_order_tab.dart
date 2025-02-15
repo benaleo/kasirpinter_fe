@@ -28,6 +28,7 @@ class _PosOrderTabState extends State<PosOrderTab> {
   Map<String, dynamic>? selectedOrder;
   String _paymentMethod = "";
   String _paymentStatus = "";
+  int _selectedFilterIndex = -1;
 
   // Fungsi untuk mendapatkan daftar pesanan yang difilter
   List<Map<String, dynamic>> getFilteredOrders() {
@@ -81,7 +82,7 @@ class _PosOrderTabState extends State<PosOrderTab> {
           child: Row(
             children: [
               Expanded(
-                flex: selectedOrder == null ? 1 : 2, // TODO why not be null after closeSide
+                flex: selectedOrder == null ? 1 : 2,
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
                   decoration: BoxDecoration(
@@ -108,10 +109,12 @@ class _PosOrderTabState extends State<PosOrderTab> {
                               setState(() {
                                 _paymentMethod = "";
                                 _paymentStatus = "";
+                                _selectedFilterIndex = 0;
                                 futureTransactions =
                                     TransactionService().getTransactions(paymentMethod: _paymentMethod, paymentStatus: _paymentStatus);
                               });
                             },
+                            isActive: _selectedFilterIndex == 0,
                           ),
                           OrderFilterCategory(
                             text: "Lunas",
@@ -119,10 +122,12 @@ class _PosOrderTabState extends State<PosOrderTab> {
                               setState(() {
                                 _paymentMethod = "";
                                 _paymentStatus = "PAID";
+                                _selectedFilterIndex = 1;
                                 futureTransactions =
                                     TransactionService().getTransactions(paymentMethod: _paymentMethod, paymentStatus: _paymentStatus);
                               });
                             },
+                            isActive: _selectedFilterIndex == 1,
                           ),
                           OrderFilterCategory(
                             text: "Nanti",
@@ -130,10 +135,25 @@ class _PosOrderTabState extends State<PosOrderTab> {
                               setState(() {
                                 _paymentMethod = "";
                                 _paymentStatus = "PENDING";
+                                _selectedFilterIndex = 2;
                                 futureTransactions =
                                     TransactionService().getTransactions(paymentMethod: _paymentMethod, paymentStatus: _paymentStatus);
                               });
                             },
+                            isActive: _selectedFilterIndex == 2,
+                          ),
+                          OrderFilterCategory(
+                            text: "Batal",
+                            onPressed: () {
+                              setState(() {
+                                _paymentMethod = "";
+                                _paymentStatus = "CANCELLED";
+                                _selectedFilterIndex = 3;
+                                futureTransactions =
+                                    TransactionService().getTransactions(paymentMethod: _paymentMethod, paymentStatus: _paymentStatus);
+                              });
+                            },
+                            isActive: _selectedFilterIndex == 3,
                           ),
                           OrderFilterCategory(
                             text: "Cash",
@@ -141,10 +161,12 @@ class _PosOrderTabState extends State<PosOrderTab> {
                               setState(() {
                                 _paymentMethod = "CASH";
                                 _paymentStatus = "";
+                                _selectedFilterIndex = 4;
                                 futureTransactions =
                                     TransactionService().getTransactions(paymentMethod: _paymentMethod, paymentStatus: _paymentStatus);
                               });
                             },
+                            isActive: _selectedFilterIndex == 4,
                           ),
                           OrderFilterCategory(
                             text: "QRIS",
@@ -152,10 +174,12 @@ class _PosOrderTabState extends State<PosOrderTab> {
                               setState(() {
                                 _paymentMethod = "QRIS";
                                 _paymentStatus = "";
+                                _selectedFilterIndex = 5;
                                 futureTransactions =
                                     TransactionService().getTransactions(paymentMethod: _paymentMethod, paymentStatus: _paymentStatus);
                               });
                             },
+                            isActive: _selectedFilterIndex == 5,
                           ),
                         ],
                       ),
@@ -180,11 +204,98 @@ class _PosOrderTabState extends State<PosOrderTab> {
                                       child: Card(
                                         color: order['payment_status'] == 'Lunas' ? Colors.white : Colors.grey[300],
                                         child: ListTile(
-                                          title: Text('No. Pesanan: ${order['order_no']}'),
-                                          subtitle: Text('Nama: ${order['customer']}\nTotal: Rp. ${order['total_price']}'),
-                                          trailing: Chip(
-                                            label: Text(order['payment_status']),
-                                            backgroundColor: order['payment_status'] == 'Lunas' ? Colors.green : Colors.red,
+                                          title: Row(
+                                            children: [
+                                              Poppins(
+                                                text: 'No. Pesanan: ',
+                                                size: 12,
+                                                color: Colors.grey.shade600,
+                                              ),
+                                              PoppinsBold(
+                                                text: '${order['order_no']}',
+                                                size: 14,
+                                              ),
+                                            ],
+                                          ),
+                                          subtitle: Column(
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Poppins(
+                                                    text: 'Nama pelanggan: ',
+                                                    size: 12,
+                                                    color: Colors.grey.shade600,
+                                                  ),
+                                                  PoppinsBold(
+                                                    text: '${order['customer']}',
+                                                    size: 14,
+                                                  ),
+                                                ],
+                                              ),
+                                              Row(
+                                                children: [
+                                                  Poppins(
+                                                    text: 'Jml item: ',
+                                                    size: 12,
+                                                    color: Colors.grey.shade600,
+                                                  ),
+                                                  PoppinsBold(
+                                                    text: (order['details'] as List<dynamic>)
+                                                        .map<int>(
+                                                            (item) => (item['quantity'] as int? ?? 0)) // Ensure int type and default to 0 if null
+                                                        .fold<int>(0, (sum, quantity) => sum + quantity) // Sum all quantities
+                                                        .toString(),
+                                                    size: 14,
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                          trailing: SizedBox(
+                                            width: 150.0,
+                                            child: Column(
+                                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                              crossAxisAlignment: CrossAxisAlignment.end,
+                                              children: [
+                                                Row(
+                                                  spacing: 4.0,
+                                                  mainAxisAlignment: MainAxisAlignment.end,
+                                                  children: [
+                                                    Center(
+                                                      child: Container(
+                                                        padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                                                        decoration: BoxDecoration(
+                                                          color: order['payment_status'] == "PAID"
+                                                              ? Color(0xffE7772D)
+                                                              : (order['payment_status'] == "PENDING" ? Colors.transparent : Colors.red),
+                                                          borderRadius: BorderRadius.circular(10.0),
+                                                          border: order['payment_status'] == "PENDING"
+                                                              ? Border.all(color: Color(0xffE7772D), width: 2.0)
+                                                              : (order['payment_status'] == "PAID" ? Border.all(color: Color(0xffE7772D), width: 2.0) : Border.all(color: Colors.red, width: 2.0)),
+                                                        ),
+                                                        child: Poppins(
+                                                            text: order['payment_status'] == "PAID"
+                                                                ? "Lunas"
+                                                                : (order['payment_status'] == "PENDING" ? "Nanti" : "Batal"),
+                                                            size: 12,
+                                                            color: order['payment_status'] == "PENDING" ? Color(0xffE7772D) : Colors.white),
+                                                      ),
+                                                    ),
+                                                    if (order['payment_status'] == 'PAID')
+                                                      Center(
+                                                        child: Container(
+                                                          decoration: BoxDecoration(
+                                                            borderRadius: BorderRadius.circular(10.0),
+                                                            border: Border.all(color: Color(0XFF369AEC), width: 1.0),
+                                                          ),
+                                                          padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                                                          child: Poppins(text: order['payment_method'], size: 12, color: Color(0XFF369AEC)),
+                                                        ),
+                                                      )
+                                                  ],
+                                                )
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -224,22 +335,46 @@ class _PosOrderTabState extends State<PosOrderTab> {
   }
 }
 
-class OrderFilterCategory extends StatelessWidget {
+class OrderFilterCategory extends StatefulWidget {
   final String text;
   final VoidCallback onPressed;
+  final bool isActive;
 
-  const OrderFilterCategory({super.key, required this.text, required this.onPressed});
+  const OrderFilterCategory({
+    super.key,
+    required this.text,
+    required this.onPressed,
+    required this.isActive,
+  });
 
+  @override
+  _OrderFilterCategoryState createState() => _OrderFilterCategoryState();
+}
+
+class _OrderFilterCategoryState extends State<OrderFilterCategory> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: 35.0,
       padding: EdgeInsets.symmetric(horizontal: 5.0, vertical: 2.0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(5.0),
       ),
       child: ElevatedButton(
-        onPressed: onPressed,
-        child: Text(text),
+        onPressed: widget.onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: widget.isActive
+              ? Color(0xffE7772D) // Active color
+              : Colors.grey.shade200, // Inactive color
+          foregroundColor: widget.isActive
+              ? Colors.white // Active text color
+              : Colors.black, // Inactive text color
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          elevation: 0.0,
+        ),
+        child: Text(widget.text),
       ),
     );
   }
@@ -345,6 +480,36 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
     );
   }
 
+  void _confirmCancelOrder({required String transactionId}) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return ConfirmDialog(
+          onPressed: () async {
+            final TransactionService transactionService = TransactionService();
+            final response = await transactionService.cancelTransaction(transactionId);
+            if (response['success']) {
+              print("Berhasil membatalkan pesanan print toast");
+              ToastCustom(
+                "Berhasil membatalkan pesanan",
+                Colors.green,
+              );
+              setState(() {
+                // Update any necessary state variables
+              });
+            } else {
+              print("Error: ${response['message']}");
+            }
+            Navigator.pop(context);
+            Navigator.of(context).popUntil((route) => route.isFirst);
+            Navigator.of(context).pushNamed("/pos-order");
+          },
+          text: "Apakah kamu yakin akan menghapus detail pesanan ini?",
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     double widthDevice = MediaQuery.of(context).size.width;
@@ -388,7 +553,7 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
                   icon: Icon(Icons.close),
                   onPressed: () {
                     setState(() {
-                      widget.close(); // TODO run the close side
+                      widget.close();
                     });
                     ;
                   },
@@ -486,7 +651,7 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
             }),
             Spacer(),
             Divider(),
-            if (status != "PAID")
+            if (status == "PENDING")
               KeyboardVisibilityBuilder(
                 builder: (context, visible) {
                   return AnimatedContainer(
@@ -592,6 +757,17 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
                                 colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
                               ),
                             ),
+                            IconBoxText(
+                              "Batalkan",
+                              12.0,
+                              onPresses: () {
+                                _confirmCancelOrder(transactionId: widget.transactionId);
+                              },
+                              height: 40.0,
+                              color: Colors.white,
+                              boxColor: Colors.red.shade600,
+                              icon: Icon(Icons.cancel_outlined, color: Colors.white),
+                            ),
                           ],
                         ),
                       ],
@@ -599,7 +775,7 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
                   );
                 },
               ),
-            if (status != "PENDING")
+            if (status == "PAID")
               KeyboardVisibilityBuilder(
                 builder: (context, visible) {
                   return AnimatedContainer(

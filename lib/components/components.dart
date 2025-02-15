@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kasirpinter_fe/services/auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -45,12 +46,7 @@ class Poppins extends StatelessWidget {
   final TextAlign? textAlign;
   final color;
 
-  const Poppins(
-      {super.key,
-      required this.text,
-      required this.size,
-      this.textAlign,
-      this.color});
+  const Poppins({super.key, required this.text, required this.size, this.textAlign, this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -71,12 +67,7 @@ class PoppinsBold extends StatelessWidget {
   final TextAlign? textAlign;
   final color;
 
-  const PoppinsBold(
-      {super.key,
-      required this.text,
-      required this.size,
-      this.textAlign,
-      this.color});
+  const PoppinsBold({super.key, required this.text, required this.size, this.textAlign, this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -139,18 +130,14 @@ class ElevatedButtonCustom extends StatelessWidget {
         onPressed: onPressed != null
             ? onPressed
             : () {
-                route != null
-                    ? Navigator.of(context).pushNamed(route ?? "")
-                    : null;
+                route != null ? Navigator.of(context).pushNamed(route ?? "") : null;
               },
         style: ElevatedButton.styleFrom(
           minimumSize: Size(boxSize ?? double.infinity, 50.0),
           backgroundColor: bgColor != null ? bgColor : Color(0xFF723E29),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
         ),
-        child: child ??
-            Sans(text, size, color: color != null ? color : Colors.black),
+        child: child ?? Sans(text, size, color: color != null ? color : Colors.black),
       ),
     );
   }
@@ -199,15 +186,12 @@ class _TextInputCustomState extends State<TextInputCustom> {
       height: widget.height != null ? widget.height : 50.0,
       child: TextField(
         controller: widget.controller,
-        obscureText: widget.isPassword != null && widget.isPassword!
-            ? _obscureText
-            : false,
+        obscureText: widget.isPassword != null && widget.isPassword! ? _obscureText : false,
         decoration: InputDecoration(
           labelText: widget.text,
           suffixIcon: widget.isPassword != null && widget.isPassword!
               ? IconButton(
-                  icon: Icon(
-                      _obscureText ? Icons.visibility : Icons.visibility_off),
+                  icon: Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
                   onPressed: () {
                     setState(() {
                       _obscureText = !_obscureText;
@@ -246,8 +230,7 @@ class GradientText extends StatelessWidget {
           colors: gradientColors,
         ).createShader(bounds);
       },
-      blendMode:
-          BlendMode.srcIn, // Tambahkan ini agar ShaderMask bekerja dengan baik
+      blendMode: BlendMode.srcIn, // Tambahkan ini agar ShaderMask bekerja dengan baik
       child: Text(
         text,
         style: style.copyWith(color: Colors.white), // Pastikan ada warna awal
@@ -279,8 +262,7 @@ class _DrawerElementState extends State<DrawerElement> {
   Future<void> _onLogout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('token'); // Hapus token
-    Navigator.pushNamedAndRemoveUntil(
-        context, "/login", (route) => false); // Kembali ke login
+    Navigator.pushNamedAndRemoveUntil(context, "/login", (route) => false); // Kembali ke login
   }
 
   @override
@@ -425,13 +407,7 @@ class IconBoxText extends StatelessWidget {
   final double? height;
   final onPresses;
 
-  const IconBoxText(this.text, this.size,
-      {super.key,
-      this.icon,
-      this.color,
-      this.boxColor,
-      this.height,
-      this.onPresses});
+  const IconBoxText(this.text, this.size, {super.key, this.icon, this.color, this.boxColor, this.height, this.onPresses});
 
   @override
   Widget build(BuildContext context) {
@@ -457,10 +433,7 @@ class IconBoxText extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              icon != null
-                  ? icon
-                  : Icon(Icons.payment_outlined,
-                      color: color != null ? color : Colors.grey.shade600),
+              icon != null ? icon : Icon(Icons.payment_outlined, color: color != null ? color : Colors.grey.shade600),
               SizedBox(width: 10.0),
               PoppinsBold(
                 text: text,
@@ -494,11 +467,7 @@ class StackCloseButton extends StatelessWidget {
           splashFactory: NoSplash.splashFactory,
         ),
         child: Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-                shape: BoxShape.circle, color: Colors.grey.shade200),
-            child: Icon(Icons.close_outlined)),
+            width: 40, height: 40, decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.grey.shade200), child: Icon(Icons.close_outlined)),
       ),
     );
   }
@@ -525,8 +494,7 @@ class _ConfirmDialogState extends State<ConfirmDialog> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20.0),
       ),
-      title: Text("Konfirmasi",
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+      title: Text("Konfirmasi", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
       content: Text(widget.text, style: TextStyle(fontSize: 14)),
       actions: [
         TextButton(
@@ -581,5 +549,29 @@ class InformationDialog extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class ToastCustom extends StatelessWidget {
+  final String text;
+  final Color color;
+  final Color? textColor;
+
+  const ToastCustom(this.text, this.color, {super.key, this.textColor});
+
+  @override
+  Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Fluttertoast.showToast(
+        msg: text,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: color,
+        textColor: textColor != null ? textColor : Colors.white,
+        fontSize: 16.0,
+      );
+    });
+    return Container(); // Return an empty container or any other widget
   }
 }
