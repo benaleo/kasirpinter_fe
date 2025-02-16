@@ -27,8 +27,8 @@ class UserService {
 
       print("url is: $url");
       print("Token is: $token");
-      print("Response status: ${response.statusCode}");
-      print("Response body: ${response.body}");
+      // print("Response status: ${response.statusCode}");
+      // print("Response body: ${response.body}");
 
       final data = json.decode(response.body);
       if (data['success']) {
