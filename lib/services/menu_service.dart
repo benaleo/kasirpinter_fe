@@ -11,13 +11,16 @@ class MenuService {
   // Key to store menu categories in SharedPreferences
   static const String _menuCategoriesKey = 'saved_menu_categories';
 
-  Future<List<Map<String, dynamic>>> fetchMenuItems({String? categoryName}) async {
+  Future<List<Map<String, dynamic>>> fetchMenuItems(
+      {String? categoryName}) async {
     final AuthService authService = AuthService();
     final String? token = await authService.getToken();
     if (token == null) {
       throw Exception("Token not found");
     }
-    String url = '$_baseUrl/$_mainUrl/menu?pages=0&limit=1000&sortBy=id&direction=asc';
+
+    String url =
+        '$_baseUrl/$_mainUrl/menu?pages=0&limit=1000&sortBy=id&direction=asc';
     if (categoryName != null && categoryName.isNotEmpty) {
       if (categoryName != 'all') {
         url += '&category=$categoryName';

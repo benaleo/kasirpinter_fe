@@ -6,6 +6,8 @@ import 'package:kasirpinter_fe/services/auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
+import 'package:skeleton_text/skeleton_text.dart';
+
 class SansBold extends StatelessWidget {
   final text;
   final double size;
@@ -111,6 +113,7 @@ class ElevatedButtonCustom extends StatelessWidget {
   final double? boxHeight;
   final Widget? child;
   final double? width;
+  final BoxDecoration? decoration;
 
   const ElevatedButtonCustom({
     super.key,
@@ -124,14 +127,15 @@ class ElevatedButtonCustom extends StatelessWidget {
     this.boxHeight,
     this.child,
     this.width,
+    this.decoration,
   });
 
   @override
   Widget build(BuildContext context) {
-    double widthDevice = MediaQuery.of(context).size.width;
     return Container(
       width: width != null ? width : null,
       height: boxHeight ?? 50.0,
+      decoration: decoration,
       child: ElevatedButton(
         onPressed: onPressed != null
             ? onPressed
@@ -628,5 +632,25 @@ class ToastCustom extends StatelessWidget {
       );
     });
     return Container(); // Return an empty container or any other widget
+  }
+}
+
+class SkeletonShimmer extends StatelessWidget {
+  final double width;
+  final double height;
+
+  const SkeletonShimmer(this.width, this.height, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SkeletonAnimation(
+      child: Container(
+        width: width,
+        height: height,
+        color: Colors.grey[300],
+      ),
+      shimmerColor: Colors.white54,
+      borderRadius: BorderRadius.circular(10.0),
+    );
   }
 }

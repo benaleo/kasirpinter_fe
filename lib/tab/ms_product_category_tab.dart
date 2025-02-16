@@ -16,8 +16,12 @@ class _MsProductCategoryTabState extends State<MsProductCategoryTab> {
   int _currentPage = 0;
   String _searchKeyword = '';
   Timer? _debounce;
+  bool _isLoading = true;
 
   Future<void> _fetchCategories() async {
+    setState(() {
+      _isLoading = true;
+    });
     try {
       final response = await _service.fetchProductCategories(page: _currentPage, keyword: _searchKeyword);
       setState(() {
@@ -25,6 +29,10 @@ class _MsProductCategoryTabState extends State<MsProductCategoryTab> {
       });
     } catch (e) {
       print('Error fetching categories: $e');
+    }finally{
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -205,74 +213,70 @@ class _MsProductCategoryTabState extends State<MsProductCategoryTab> {
               ),
               SizedBox(height: 20.0),
               Expanded(
-                child: _categories.isEmpty
-                    ? Center(child: CircularProgressIndicator())
-                    : SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Container(
-                          width: widthDevice,
-                          child: DataTable(
-                            headingRowColor: MaterialStateColor.resolveWith((states) => Color(0xFF464646)),
-                            columnSpacing: 20.0,
-                            columns: [
-                              DataColumn(
-                                label: PoppinsBold(text: 'ID', size: 16.0, color: Colors.white),
+                child: SingleChildScrollView(
+                  child: Container(
+                    width: widthDevice,
+                    child: DataTable(
+                      headingRowColor: MaterialStateColor.resolveWith((states) => Color(0xFF464646)),
+                      columnSpacing: 20.0,
+                      columns: [
+                        DataColumn(label: PoppinsBold(text: 'ID', size: 16.0, color: Colors.white)),
+                        DataColumn(label: PoppinsBold(text: 'Name', size: 16.0, color: Colors.white)),
+                        DataColumn(label: PoppinsBold(text: 'Status', size: 16.0, color: Colors.white)),
+                        DataColumn(label: PoppinsBold(text: 'Type', size: 16.0, color: Colors.white)),
+                        DataColumn(label: PoppinsBold(text: 'Total Data', size: 16.0, color: Colors.white)),
+                        DataColumn(label: PoppinsBold(text: 'Action', size: 16.0, color: Colors.white)),
+                      ],
+                      rows: List<DataRow>.generate(
+                        _isLoading ? 5 : _categories.length,
+                        (index) {
+                          if (_isLoading) {
+                            return DataRow(cells: <DataCell>[
+                              DataCell(SkeletonShimmer(50.0, 20.0)),
+                              DataCell(SkeletonShimmer(100.0, 20.0)),
+                              DataCell(SkeletonShimmer(100.0, 20.0)),
+                              DataCell(SkeletonShimmer(100.0, 20.0)),
+                              DataCell(SkeletonShimmer(100.0, 20.0)),
+                              DataCell(SkeletonShimmer(50.0, 20.0)),
+                            ]);
+                          } else {
+                            final category = _categories[index];
+                            return DataRow(
+                              color: MaterialStateColor.resolveWith(
+                                (states) => index.isOdd ? Colors.grey.shade50 : Colors.white,
                               ),
-                              DataColumn(
-                                label: PoppinsBold(text: 'Name', size: 16.0, color: Colors.white),
-                              ),
-                              DataColumn(
-                                label: PoppinsBold(text: 'Status', size: 16.0, color: Colors.white),
-                              ),
-                              DataColumn(
-                                label: PoppinsBold(text: 'Type', size: 16.0, color: Colors.white),
-                              ),
-                              DataColumn(
-                                label: PoppinsBold(text: 'Total Data', size: 16.0, color: Colors.white),
-                              ),
-                              DataColumn(
-                                label: PoppinsBold(text: 'Action', size: 16.0, color: Colors.white),
-                              ),
-                            ],
-                            rows: List<DataRow>.generate(
-                              _categories.length,
-                              (index) {
-                                final category = _categories[index];
-                                return DataRow(
-                                  color: MaterialStateColor.resolveWith(
-                                    (states) => index.isOdd ? Colors.grey.shade50 : Colors.white,
-                                  ),
-                                  cells: [
-                                    DataCell(Poppins(text: (index + 1 + _currentPage * 10).toString(), size: 14)),
-                                    DataCell(Poppins(text: category['name'], size: 14)),
-                                    DataCell(Poppins(text: category['isActive'] ? 'Active' : 'Inactive', size: 14)),
-                                    DataCell(Poppins(text: 'Menu', size: 14)), // Assuming type is always 'Menu'
-                                    DataCell(Poppins(text: '${category['totalProducts']} item', size: 14)),
-                                    DataCell(
-                                      Row(
-                                        children: [
-                                          IconButton(
-                                            icon: Icon(Icons.visibility),
-                                            onPressed: () {},
-                                          ),
-                                          IconButton(
-                                            icon: Icon(Icons.edit),
-                                            onPressed: () {},
-                                          ),
-                                          IconButton(
-                                            icon: Icon(Icons.delete),
-                                            onPressed: () {},
-                                          ),
-                                        ],
+                              cells: [
+                                DataCell(Poppins(text: (index + 1 + _currentPage * 10).toString(), size: 14)),
+                                DataCell(Poppins(text: category['name'], size: 14)),
+                                DataCell(Poppins(text: category['isActive'] ? 'Active' : 'Inactive', size: 14)),
+                                DataCell(Poppins(text: 'Menu', size: 14)), // Assuming type is always 'Menu'
+                                DataCell(Poppins(text: '${category['totalProducts']} item', size: 14)),
+                                DataCell(
+                                  Row(
+                                    children: [
+                                      IconButton(
+                                        icon: Icon(Icons.visibility),
+                                        onPressed: () {},
                                       ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            ),
-                          ),
-                        ),
+                                      IconButton(
+                                        icon: Icon(Icons.edit),
+                                        onPressed: () {},
+                                      ),
+                                      IconButton(
+                                        icon: Icon(Icons.delete),
+                                        onPressed: () {},
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            );
+                          }
+                        },
                       ),
+                    ),
+                  ),
+                ),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

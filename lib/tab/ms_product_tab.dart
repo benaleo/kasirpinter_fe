@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:kasirpinter_fe/components/components.dart';
+import 'package:skeleton_text/skeleton_text.dart';
+
 import '../services/ms_product_service.dart';
 
 class MsProductTab extends StatefulWidget {
@@ -16,16 +18,32 @@ class _MsProductTabState extends State<MsProductTab> {
   int _currentPage = 0;
   String _searchKeyword = '';
   Timer? _debounce;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchProducts();
+  }
 
   Future<void> _fetchProducts() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
       final response = await _service.fetchProducts(page: _currentPage, keyword: _searchKeyword);
       setState(() {
         _products = List<Map<String, dynamic>>.from(response['data']['result']);
+        _isLoading = false;
       });
       print('Fetched ${_products.length} products');
+      print('Response: $response');
     } catch (e) {
       print('Error fetching products: $e');
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -75,8 +93,8 @@ class _MsProductTabState extends State<MsProductTab> {
                     bgColor: Colors.blue,
                     color: Colors.white,
                     boxHeight: 40.0,
-                    onPressed: (){
-
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/setting/product-list/add');
                     },
                   ),
                 ],
@@ -118,23 +136,61 @@ class _MsProductTabState extends State<MsProductTab> {
                         DataColumn(label: PoppinsBold(text: 'Harga Jual', size: 16.0, color: Colors.white)),
                         DataColumn(label: PoppinsBold(text: 'Action', size: 16.0, color: Colors.white)),
                       ],
-                      rows: _products.map((product) {
-                        return DataRow(cells: <DataCell>[
-                          DataCell(Poppins(text: product['id'] ?? '', size: 16.0,)),
-                          DataCell(Poppins(text: product['name'] ?? '', size: 16.0,)),
-                          DataCell(Poppins(text: product['categoryName'] ?? '', size: 16.0,)),
-                          DataCell(Poppins(text: product['isActive'] ? 'Active' : 'Inactive', size: 16.0,)),
-                          DataCell(Poppins(text: product['isUpSale'] ? 'Yes' : 'No', size: 16.0,)),
-                          DataCell(Poppins(text: product['hppPrice'].toString(), size: 16.0,)),
-                          DataCell(Poppins(text: product['price'].toString(), size: 16.0,)),
-                          DataCell(IconButton(
-                            icon: Icon(Icons.edit),
-                            onPressed: () {
-                              // Implement edit functionality
-                            },
-                          )),
-                        ]);
-                      }).toList(),
+                      rows: List<DataRow>.generate(
+                        _isLoading ? 5 : _products.length,
+                        (index) {
+                          if (_isLoading) {
+                            return DataRow(cells: <DataCell>[
+                              DataCell(SkeletonShimmer(50.0, 20.0)),
+                              DataCell(SkeletonShimmer(100.0, 20.0)),
+                              DataCell(SkeletonShimmer(100.0, 20.0)),
+                              DataCell(SkeletonShimmer(100.0, 20.0)),
+                              DataCell(SkeletonShimmer(100.0, 20.0)),
+                              DataCell(SkeletonShimmer(100.0, 20.0)),
+                              DataCell(SkeletonShimmer(100.0, 20.0)),
+                              DataCell(SkeletonShimmer(50.0, 20.0)),
+                            ]);
+                          } else {
+                            final product = _products[index];
+                            return DataRow(cells: <DataCell>[
+                              DataCell(Poppins(
+                                text: (index + 1 + _currentPage * 10).toString(),
+                                size: 16.0,
+                              )),
+                              DataCell(Poppins(
+                                text: product['name'] ?? '',
+                                size: 16.0,
+                              )),
+                              DataCell(Poppins(
+                                text: product['categoryName'] ?? '',
+                                size: 16.0,
+                              )),
+                              DataCell(Poppins(
+                                text: product['isActive'] == true ? 'Aktif' : 'Tidak Aktif',
+                                size: 16.0,
+                              )),
+                              DataCell(Poppins(
+                                text: product['isUpSale'] == true ? 'Aktif' : 'Tidak Aktif',
+                                size: 16.0,
+                              )),
+                              DataCell(Poppins(
+                                text: product['hppPrice'] != 0 ? "Rp. ${product['hppPrice'].toString()}" : '0',
+                                size: 16.0,
+                              )),
+                              DataCell(Poppins(
+                                text: product['price'] != 0 ? "Rp. ${product['price'].toString()}" : '0',
+                                size: 16.0,
+                              )),
+                              DataCell(IconButton(
+                                icon: Icon(Icons.edit),
+                                onPressed: () {
+                                  // Implement edit functionality
+                                },
+                              )),
+                            ]);
+                          }
+                        },
+                      ).toList(),
                     ),
                   ),
                 ),

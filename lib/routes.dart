@@ -4,6 +4,8 @@ import 'package:kasirpinter_fe/tab/auth_change_password.dart';
 import 'package:kasirpinter_fe/tab/auth_forgot_password_tab.dart';
 import 'package:kasirpinter_fe/tab/auth_login_tab.dart';
 import 'package:kasirpinter_fe/tab/auth_otp_tab.dart';
+import 'package:kasirpinter_fe/tab/ms_product_form_tab.dart';
+import 'package:kasirpinter_fe/tab/ms_product_form_tab.dart';
 import 'package:kasirpinter_fe/tab/ms_product_tab.dart';
 import 'package:kasirpinter_fe/tab/ms_product_category_tab.dart';
 import 'package:kasirpinter_fe/tab/pos_dashboard_tab.dart';
@@ -155,6 +157,20 @@ class Routes {
             },
           ),
         );
+      case '/setting/product-list/add':
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => LayoutBuilder(
+            builder: (context, constraits) {
+              if (constraits.maxWidth > 800) {
+                return MsProductFormTab();
+              } else {
+                return MsProductFormTab();
+              }
+            },
+          ),
+        );
+
       case '/setting/product':
         return MaterialPageRoute(
           settings: settings,
