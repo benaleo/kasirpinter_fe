@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:kasirpinter_fe/components/components.dart';
+import 'package:kasirpinter_fe/tab/ms_product_form_tab.dart';
 import 'package:skeleton_text/skeleton_text.dart';
 
 import '../services/ms_product_service.dart';
@@ -32,7 +33,8 @@ class _MsProductTabState extends State<MsProductTab> {
     });
 
     try {
-      final response = await _service.fetchProducts(page: _currentPage, keyword: _searchKeyword);
+      final response = await _service.fetchProducts(
+          page: _currentPage, keyword: _searchKeyword);
       setState(() {
         _products = List<Map<String, dynamic>>.from(response['data']['result']);
         _isLoading = false;
@@ -57,6 +59,64 @@ class _MsProductTabState extends State<MsProductTab> {
     });
   }
 
+  void _popupDeleteProduct(product) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ConfirmDialog(
+          onPressed: () async {
+            setState(() {
+              _isLoading = true;
+            });
+            try {
+              final MsProductService service = MsProductService();
+              final response = await service.deleteProduct(product['id']);
+              print('Response after delete: $response');
+              if (response.success) {
+                Fluttertoast.showToast(
+                  msg: "Berhasil menghapus produk!",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.green,
+                  textColor: Colors.white,
+                  fontSize: 16.0,
+                );
+                _fetchProducts();
+              } else {
+                Fluttertoast.showToast(
+                  msg: "Gagal menghapus produk!",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0,
+                );
+              }
+            } catch (e) {
+              print('Failed to delete product: $e');
+              Fluttertoast.showToast(
+                msg: "Gagal menghapus produk!",
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.BOTTOM,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0,
+              );
+            } finally {
+              setState(() {
+                _isLoading = false;
+              });
+            }
+          },
+          text: "Apakah kamu yakin akan menghapus produk ini?",
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     double widthDevice = MediaQuery.of(context).size.width;
@@ -76,16 +136,20 @@ class _MsProductTabState extends State<MsProductTab> {
           ),
         ),
         drawer: DrawerElement(),
-        backgroundColor: Colors.white,
-        body: Padding(
+        backgroundColor: Colors.grey[200],
+        body: Container(
+          margin: EdgeInsets.all(20.0),
           padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20.0), color: Colors.white),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  PoppinsBold(text: "Daftar Produk", size: 24.0, color: Colors.black),
+                  PoppinsBold(
+                      text: "Daftar Produk", size: 24.0, color: Colors.black),
                   ElevatedButtonCustom(
                     text: "Tambah",
                     size: 16.0,
@@ -124,17 +188,44 @@ class _MsProductTabState extends State<MsProductTab> {
                   child: Container(
                     width: widthDevice,
                     child: DataTable(
-                      headingRowColor: MaterialStateColor.resolveWith((states) => Color(0xFF464646)),
+                      headingRowColor: MaterialStateColor.resolveWith(
+                          (states) => Color(0xFF464646)),
                       columnSpacing: 20.0,
                       columns: const <DataColumn>[
-                        DataColumn(label: PoppinsBold(text: 'ID', size: 16.0, color: Colors.white)),
-                        DataColumn(label: PoppinsBold(text: 'Nama', size: 16.0, color: Colors.white)),
-                        DataColumn(label: PoppinsBold(text: 'Kategori', size: 16.0, color: Colors.white)),
-                        DataColumn(label: PoppinsBold(text: 'Status', size: 16.0, color: Colors.white)),
-                        DataColumn(label: PoppinsBold(text: 'Upsales', size: 16.0, color: Colors.white)),
-                        DataColumn(label: PoppinsBold(text: 'HPP', size: 16.0, color: Colors.white)),
-                        DataColumn(label: PoppinsBold(text: 'Harga Jual', size: 16.0, color: Colors.white)),
-                        DataColumn(label: PoppinsBold(text: 'Action', size: 16.0, color: Colors.white)),
+                        DataColumn(
+                            label: PoppinsBold(
+                                text: 'ID', size: 16.0, color: Colors.white)),
+                        DataColumn(
+                            label: PoppinsBold(
+                                text: 'Nama', size: 16.0, color: Colors.white)),
+                        DataColumn(
+                            label: PoppinsBold(
+                                text: 'Kategori',
+                                size: 16.0,
+                                color: Colors.white)),
+                        DataColumn(
+                            label: PoppinsBold(
+                                text: 'Status',
+                                size: 16.0,
+                                color: Colors.white)),
+                        DataColumn(
+                            label: PoppinsBold(
+                                text: 'Upsales',
+                                size: 16.0,
+                                color: Colors.white)),
+                        DataColumn(
+                            label: PoppinsBold(
+                                text: 'HPP', size: 16.0, color: Colors.white)),
+                        DataColumn(
+                            label: PoppinsBold(
+                                text: 'Harga Jual',
+                                size: 16.0,
+                                color: Colors.white)),
+                        DataColumn(
+                            label: PoppinsBold(
+                                text: 'Action',
+                                size: 16.0,
+                                color: Colors.white)),
                       ],
                       rows: List<DataRow>.generate(
                         _isLoading ? 5 : _products.length,
@@ -154,7 +245,8 @@ class _MsProductTabState extends State<MsProductTab> {
                             final product = _products[index];
                             return DataRow(cells: <DataCell>[
                               DataCell(Poppins(
-                                text: (index + 1 + _currentPage * 10).toString(),
+                                text:
+                                    (index + 1 + _currentPage * 10).toString(),
                                 size: 16.0,
                               )),
                               DataCell(Poppins(
@@ -166,26 +258,51 @@ class _MsProductTabState extends State<MsProductTab> {
                                 size: 16.0,
                               )),
                               DataCell(Poppins(
-                                text: product['isActive'] == true ? 'Aktif' : 'Tidak Aktif',
+                                text: product['isActive'] == true
+                                    ? 'Aktif'
+                                    : 'Tidak Aktif',
                                 size: 16.0,
                               )),
                               DataCell(Poppins(
-                                text: product['isUpSale'] == true ? 'Aktif' : 'Tidak Aktif',
+                                text: product['isUpSale'] == true
+                                    ? 'Aktif'
+                                    : 'Tidak Aktif',
                                 size: 16.0,
                               )),
                               DataCell(Poppins(
-                                text: product['hppPrice'] != 0 ? "Rp. ${product['hppPrice'].toString()}" : '0',
+                                text: product['hppPrice'] != 0
+                                    ? "Rp. ${product['hppPrice'].toString()}"
+                                    : '0',
                                 size: 16.0,
                               )),
                               DataCell(Poppins(
-                                text: product['price'] != 0 ? "Rp. ${product['price'].toString()}" : '0',
+                                text: product['price'] != 0
+                                    ? "Rp. ${product['price'].toString()}"
+                                    : '0',
                                 size: 16.0,
                               )),
-                              DataCell(IconButton(
-                                icon: Icon(Icons.edit),
-                                onPressed: () {
-                                  // Implement edit functionality
-                                },
+                              DataCell(Row(
+                                children: [
+                                  IconButton(
+                                    icon: Icon(Icons.edit),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              MsProductFormTab(
+                                                  productId: product['id']),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.delete, color: Colors.red),
+                                    onPressed: () {
+                                      _popupDeleteProduct(product);
+                                    },
+                                  ),
+                                ],
                               )),
                             ]);
                           }

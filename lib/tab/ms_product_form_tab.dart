@@ -9,15 +9,18 @@ import 'dart:io';
 import '../components/components.dart';
 
 class MsProductFormTab extends StatefulWidget {
-  const MsProductFormTab({super.key});
+  final String? productId;
+
+  MsProductFormTab({this.productId});
 
   @override
-  State<MsProductFormTab> createState() => _MsProductFormTabState();
+  _MsProductFormTabState createState() => _MsProductFormTabState();
 }
 
 class _MsProductFormTabState extends State<MsProductFormTab> {
   final _formKey = GlobalKey<FormState>();
   File? _image;
+  String imageUrl = '';
   final picker = ImagePicker();
   String name = '';
   int price = 0;
@@ -33,6 +36,9 @@ class _MsProductFormTabState extends State<MsProductFormTab> {
   void initState() {
     super.initState();
     fetchProductCategories();
+    if (widget.productId != null) {
+      loadProductDetails(widget.productId!);
+    }
   }
 
   Future<void> fetchProductCategories() async {
@@ -42,6 +48,28 @@ class _MsProductFormTabState extends State<MsProductFormTab> {
       setState(() {});
     } catch (e) {
       print('Failed to fetch categories: $e');
+    }
+  }
+
+  Future<void> loadProductDetails(String productId) async {
+    try {
+      final service = MsProductService();
+      final product = await service.getDetailProduct(productId);
+      setState(() {
+        name = product['name'];
+        price = product['price'];
+        hppPrice = product['hppPrice'];
+        stock = product['stock'];
+        isUnlimited = product['isUnlimited'];
+        isUpSale = product['isUpSale'];
+        isActive = product['isActive'];
+        categoryId = product['categoryId'];
+        // Handle image loading if needed
+        imageUrl = product['image'];
+      });
+      print("product details is : $product");
+    } catch (e) {
+      print('Failed to load product details: $e');
     }
   }
 
@@ -66,19 +94,35 @@ class _MsProductFormTabState extends State<MsProductFormTab> {
       _formKey.currentState!.save();
       try {
         final service = MsProductService();
-        await service.createProduct(
-          image: _image!,
-          name: name,
-          price: price,
-          hppPrice: hppPrice,
-          stock: stock,
-          isUnlimited: isUnlimited,
-          isUpSale: isUpSale,
-          isActive: isActive,
-          categoryId: categoryId,
-        );
+        if (widget.productId == null) {
+          await service.createUpdateProduct(
+            productId: null,
+            image: _image!,
+            name: name,
+            price: price,
+            hppPrice: hppPrice,
+            stock: stock,
+            isUnlimited: isUnlimited,
+            isUpSale: isUpSale,
+            isActive: isActive,
+            categoryId: categoryId,
+          );
+        } else {
+          await service.createUpdateProduct(
+            productId: widget.productId!,
+            image: _image!,
+            name: name,
+            price: price,
+            hppPrice: hppPrice,
+            stock: stock,
+            isUnlimited: isUnlimited,
+            isUpSale: isUpSale,
+            isActive: isActive,
+            categoryId: categoryId,
+          );
+        }
         Fluttertoast.showToast(
-          msg: "Simpan produk berhasil!",
+          msg: widget.productId == null ? "Simpan produk berhasil!" : "Update produk berhasil!",
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
           timeInSecForIosWeb: 1,
@@ -86,7 +130,7 @@ class _MsProductFormTabState extends State<MsProductFormTab> {
           textColor: Colors.white,
           fontSize: 16.0,
         );
-        Navigator.pushNamed(context, "/setting/product-list");
+        Navigator.pushNamed(context, '/settings/product-list');
       } catch (e) {
         Fluttertoast.showToast(
           msg: "Gagal menyimpan produk.",
@@ -201,13 +245,13 @@ class _MsProductFormTabState extends State<MsProductFormTab> {
                                                 ],
                                               ),
                                             )
-                                          : Image.file(
+                                          : imageUrl != "" ? Image.network(imageUrl, width: 400, height: 400, fit: BoxFit.cover,) :  Image.file(
                                               _image!,
                                               width: 400,
                                               height: 400,
                                               fit: BoxFit.cover,
                                             ),
-                                      if (_image != null)
+                                      if (_image != null || imageUrl != "")
                                         Positioned(
                                           top: 0,
                                           right: 0,
@@ -241,6 +285,9 @@ class _MsProductFormTabState extends State<MsProductFormTab> {
                                               Poppins(text: "Nama :", size: 16.0),
                                               SizedBox(height: 5.0),
                                               TextFormField(
+                                                controller: TextEditingController(
+                                                  text: name,
+                                                ),
                                                 decoration: InputDecoration(
                                                   hintText: 'Masukan nama produk',
                                                   border: OutlineInputBorder(),
@@ -298,6 +345,9 @@ class _MsProductFormTabState extends State<MsProductFormTab> {
                                               Poppins(text: "Harga (Rp) :", size: 16.0),
                                               SizedBox(height: 5.0),
                                               TextFormField(
+                                                controller: TextEditingController(
+                                                  text: price.toString(),
+                                                ),
                                                 decoration: InputDecoration(
                                                   border: OutlineInputBorder(),
                                                   hintText: 'Masukan harga produk',
@@ -321,6 +371,9 @@ class _MsProductFormTabState extends State<MsProductFormTab> {
                                               Poppins(text: "HPP (Rp) :", size: 16.0),
                                               SizedBox(height: 5.0),
                                               TextFormField(
+                                                controller: TextEditingController(
+                                                  text: hppPrice.toString(),
+                                                ),
                                                 decoration: InputDecoration(
                                                   border: OutlineInputBorder(),
                                                   hintText: 'Masukan harga hpp',
@@ -392,6 +445,9 @@ class _MsProductFormTabState extends State<MsProductFormTab> {
                                               Poppins(text: "Stock produk :", size: 16.0),
                                               SizedBox(height: 5.0),
                                               TextFormField(
+                                                controller: TextEditingController(
+                                                  text: stock.toString(),
+                                                ),
                                                 decoration: InputDecoration(
                                                   hintText: 'Masukan stock produk',
                                                   border: OutlineInputBorder(),
