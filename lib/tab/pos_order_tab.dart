@@ -216,6 +216,10 @@ class _PosOrderTabState extends State<PosOrderTab> {
                             future: futureTransactions,
                             builder: (context, snapshot) {
                               if (snapshot.hasData) {
+                                if (snapshot.data!.isEmpty) {
+                                  return Center(
+                                      child: Text('No orders available.'));
+                                }
                                 // Safely cast the data to List<Map<String, dynamic>>
                                 orders = List<Map<String, dynamic>>.from(
                                     snapshot.data!);

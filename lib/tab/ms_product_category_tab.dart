@@ -12,6 +12,7 @@ class MsProductCategoryTab extends StatefulWidget {
 
 class _MsProductCategoryTabState extends State<MsProductCategoryTab> {
   final MsProductCategoryService _service = MsProductCategoryService();
+
   List<Map<String, dynamic>> _categories = [];
   int _currentPage = 0;
   String _searchKeyword = '';
