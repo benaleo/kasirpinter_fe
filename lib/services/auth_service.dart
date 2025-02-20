@@ -52,16 +52,13 @@ class AuthService {
 
   // send otp
   Future<ApiResponse> sendOtp(String email) async {
-    print("api url is : $_baseUrl");
     try {
+      String url = '$_baseUrl/$_mainUrl/forgot-password?email=$email';
       final response = await http.post(
-        Uri.parse('$_baseUrl/$_mainUrl/forgot-password'),
+        Uri.parse(url),
         headers: {"Content-Type": "application/json", "accept": "*/*"},
-        body: jsonEncode(<String, String>{
-          'email': email,
-        }),
       );
-
+      print("api url is : $url");
       final data = jsonDecode(response.body);
       print("Response data: $data");
       if (data['success']) {

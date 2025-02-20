@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../components/auth_components.dart';
 import '../components/components.dart';
+import '../services/auth_service.dart'; // Import AuthService
 
 class AuthForgotPasswordTab extends StatefulWidget {
   const AuthForgotPasswordTab({super.key});
@@ -12,14 +13,45 @@ class AuthForgotPasswordTab extends StatefulWidget {
 
 class _AuthForgotPasswordTabState extends State<AuthForgotPasswordTab> {
   final TextEditingController _emailController = TextEditingController();
+  bool _isLoading = false;
 
-  void _successPopup(){
-    showDialog(
-      context: context,
-      builder: (context){
-        return AuthPopupOTP(route: "/otp",);
+  Future<void> _sendOtp() async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      // Create an instance of AuthService
+      final authService = AuthService();
+
+      // Call the sendOtp API function on the instance
+      final response = await authService.sendOtp(_emailController.text);
+      if (response.success) {
+        // Navigate to the OTP route if successful
+        _successPopup();
+      } else {
+        // Handle error (show message to user)
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(response.message)));
       }
-    );
+    } catch (e) {
+      // Handle exceptions
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('An error occurred: $e')));
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _successPopup() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AuthPopupOTP(
+            route: "/otp",
+          );
+        });
   }
 
   @override
@@ -36,14 +68,18 @@ class _AuthForgotPasswordTabState extends State<AuthForgotPasswordTab> {
                     color: Colors.white,
                     padding: EdgeInsets.symmetric(horizontal: 40.0),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 40.0),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20.0, vertical: 40.0),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Text("Lupa Password", style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold)),
+                          Text("Lupa Password",
+                              style: TextStyle(
+                                  fontSize: 36, fontWeight: FontWeight.bold)),
                           SizedBox(height: 10.0),
-                          Text("Masukkan email kamu ya untuk pemulihan", style: TextStyle(fontSize: 20.0)),
+                          Text("Masukkan email kamu ya untuk pemulihan",
+                              style: TextStyle(fontSize: 20.0)),
                           SizedBox(height: 30.0),
                           TextInputCustom(
                             text: "Email",
@@ -54,11 +90,10 @@ class _AuthForgotPasswordTabState extends State<AuthForgotPasswordTab> {
                           Divider(),
                           SizedBox(height: 20.0),
                           ElevatedButtonCustom(
-                            text: "Reset Password",
-                            size: 18,
-                            color: Colors.white,
-                            onPressed: _successPopup
-                          ),
+                              text: "Reset Password",
+                              size: 18,
+                              color: Colors.white,
+                              onPressed: _isLoading ? null : _sendOtp),
                           SizedBox(height: 20.0),
                         ],
                       ),
