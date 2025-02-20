@@ -43,4 +43,82 @@ class UserService {
       throw Exception("Failed to load user info");
     }
   }
+
+  Future<void> userPresence(String type) async {
+    final AuthService authService = AuthService();
+    final String? token = await authService.getToken();
+    if (token == null) {
+      throw Exception("Token not found");
+    }
+
+    try {
+      final String _baseUrl = dotenv.get('BASE_URL');
+      final String _mainUrl = 'api/v1/user/presence?type=$type';
+
+      String url = '$_baseUrl/$_mainUrl';
+      final response = await http.put(
+        Uri.parse(url),
+        headers: {
+          'accept': '*/*',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      print("url is: $url");
+      print("Token is: $token");
+      // print("Response status: ${response.statusCode}");
+      // print("Response body: ${response.body}");
+
+      final data = json.decode(response.body);
+      if (data['success']) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('userInfo', json.encode(data['data']));
+        print("Stored userInfo: ${json.encode(data['data'])}");
+      } else {
+        throw Exception("Failed to fetch user info: ${data['message']}");
+      }
+    } catch (e) {
+      print("Error fetching user info: $e");
+      throw Exception("Failed to load user info");
+    }
+  }
+
+  Future<void> userCompanyModal(int value) async {
+    final AuthService authService = AuthService();
+    final String? token = await authService.getToken();
+    if (token == null) {
+      throw Exception("Token not found");
+    }
+
+    try {
+      final String _baseUrl = dotenv.get('BASE_URL');
+      final String _mainUrl = 'api/v1/user/company/modal?value=$value';
+
+      String url = '$_baseUrl/$_mainUrl';
+      final response = await http.put(
+        Uri.parse(url),
+        headers: {
+          'accept': '*/*',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      print("url is: $url");
+      print("Token is: $token");
+      // print("Response status: ${response.statusCode}");
+      // print("Response body: ${response.body}");
+
+      final data = json.decode(response.body);
+      if (data['success']) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('userInfo', json.encode(data['data']));
+        print("Stored userInfo: ${json.encode(data['data'])}");
+      } else {
+        throw Exception("Failed to fetch user info: ${data['message']}");
+      }
+    } catch (e) {
+      print("Error fetching user info: $e");
+      throw Exception("Failed to load user info");
+    }
+  }
 }

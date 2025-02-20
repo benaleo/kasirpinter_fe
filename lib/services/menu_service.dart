@@ -22,11 +22,12 @@ class MenuService {
     String url =
         '$_baseUrl/$_mainUrl/menu?pages=0&limit=1000&sortBy=id&direction=asc';
     if (categoryName != null && categoryName.isNotEmpty) {
-      if (categoryName != 'all') {
+      if (categoryName != 'All') {
         url += '&category=$categoryName';
       }
     }
     print("url is :" + url);
+    print("token is : $token");
     final response = await http.get(
       Uri.parse(url),
       headers: {

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:kasirpinter_fe/components/data_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
@@ -47,5 +48,42 @@ class AuthService {
   Future<void> logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
+  }
+
+  // send otp
+  Future<ApiResponse> sendOtp(String email) async {
+    print("api url is : $_baseUrl");
+    try {
+      final response = await http.post(
+        Uri.parse('$_baseUrl/$_mainUrl/forgot-password'),
+        headers: {"Content-Type": "application/json", "accept": "*/*"},
+        body: jsonEncode(<String, String>{
+          'email': email,
+        }),
+      );
+
+      final data = jsonDecode(response.body);
+      print("Response data: $data");
+      if (data['success']) {
+        return ApiResponse(
+          success: data['success'],
+          message: data['message'],
+          data: null,
+        );
+      } else {
+        return ApiResponse(
+          success: false,
+          message: data['message'],
+          data: null,
+        );
+      }
+    } catch (e) {
+      print("Error: $e");
+      return ApiResponse(
+        success: false,
+        message: e.toString(),
+        data: null,
+      );
+    }
   }
 }
