@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:kasirpinter_fe/routes.dart';
@@ -9,14 +7,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   setPathUrlStrategy();
   await dotenv.load(fileName: ".env");
-
-  try {
-    final result = await InternetAddress.lookup(
-        'solid-silvie-kopibery-872edbea.koyeb.app');
-    print("Success: $result");
-  } on SocketException catch (e) {
-    print("Error: $e");
-  }
 
   runApp(const MyApp());
 }

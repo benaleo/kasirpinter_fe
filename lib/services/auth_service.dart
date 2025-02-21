@@ -48,6 +48,10 @@ class AuthService {
   Future<void> logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
+    await prefs.remove('userInfo');
+    await prefs.remove('tempDataEmail');
+    await prefs.remove('tempDataToken');
+    await prefs.remove('saved_menu_categories');
   }
 
   // send otp
