@@ -83,4 +83,76 @@ class AuthService {
       );
     }
   }
+
+  // verify otp
+  Future<ApiResponse> verifyOtp(String email, String otp) async {
+    try {
+      String url = '$_baseUrl/$_mainUrl/validate-otp?email=$email&otp=$otp';
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {"Content-Type": "application/json", "accept": "*/*"},
+      );
+      print("api url is : $url");
+      final data = jsonDecode(response.body);
+      print("Response data: $data");
+      if (data['success']) {
+        return ApiResponse(
+          success: data['success'],
+          message: data['message'],
+          data: data['data'],
+        );
+      } else {
+        return ApiResponse(
+          success: false,
+          message: data['message'],
+          data: null,
+        );
+      }
+    } catch (e) {
+      print("Error: $e");
+      return ApiResponse(
+        success: false,
+        message: e.toString(),
+        data: null,
+      );
+    }
+  }
+
+// verify otp
+  Future<ApiResponse> setNewPassword(
+      String password, String confirmPassword, String id, String token) async {
+    try {
+      String url = '$_baseUrl/$_mainUrl/reset-password?token=$token&id=$id';
+      final response = await http.put(Uri.parse(url),
+          headers: {"Content-Type": "application/json", "accept": "*/*"},
+          body: jsonEncode(<String, dynamic>{
+            'password': password,
+            'confirmPassword': confirmPassword
+          }));
+
+      print("api url is : $url");
+      final data = jsonDecode(response.body);
+      print("Response data: $data");
+      if (data['success']) {
+        return ApiResponse(
+          success: data['success'],
+          message: data['message'],
+          data: null,
+        );
+      } else {
+        return ApiResponse(
+          success: false,
+          message: data['message'],
+          data: null,
+        );
+      }
+    } catch (e) {
+      print("Error: $e");
+      return ApiResponse(
+        success: false,
+        message: e.toString(),
+        data: null,
+      );
+    }
+  }
 }

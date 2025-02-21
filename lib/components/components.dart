@@ -50,7 +50,12 @@ class Poppins extends StatelessWidget {
   final TextAlign? textAlign;
   final color;
 
-  const Poppins({super.key, required this.text, required this.size, this.textAlign, this.color});
+  const Poppins(
+      {super.key,
+      required this.text,
+      required this.size,
+      this.textAlign,
+      this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +76,12 @@ class PoppinsBold extends StatelessWidget {
   final TextAlign? textAlign;
   final color;
 
-  const PoppinsBold({super.key, required this.text, required this.size, this.textAlign, this.color});
+  const PoppinsBold(
+      {super.key,
+      required this.text,
+      required this.size,
+      this.textAlign,
+      this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -132,22 +142,26 @@ class ElevatedButtonCustom extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: width != null ? width : null,
-      height: boxHeight ?? 50.0,
-      decoration: decoration,
-      child: ElevatedButton(
-        onPressed: onPressed != null
-            ? onPressed
-            : () {
-                route != null ? Navigator.of(context).pushNamed(route ?? "") : null;
-              },
-        style: ElevatedButton.styleFrom(
-          minimumSize: Size(boxSize ?? double.infinity, 50.0),
-          backgroundColor: bgColor != null ? bgColor : Color(0xFF723E29),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
-        ),
-        child: child ?? Sans(text, size, color: color != null ? color : Colors.black),
+    return ElevatedButton(
+      onPressed: onPressed != null
+          ? onPressed
+          : () {
+              route != null
+                  ? Navigator.of(context).pushNamed(route ?? "")
+                  : null;
+            },
+      style: ElevatedButton.styleFrom(
+        minimumSize: Size(boxSize ?? double.infinity, 50.0),
+        backgroundColor: bgColor != null ? bgColor : Color(0xFF723E29),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
+      ),
+      child: Container(
+        child: child ??
+            Poppins(
+                text: text,
+                size: size,
+                color: color != null ? color : Colors.black),
       ),
     );
   }
@@ -160,6 +174,9 @@ class TextInputCustom extends StatefulWidget {
   final bool? isPassword;
   final double? height;
   final String? customerName;
+  final FocusNode? focusNode;
+  final VoidCallback? onSubmitted;
+  final String? Function(String?)? validator;
 
   const TextInputCustom({
     super.key,
@@ -169,6 +186,9 @@ class TextInputCustom extends StatefulWidget {
     this.isPassword,
     this.height,
     this.customerName,
+    this.focusNode,
+    this.onSubmitted,
+    this.validator,
   });
 
   @override
@@ -177,6 +197,7 @@ class TextInputCustom extends StatefulWidget {
 
 class _TextInputCustomState extends State<TextInputCustom> {
   bool _obscureText = true;
+  String? _errorMessage;
 
   @override
   void initState() {
@@ -194,14 +215,23 @@ class _TextInputCustomState extends State<TextInputCustom> {
   Widget build(BuildContext context) {
     return Container(
       height: widget.height != null ? widget.height : 50.0,
-      child: TextField(
+      child: TextFormField(
         controller: widget.controller,
-        obscureText: widget.isPassword != null && widget.isPassword! ? _obscureText : false,
+        focusNode: widget.focusNode,
+        onFieldSubmitted: (_) {
+          widget.onSubmitted?.call();
+        },
+        obscureText: widget.isPassword != null && widget.isPassword!
+            ? _obscureText
+            : false,
         decoration: InputDecoration(
           labelText: widget.text,
+          errorText: _errorMessage,
+          errorStyle: const TextStyle(color: Colors.red),
           suffixIcon: widget.isPassword != null && widget.isPassword!
               ? IconButton(
-                  icon: Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
+                  icon: Icon(
+                      _obscureText ? Icons.visibility : Icons.visibility_off),
                   onPressed: () {
                     setState(() {
                       _obscureText = !_obscureText;
@@ -213,6 +243,11 @@ class _TextInputCustomState extends State<TextInputCustom> {
             borderRadius: BorderRadius.circular(10.0),
           ),
         ),
+        validator: (value) {
+          final errorMessage = widget.validator?.call(value);
+          // Don't directly set _errorMessage, just return the error
+          return errorMessage;
+        },
       ),
     );
   }
@@ -240,7 +275,8 @@ class GradientText extends StatelessWidget {
           colors: gradientColors,
         ).createShader(bounds);
       },
-      blendMode: BlendMode.srcIn, // Tambahkan ini agar ShaderMask bekerja dengan baik
+      blendMode:
+          BlendMode.srcIn, // Tambahkan ini agar ShaderMask bekerja dengan baik
       child: Text(
         text,
         style: style.copyWith(color: Colors.white), // Pastikan ada warna awal
@@ -271,7 +307,8 @@ class _DrawerElementState extends State<DrawerElement> {
     String? userInfo = prefs.getString('userInfo');
     if (userInfo != null) {
       Map<String, dynamic> userData = json.decode(userInfo);
-      userPermissions = List<String>.from(userData['permissions'].map((perm) => perm['name']));
+      userPermissions = List<String>.from(
+          userData['permissions'].map((perm) => perm['name']));
       setState(() {});
     }
     // print("userPermissions: $userPermissions");
@@ -290,7 +327,8 @@ class _DrawerElementState extends State<DrawerElement> {
   Future<void> _onLogout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('token'); // Hapus token
-    Navigator.pushNamedAndRemoveUntil(context, "/login", (route) => false); // Kembali ke login
+    Navigator.pushNamedAndRemoveUntil(
+        context, "/login", (route) => false); // Kembali ke login
   }
 
   @override
@@ -466,7 +504,13 @@ class IconBoxText extends StatelessWidget {
   final double? height;
   final onPresses;
 
-  const IconBoxText(this.text, this.size, {super.key, this.icon, this.color, this.boxColor, this.height, this.onPresses});
+  const IconBoxText(this.text, this.size,
+      {super.key,
+      this.icon,
+      this.color,
+      this.boxColor,
+      this.height,
+      this.onPresses});
 
   @override
   Widget build(BuildContext context) {
@@ -492,7 +536,10 @@ class IconBoxText extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              icon != null ? icon : Icon(Icons.payment_outlined, color: color != null ? color : Colors.grey.shade600),
+              icon != null
+                  ? icon
+                  : Icon(Icons.payment_outlined,
+                      color: color != null ? color : Colors.grey.shade600),
               SizedBox(width: 10.0),
               PoppinsBold(
                 text: text,
@@ -526,7 +573,11 @@ class StackCloseButton extends StatelessWidget {
           splashFactory: NoSplash.splashFactory,
         ),
         child: Container(
-            width: 40, height: 40, decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.grey.shade200), child: Icon(Icons.close_outlined)),
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+                shape: BoxShape.circle, color: Colors.grey.shade200),
+            child: Icon(Icons.close_outlined)),
       ),
     );
   }
@@ -553,7 +604,8 @@ class _ConfirmDialogState extends State<ConfirmDialog> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20.0),
       ),
-      title: Text("Konfirmasi", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+      title: Text("Konfirmasi",
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
       content: Text(widget.text, style: TextStyle(fontSize: 14)),
       actions: [
         TextButton(
@@ -581,7 +633,7 @@ class _ConfirmDialogState extends State<ConfirmDialog> {
 }
 
 class InformationDialog extends StatelessWidget {
-  final String text;
+  final String? text;
 
   const InformationDialog(this.text, {super.key});
 
@@ -596,7 +648,7 @@ class InformationDialog extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Poppins(text: "Email atau password salah!", size: 16.0),
+            Poppins(text: text ?? "Email atau password salah!", size: 16.0),
             SizedBox(height: 10.0),
             ElevatedButton(
               onPressed: () {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../components/auth_components.dart';
 import '../components/components.dart';
@@ -20,6 +21,10 @@ class _AuthForgotPasswordTabState extends State<AuthForgotPasswordTab> {
       _isLoading = true;
     });
     try {
+      // Store email in SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('tempDataEmail', _emailController.text);
+
       // Create an instance of AuthService
       final authService = AuthService();
 
@@ -48,7 +53,7 @@ class _AuthForgotPasswordTabState extends State<AuthForgotPasswordTab> {
     showDialog(
         context: context,
         builder: (context) {
-          return AuthPopupOTP(
+          return SuccessAuthPopup(
             route: "/otp",
           );
         });
@@ -92,7 +97,14 @@ class _AuthForgotPasswordTabState extends State<AuthForgotPasswordTab> {
                           ElevatedButtonCustom(
                               text: "Reset Password",
                               size: 18,
+                              child: !_isLoading
+                                  ? Poppins(
+                                      text: "Reset Password",
+                                      size: 18,
+                                      color: Colors.white)
+                                  : CircularProgressIndicator(),
                               color: Colors.white,
+                              bgColor: _isLoading ? Colors.grey : null,
                               onPressed: _isLoading ? null : _sendOtp),
                           SizedBox(height: 20.0),
                         ],

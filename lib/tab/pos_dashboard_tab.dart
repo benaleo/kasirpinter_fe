@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+import 'package:kasirpinter_fe/components/data_model.dart';
 import 'package:kasirpinter_fe/services/user_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -75,7 +76,7 @@ class _PosDashboardTabState extends State<PosDashboardTab> {
       setState(() {
         clockIn = userData['in_at'];
         clockOut = userData['out_at'];
-        _modalAwal = userData['modal_awal'];
+        _modalAwal = userData['company_modal'];
       });
     }
   }
@@ -126,7 +127,16 @@ class _PosDashboardTabState extends State<PosDashboardTab> {
                     );
                   });
             } catch (e) {
-              print("Error: $e");
+              print("Error on dashboard: $e");
+              Fluttertoast.showToast(
+                msg: e.toString(),
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.BOTTOM,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: 16.0,
+              );
             }
           },
           text: "Apakah kamu yakin akan $verb?",
@@ -183,47 +193,81 @@ class _PosDashboardTabState extends State<PosDashboardTab> {
             ),
           ),
           actions: <Widget>[
-            ElevatedButtonCustom(
-              text: "Batal",
-              size: 16.0,
-              boxHeight: 40.0,
-              width: 150.0,
-              bgColor: Colors.transparent,
-              color: Colors.black,
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            ElevatedButtonCustom(
-              text: "Simpan",
-              size: 16.0,
-              boxHeight: 40.0,
-              width: 150.0,
-              bgColor: Colors.blue,
-              color: Colors.white,
-              onPressed: () async {
-                int? result = value;
-                if (result != null) {
-                  await _userService.userCompanyModal(result);
-                }
-                // close popup
-                Navigator.of(context).pop();
-                // add toast
-                Fluttertoast.showToast(
-                  msg: "Berhasil menyimpan kategori!",
-                  toastLength: Toast.LENGTH_SHORT,
-                  gravity: ToastGravity.BOTTOM,
-                  timeInSecForIosWeb: 1,
-                  backgroundColor: Colors.green,
-                  textColor: Colors.white,
-                  fontSize: 16.0,
-                );
-                // fetch
-                await _updateUserInfo(null, null);
-              },
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Expanded(
+                  child: ElevatedButtonCustom(
+                    text: "Batal",
+                    size: 16.0,
+                    boxHeight: 40.0,
+                    width: 150.0,
+                    bgColor: Colors.transparent,
+                    color: Colors.black,
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ),
+                SizedBox(width: 100.0),
+                Expanded(
+                  child: ElevatedButtonCustom(
+                    text: "Simpan",
+                    size: 16.0,
+                    boxHeight: 40.0,
+                    width: 150.0,
+                    bgColor: Colors.blue,
+                    color: Colors.white,
+                    onPressed: () async {
+                      try {
+                        int? result = value;
+                        print("result is: $result");
+                        ApiResponse _result =
+                            await _userService.userCompanyModal(result);
+                        print("result is 2: $result");
+                        if (_result.success) {
+                          // close popup
+                          Navigator.of(context).pop();
+                          print("close popup");
+                          // add toast
+                          Fluttertoast.showToast(
+                            msg: "Berhasil menyimpan modal awal!",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.green,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                          print("add toast");
+                          // fetch
+                          await _updateUserInfo(null, null);
+                          print("fetch");
+                        } else {
+                          Navigator.of(context).pop();
+                          _showInformationDialog(_result.message);
+                        }
+                      } on Exception catch (e) {
+                        print("Error: $e");
+                        Navigator.of(context).pop();
+                        _showInformationDialog(e.toString());
+                      }
+                    },
+                  ),
+                ),
+              ],
             )
           ],
         );
+      },
+    );
+  }
+
+  void _showInformationDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return InformationDialog(message);
       },
     );
   }
@@ -363,6 +407,7 @@ class _PosDashboardTabState extends State<PosDashboardTab> {
                                       ],
                                     ),
                                     ElevatedButtonCustom(
+                                      boxSize: 250.0,
                                       text: "Masuk",
                                       size: 16.0,
                                       width: 250.0,
@@ -405,6 +450,7 @@ class _PosDashboardTabState extends State<PosDashboardTab> {
                                       ],
                                     ),
                                     ElevatedButtonCustom(
+                                      boxSize: 250.0,
                                       text: "Pulang",
                                       size: 16.0,
                                       width: 250.0,
@@ -461,7 +507,10 @@ class _PosDashboardTabState extends State<PosDashboardTab> {
                             CardDashboard(
                               "Modal Awal",
                               "Rp. $_modalAwal",
-                              onTap: _showAddModal,
+                              onTap: () {
+                                print("tapped Modal Awal");
+                                _showAddModal();
+                              },
                             ),
                             CardDashboard(
                                 "Total Pemasukan", "Rp. $_pemasukanPenjualan"),
@@ -657,7 +706,10 @@ class CardDashboard extends StatelessWidget {
               top: 0.0,
               right: 0.0,
               child: ElevatedButton(
-                  onPressed: () {}, child: Poppins(text: "Add", size: 16.0)),
+                  onPressed: () {
+                    onTap!();
+                  },
+                  child: Poppins(text: "Add", size: 16.0)),
             ),
         ],
       ),

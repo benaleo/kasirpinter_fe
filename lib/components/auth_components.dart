@@ -14,7 +14,8 @@ class SideBarAuth extends StatelessWidget {
         height: heightDevice,
         decoration: BoxDecoration(
             image: DecorationImage(
-              image: AssetImage('assets/left_side_login.png'), // Ganti dengan path gambar Anda
+              image: AssetImage(
+                  'assets/left_side_login.png'), // Ganti dengan path gambar Anda
               fit: BoxFit.cover,
             ),
             borderRadius: BorderRadius.only(
@@ -34,7 +35,8 @@ class SideBarAuth extends StatelessWidget {
                   width: 300.0,
                 ),
                 SizedBox(height: 10),
-                Sans('Atur dan kembangkan bisnis bersama kami sekarang!', 18, color: Colors.white),
+                Sans('Atur dan kembangkan bisnis bersama kami sekarang!', 18,
+                    color: Colors.white),
               ],
             ),
           ),
@@ -44,13 +46,20 @@ class SideBarAuth extends StatelessWidget {
   }
 }
 
-class AuthPopupOTP extends StatelessWidget {
+class SuccessAuthPopup extends StatelessWidget {
   final route;
   final title;
   final body;
   final buttonText;
+  final VoidCallback? onPressed;
 
-  const AuthPopupOTP({super.key, this.route, this.buttonText, this.title, this.body});
+  const SuccessAuthPopup(
+      {super.key,
+      this.route,
+      this.buttonText,
+      this.title,
+      this.body,
+      this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -80,24 +89,33 @@ class AuthPopupOTP extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Image.asset("assets/images/success_man.png", height: 200.0, width: 200.0),
+                  Image.asset("assets/images/success_man.png",
+                      height: 200.0, width: 200.0),
                   SizedBox(height: 10.0),
-                  SansBold(title != null ? title : "OTP berhasil dikirim", 20.0),
+                  SansBold(
+                      title != null ? title : "OTP berhasil dikirim", 20.0),
                   SizedBox(height: 10.0),
                   SizedBox(
                       width: 350.0,
                       child: Sans(
-                        body != null ? body : "Silakan cek kotak masuk emailmu dan masukkan kode OTP di langkah selanjutnya",
+                        body != null
+                            ? body
+                            : "Silakan cek kotak masuk emailmu dan masukkan kode OTP di langkah selanjutnya",
                         16.0,
                         textAlign: TextAlign.center,
                       )),
                   SizedBox(height: 20.0),
                   ElevatedButton(
                     onPressed: () {
-                      // Tambahkan logika verifikasi OTP di sini
-                      Navigator.of(context).pushNamed(route);
+                      if (onPressed != null) {
+                        onPressed!();
+                      } else {
+                        Navigator.of(context).pushNamed(route);
+                      }
                     },
-                    child: Text(buttonText != null ? buttonText : "Langkah selanjutnya"),
+                    child: Text(buttonText != null
+                        ? buttonText
+                        : "Langkah selanjutnya"),
                   ),
                 ],
               ),

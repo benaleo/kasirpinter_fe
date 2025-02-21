@@ -1,5 +1,6 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:kasirpinter_fe/components/data_model.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'auth_service.dart';
@@ -83,7 +84,7 @@ class UserService {
     }
   }
 
-  Future<void> userCompanyModal(int value) async {
+  Future<ApiResponse> userCompanyModal(int value) async {
     final AuthService authService = AuthService();
     final String? token = await authService.getToken();
     if (token == null) {
@@ -113,12 +114,25 @@ class UserService {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('userInfo', json.encode(data['data']));
         print("Stored userInfo: ${json.encode(data['data'])}");
+        return ApiResponse(
+          success: data['success'],
+          message: data['message'],
+          data: data['data'] ?? "",
+        );
       } else {
-        throw Exception("Failed to fetch user info: ${data['message']}");
+        return ApiResponse(
+          success: false,
+          message: data['message'],
+          data: null,
+        );
       }
     } catch (e) {
       print("Error fetching user info: $e");
-      throw Exception("Failed to load user info");
+      return ApiResponse(
+        success: false,
+        message: e.toString(),
+        data: null,
+      );
     }
   }
 }
