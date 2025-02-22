@@ -118,7 +118,7 @@ class _MsProductFormTabState extends State<MsProductFormTab> {
         if (widget.productId == null) {
           await service.createUpdateProduct(
             productId: null,
-            image: _image!,
+            image: _image is File ? _image : null,
             name: _nameController.text,
             price: int.parse(_priceController.text),
             hppPrice: int.parse(_hppPriceController.text),
@@ -131,7 +131,7 @@ class _MsProductFormTabState extends State<MsProductFormTab> {
         } else {
           await service.createUpdateProduct(
             productId: widget.productId!,
-            image: _image!,
+            image: _image is File ? _image : null,
             name: _nameController.text,
             price: int.parse(_priceController.text),
             hppPrice: int.parse(_hppPriceController.text),

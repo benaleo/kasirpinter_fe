@@ -44,7 +44,7 @@ class MsProductService {
 
   Future<void> createUpdateProduct({
     String? productId,
-    required File image,
+    File? image,
     required String name,
     required int price,
     required int hppPrice,
@@ -76,9 +76,11 @@ class MsProductService {
           ..fields['categoryId'] = categoryId
           ..headers['Authorization'] = 'Bearer $token'
           ..headers['accept'] = '*/*'
-          ..headers['Content-Type'] = 'multipart/form-data'
-          ..files.add(await http.MultipartFile.fromPath('image', image.path));
-
+          ..headers['Content-Type'] = 'multipart/form-data';
+    // ..files.add(await http.MultipartFile.fromPath('image', image.path));
+    if (image != null)
+      request.files.add(await http.MultipartFile.fromPath(
+          'image', image.path)); // Only add if image is not null
     final response = await request.send();
 
     print("Response status: ${response.statusCode}");
