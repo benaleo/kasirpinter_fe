@@ -32,6 +32,11 @@ class _MsProductFormTabState extends State<MsProductFormTab> {
   String categoryId = '';
   List<Map<String, String>> categories = [];
 
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _priceController = TextEditingController();
+  final TextEditingController _hppPriceController = TextEditingController();
+  final TextEditingController _stockController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -39,6 +44,19 @@ class _MsProductFormTabState extends State<MsProductFormTab> {
     if (widget.productId != null) {
       loadProductDetails(widget.productId!);
     }
+    _nameController.text = name;
+    _priceController.text = price.toString();
+    _hppPriceController.text = hppPrice.toString();
+    _stockController.text = stock.toString();
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _priceController.dispose();
+    _hppPriceController.dispose();
+    _stockController.dispose();
+    super.dispose();
   }
 
   Future<void> fetchProductCategories() async {
@@ -64,8 +82,11 @@ class _MsProductFormTabState extends State<MsProductFormTab> {
         isUpSale = product['isUpSale'];
         isActive = product['isActive'];
         categoryId = product['categoryId'];
-        // Handle image loading if needed
         imageUrl = product['image'];
+        _nameController.text = name;
+        _priceController.text = price.toString();
+        _hppPriceController.text = hppPrice.toString();
+        _stockController.text = stock.toString();
       });
       print("product details is : $product");
     } catch (e) {
@@ -98,10 +119,10 @@ class _MsProductFormTabState extends State<MsProductFormTab> {
           await service.createUpdateProduct(
             productId: null,
             image: _image!,
-            name: name,
-            price: price,
-            hppPrice: hppPrice,
-            stock: stock,
+            name: _nameController.text,
+            price: int.parse(_priceController.text),
+            hppPrice: int.parse(_hppPriceController.text),
+            stock: int.parse(_stockController.text),
             isUnlimited: isUnlimited,
             isUpSale: isUpSale,
             isActive: isActive,
@@ -111,10 +132,10 @@ class _MsProductFormTabState extends State<MsProductFormTab> {
           await service.createUpdateProduct(
             productId: widget.productId!,
             image: _image!,
-            name: name,
-            price: price,
-            hppPrice: hppPrice,
-            stock: stock,
+            name: _nameController.text,
+            price: int.parse(_priceController.text),
+            hppPrice: int.parse(_hppPriceController.text),
+            stock: int.parse(_stockController.text),
             isUnlimited: isUnlimited,
             isUpSale: isUpSale,
             isActive: isActive,
@@ -122,7 +143,9 @@ class _MsProductFormTabState extends State<MsProductFormTab> {
           );
         }
         Fluttertoast.showToast(
-          msg: widget.productId == null ? "Simpan produk berhasil!" : "Update produk berhasil!",
+          msg: widget.productId == null
+              ? "Simpan produk berhasil!"
+              : "Update produk berhasil!",
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
           timeInSecForIosWeb: 1,
@@ -130,7 +153,7 @@ class _MsProductFormTabState extends State<MsProductFormTab> {
           textColor: Colors.white,
           fontSize: 16.0,
         );
-        Navigator.pushNamed(context, '/settings/product-list');
+        Navigator.pushNamed(context, '/setting/product-list');
       } catch (e) {
         Fluttertoast.showToast(
           msg: "Gagal menyimpan produk.",
@@ -199,7 +222,8 @@ class _MsProductFormTabState extends State<MsProductFormTab> {
                             children: [
                               GestureDetector(
                                 onTap: () async {
-                                  final pickedFile = await picker.getImage(source: ImageSource.gallery);
+                                  final pickedFile = await picker.getImage(
+                                      source: ImageSource.gallery);
                                   setState(() {
                                     if (pickedFile != null) {
                                       _image = File(pickedFile.path);
@@ -219,8 +243,10 @@ class _MsProductFormTabState extends State<MsProductFormTab> {
                                               height: 400,
                                               color: Colors.grey[200],
                                               child: Column(
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
                                                 children: [
                                                   Icon(
                                                     Icons.cloud_upload_outlined,
@@ -228,13 +254,22 @@ class _MsProductFormTabState extends State<MsProductFormTab> {
                                                     size: 200.0,
                                                   ),
                                                   SizedBox(height: 12.0),
-                                                  Poppins(text: "Upload gambar produk disini", size: 16.0, color: Colors.grey[400]),
+                                                  Poppins(
+                                                      text:
+                                                          "Upload gambar produk disini",
+                                                      size: 16.0,
+                                                      color: Colors.grey[400]),
                                                   SizedBox(height: 12.0),
                                                   Container(
-                                                    padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 20.0,
+                                                            vertical: 5.0),
                                                     decoration: BoxDecoration(
                                                       color: Colors.blue,
-                                                      borderRadius: BorderRadius.circular(20.0),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20.0),
                                                     ),
                                                     child: Poppins(
                                                       text: "Pilih gambar",
@@ -245,12 +280,19 @@ class _MsProductFormTabState extends State<MsProductFormTab> {
                                                 ],
                                               ),
                                             )
-                                          : imageUrl != "" ? Image.network(imageUrl, width: 400, height: 400, fit: BoxFit.cover,) :  Image.file(
-                                              _image!,
-                                              width: 400,
-                                              height: 400,
-                                              fit: BoxFit.cover,
-                                            ),
+                                          : imageUrl != ""
+                                              ? Image.network(
+                                                  imageUrl,
+                                                  width: 400,
+                                                  height: 400,
+                                                  fit: BoxFit.cover,
+                                                )
+                                              : Image.file(
+                                                  _image!,
+                                                  width: 400,
+                                                  height: 400,
+                                                  fit: BoxFit.cover,
+                                                ),
                                       if (_image != null || imageUrl != "")
                                         Positioned(
                                           top: 0,
@@ -280,50 +322,61 @@ class _MsProductFormTabState extends State<MsProductFormTab> {
                                       children: [
                                         Expanded(
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              Poppins(text: "Nama :", size: 16.0),
+                                              Poppins(
+                                                  text: "Nama :", size: 16.0),
                                               SizedBox(height: 5.0),
                                               TextFormField(
-                                                controller: TextEditingController(
-                                                  text: name,
-                                                ),
+                                                controller: _nameController,
                                                 decoration: InputDecoration(
-                                                  hintText: 'Masukan nama produk',
+                                                  hintText:
+                                                      'Masukan nama produk',
                                                   border: OutlineInputBorder(),
                                                 ),
                                                 validator: (value) {
-                                                  if (value == null || value.isEmpty) {
+                                                  if (value == null ||
+                                                      value.isEmpty) {
                                                     return 'Masukkan nama';
                                                   }
                                                   return null;
                                                 },
-                                                onSaved: (value) => name = value!,
                                               ),
                                             ],
                                           ),
                                         ),
                                         Expanded(
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              Poppins(text: "Kategori :", size: 16.0),
+                                              Poppins(
+                                                  text: "Kategori :",
+                                                  size: 16.0),
                                               SizedBox(height: 5.0),
                                               DropdownButtonFormField<String>(
                                                 decoration: InputDecoration(
-                                                  hintText: 'Pilih produk kategori',
+                                                  hintText:
+                                                      'Pilih produk kategori',
                                                   border: OutlineInputBorder(),
                                                 ),
-                                                value: categoryId.isNotEmpty ? categoryId : null,
-                                                items: categories.map((category) {
+                                                value: categoryId.isNotEmpty
+                                                    ? categoryId
+                                                    : null,
+                                                items:
+                                                    categories.map((category) {
                                                   return DropdownMenuItem(
                                                     value: category['id'],
-                                                    child: Text(category['name']!),
+                                                    child:
+                                                        Text(category['name']!),
                                                   );
                                                 }).toList(),
-                                                onChanged: (value) => setState(() => categoryId = value!),
+                                                onChanged: (value) => setState(
+                                                    () => categoryId = value!),
                                                 validator: (value) {
-                                                  if (value == null || value.isEmpty) {
+                                                  if (value == null ||
+                                                      value.isEmpty) {
                                                     return 'Pilih kategori';
                                                   }
                                                   return null;
@@ -340,46 +393,51 @@ class _MsProductFormTabState extends State<MsProductFormTab> {
                                       children: [
                                         Expanded(
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              Poppins(text: "Harga (Rp) :", size: 16.0),
+                                              Poppins(
+                                                  text: "Harga (Rp) :",
+                                                  size: 16.0),
                                               SizedBox(height: 5.0),
                                               TextFormField(
-                                                controller: TextEditingController(
-                                                  text: price.toString(),
-                                                ),
+                                                controller: _priceController,
                                                 decoration: InputDecoration(
                                                   border: OutlineInputBorder(),
-                                                  hintText: 'Masukan harga produk',
+                                                  hintText:
+                                                      'Masukan harga produk',
                                                 ),
-                                                keyboardType: TextInputType.number,
+                                                keyboardType:
+                                                    TextInputType.number,
                                                 validator: (value) {
-                                                  if (value == null || value.isEmpty) {
+                                                  if (value == null ||
+                                                      value.isEmpty) {
                                                     return 'Masukkan harga';
                                                   }
                                                   return null;
                                                 },
-                                                onSaved: (value) => price = int.parse(value!),
                                               ),
                                             ],
                                           ),
                                         ),
                                         Expanded(
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              Poppins(text: "HPP (Rp) :", size: 16.0),
+                                              Poppins(
+                                                  text: "HPP (Rp) :",
+                                                  size: 16.0),
                                               SizedBox(height: 5.0),
                                               TextFormField(
-                                                controller: TextEditingController(
-                                                  text: hppPrice.toString(),
-                                                ),
+                                                controller:
+                                                    _hppPriceController,
                                                 decoration: InputDecoration(
                                                   border: OutlineInputBorder(),
                                                   hintText: 'Masukan harga hpp',
                                                 ),
-                                                keyboardType: TextInputType.number,
-                                                onSaved: (value) => hppPrice = int.parse(value!),
+                                                keyboardType:
+                                                    TextInputType.number,
                                               ),
                                             ],
                                           ),
@@ -392,42 +450,59 @@ class _MsProductFormTabState extends State<MsProductFormTab> {
                                       children: [
                                         Expanded(
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              Poppins(text: "Unlimited :", size: 16.0),
+                                              Poppins(
+                                                  text: "Unlimited :",
+                                                  size: 16.0),
                                               SizedBox(height: 5.0),
                                               DropdownButtonFormField<bool>(
                                                 decoration: InputDecoration(
-                                                  hintText: 'Apakah produk ini unlimited?',
+                                                  hintText:
+                                                      'Apakah produk ini unlimited?',
                                                   border: OutlineInputBorder(),
                                                 ),
                                                 value: isUnlimited,
                                                 items: [
-                                                  DropdownMenuItem(value: true, child: Text('Yes')),
-                                                  DropdownMenuItem(value: false, child: Text('No')),
+                                                  DropdownMenuItem(
+                                                      value: true,
+                                                      child: Text('Yes')),
+                                                  DropdownMenuItem(
+                                                      value: false,
+                                                      child: Text('No')),
                                                 ],
-                                                onChanged: (value) => setState(() => isUnlimited = value!),
+                                                onChanged: (value) => setState(
+                                                    () => isUnlimited = value!),
                                               ),
                                             ],
                                           ),
                                         ),
                                         Expanded(
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              Poppins(text: "Upsale :", size: 16.0),
+                                              Poppins(
+                                                  text: "Upsale :", size: 16.0),
                                               SizedBox(height: 5.0),
                                               DropdownButtonFormField<bool>(
                                                 decoration: InputDecoration(
-                                                  hintText: 'Apakah produk ini upsale?',
+                                                  hintText:
+                                                      'Apakah produk ini upsale?',
                                                   border: OutlineInputBorder(),
                                                 ),
                                                 value: isUpSale,
                                                 items: [
-                                                  DropdownMenuItem(value: true, child: Text('Yes')),
-                                                  DropdownMenuItem(value: false, child: Text('No')),
+                                                  DropdownMenuItem(
+                                                      value: true,
+                                                      child: Text('Yes')),
+                                                  DropdownMenuItem(
+                                                      value: false,
+                                                      child: Text('No')),
                                                 ],
-                                                onChanged: (value) => setState(() => isUpSale = value!),
+                                                onChanged: (value) => setState(
+                                                    () => isUpSale = value!),
                                               ),
                                             ],
                                           ),
@@ -440,35 +515,40 @@ class _MsProductFormTabState extends State<MsProductFormTab> {
                                       children: [
                                         Expanded(
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              Poppins(text: "Stock produk :", size: 16.0),
+                                              Poppins(
+                                                  text: "Stock produk :",
+                                                  size: 16.0),
                                               SizedBox(height: 5.0),
                                               TextFormField(
-                                                controller: TextEditingController(
-                                                  text: stock.toString(),
-                                                ),
+                                                controller: _stockController,
                                                 decoration: InputDecoration(
-                                                  hintText: 'Masukan stock produk',
+                                                  hintText:
+                                                      'Masukan stock produk',
                                                   border: OutlineInputBorder(),
                                                 ),
-                                                keyboardType: TextInputType.number,
+                                                keyboardType:
+                                                    TextInputType.number,
                                                 validator: (value) {
-                                                  if (value == null || value.isEmpty) {
+                                                  if (value == null ||
+                                                      value.isEmpty) {
                                                     return 'Masukkan stok';
                                                   }
                                                   return null;
                                                 },
-                                                onSaved: (value) => stock = int.parse(value!),
                                               ),
                                             ],
                                           ),
                                         ),
                                         Expanded(
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              Poppins(text: "Status :", size: 16.0),
+                                              Poppins(
+                                                  text: "Status :", size: 16.0),
                                               SizedBox(height: 5.0),
                                               DropdownButtonFormField<bool>(
                                                 decoration: InputDecoration(
@@ -477,10 +557,15 @@ class _MsProductFormTabState extends State<MsProductFormTab> {
                                                 ),
                                                 value: isActive,
                                                 items: [
-                                                  DropdownMenuItem(value: true, child: Text('Active')),
-                                                  DropdownMenuItem(value: false, child: Text('Inactive')),
+                                                  DropdownMenuItem(
+                                                      value: true,
+                                                      child: Text('Active')),
+                                                  DropdownMenuItem(
+                                                      value: false,
+                                                      child: Text('Inactive')),
                                                 ],
-                                                onChanged: (value) => setState(() => isActive = value!),
+                                                onChanged: (value) => setState(
+                                                    () => isActive = value!),
                                               ),
                                             ],
                                           ),
@@ -506,10 +591,12 @@ class _MsProductFormTabState extends State<MsProductFormTab> {
                                 color: Colors.red,
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(15.0),
-                                    border: Border.all(color: Colors.red, width: 2.0),
+                                    border: Border.all(
+                                        color: Colors.red, width: 2.0),
                                     color: Colors.white),
                                 onPressed: () {
-                                  Navigator.pushNamed(context, "/setting/product-list");
+                                  Navigator.pushNamed(
+                                      context, "/setting/product-list");
                                 },
                               ),
                               ElevatedButtonCustom(
