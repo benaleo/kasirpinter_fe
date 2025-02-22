@@ -12,6 +12,7 @@ class MsProductCategoryTab extends StatefulWidget {
 
 class _MsProductCategoryTabState extends State<MsProductCategoryTab> {
   final MsProductCategoryService _service = MsProductCategoryService();
+  final TextEditingController _nameController = TextEditingController();
 
   List<Map<String, dynamic>> _categories = [];
   int _currentPage = 0;
@@ -51,11 +52,14 @@ class _MsProductCategoryTabState extends State<MsProductCategoryTab> {
     });
   }
 
-  void _showAddCategoryDialog(String? dataId, String? _name, bool? _isActive) {
+  void _showAddCategoryDialog(
+      String? dataId, String? initialName, bool? initialIsActive) {
+    // Reset the controller with the initial value (if any)
+    _nameController.text = initialName ?? '';
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        String name = '';
         return AlertDialog(
           backgroundColor: Colors.white,
           content: Container(
@@ -65,7 +69,7 @@ class _MsProductCategoryTabState extends State<MsProductCategoryTab> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
+              children: [
                 PoppinsBold(
                   text: "Tambah kategori",
                   size: 24.0,
@@ -73,17 +77,14 @@ class _MsProductCategoryTabState extends State<MsProductCategoryTab> {
                 ),
                 SizedBox(height: 20.0),
 
-                // name
+                // Name Field
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Poppins(text: "Nama :", size: 16.0),
                     SizedBox(height: 10.0),
                     TextField(
-                      controller: TextEditingController(text: _name),
-                      onChanged: (value) {
-                        _name = value;
-                      },
+                      controller: _nameController,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.0),
@@ -96,7 +97,7 @@ class _MsProductCategoryTabState extends State<MsProductCategoryTab> {
                 ),
                 SizedBox(height: 10.0),
 
-                // isActive
+                // IsActive Dropdown
                 if (dataId != null)
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,60 +109,64 @@ class _MsProductCategoryTabState extends State<MsProductCategoryTab> {
                           hintText: 'Status apakah aktif?',
                           border: OutlineInputBorder(),
                         ),
-                        value: _isActive,
+                        value: initialIsActive,
                         items: [
                           DropdownMenuItem(value: true, child: Text('Aktif')),
                           DropdownMenuItem(
                               value: false, child: Text('Non Aktif')),
                         ],
-                        onChanged: (value) =>
-                            setState(() => _isActive = value!),
+                        onChanged: (value) => setState(() => isActive = value!),
                       ),
                     ],
                   )
               ],
             ),
           ),
-          actions: <Widget>[
-            ElevatedButtonCustom(
-              text: "Batal",
-              size: 16.0,
-              boxHeight: 40.0,
-              width: 150.0,
-              bgColor: Colors.transparent,
-              color: Colors.black,
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            ElevatedButtonCustom(
-              text: "Simpan",
-              size: 16.0,
-              boxHeight: 40.0,
-              width: 150.0,
-              bgColor: Colors.blue,
-              color: Colors.white,
-              onPressed: () async {
-                await _service.createUpdateProductCategory(
-                    dataId: dataId,
-                    name: name,
-                    type: 'MENU',
-                    isActive: isActive);
-                // close popup
-                Navigator.of(context).pop();
-                // add toast
-                Fluttertoast.showToast(
-                  msg: "Berhasil menyimpan kategori!",
-                  toastLength: Toast.LENGTH_SHORT,
-                  gravity: ToastGravity.BOTTOM,
-                  timeInSecForIosWeb: 1,
-                  backgroundColor: Colors.green,
-                  textColor: Colors.white,
-                  fontSize: 16.0,
-                );
-                // fetch
-                _fetchCategories();
-              },
+          actions: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Expanded(
+                  child: ElevatedButtonCustom(
+                    text: "Batal",
+                    size: 16.0,
+                    boxHeight: 40.0,
+                    width: 150.0,
+                    bgColor: Colors.transparent,
+                    color: Colors.black,
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: ElevatedButtonCustom(
+                    text: "Simpan",
+                    size: 16.0,
+                    boxHeight: 40.0,
+                    width: 150.0,
+                    bgColor: Colors.blue,
+                    color: Colors.white,
+                    onPressed: () {
+                      String name = _nameController.text
+                          .trim(); // Use the controller's text
+                      if (name.isEmpty) {
+                        Fluttertoast.showToast(
+                          msg: "Nama kategori tidak boleh kosong!",
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.BOTTOM,
+                          timeInSecForIosWeb: 1,
+                          backgroundColor: Colors.red,
+                          textColor: Colors.white,
+                          fontSize: 16.0,
+                        );
+                        return; // Exit if the name is empty
+                      }
+                      _createProductCategory(dataId, name, isActive ?? true);
+                    },
+                  ),
+                ),
+              ],
             )
           ],
         );
@@ -227,6 +232,44 @@ class _MsProductCategoryTabState extends State<MsProductCategoryTab> {
         );
       },
     );
+  }
+
+  void _createProductCategory(
+      String? dataId, String name, bool isActive) async {
+    try {
+      await _service.createUpdateProductCategory(
+        dataId: dataId,
+        name: name,
+        type: 'MENU',
+        isActive: isActive,
+      );
+      // close popup
+      Navigator.of(context).pop();
+      // add toast
+      Fluttertoast.showToast(
+        msg: "Berhasil menyimpan kategori!",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      // fetch
+      _fetchCategories();
+    } on Exception catch (e) {
+      print('Failed to create product category: $e');
+      // add toast
+      Fluttertoast.showToast(
+        msg: "Gagal menyimpan kategori!",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    }
   }
 
   void _nextPage() {
