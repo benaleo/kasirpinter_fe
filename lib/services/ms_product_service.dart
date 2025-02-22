@@ -77,10 +77,8 @@ class MsProductService {
           ..headers['Authorization'] = 'Bearer $token'
           ..headers['accept'] = '*/*'
           ..headers['Content-Type'] = 'multipart/form-data';
-    // ..files.add(await http.MultipartFile.fromPath('image', image.path));
     if (image != null)
-      request.files.add(await http.MultipartFile.fromPath(
-          'image', image.path)); // Only add if image is not null
+      request.files.add(await http.MultipartFile.fromPath('image', image.path));
     final response = await request.send();
 
     print("Response status: ${response.statusCode}");
