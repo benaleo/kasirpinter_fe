@@ -52,9 +52,9 @@ class MenuService {
     }
     try {
       final String _baseUrl = dotenv.get('BASE_URL');
-      final String _mainUrl = 'api/v1/user';
+      final String _mainUrl = 'api/v1/pos/menu/category';
 
-      String url = '$_baseUrl/$_mainUrl/menu/category';
+      String url = '$_baseUrl/$_mainUrl';
       final response = await http.get(
         Uri.parse(url),
         headers: {

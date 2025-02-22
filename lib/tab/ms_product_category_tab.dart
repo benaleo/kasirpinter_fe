@@ -255,9 +255,10 @@ class _MsProductCategoryTabState extends State<MsProductCategoryTab> {
         textColor: Colors.white,
         fontSize: 16.0,
       );
-      // fetch
-      _fetchCategories();
-    } on Exception catch (e) {
+
+      // Fetch the updated categories after successful addition
+      await _fetchCategories(); // Call the fetch function here
+    } catch (e) {
       print('Failed to create product category: $e');
       // add toast
       Fluttertoast.showToast(
