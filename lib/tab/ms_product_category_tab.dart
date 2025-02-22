@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:kasirpinter_fe/components/components.dart';
+import 'package:kasirpinter_fe/services/menu_service.dart';
 import '../services/ms_product_category_service.dart';
 
 class MsProductCategoryTab extends StatefulWidget {
@@ -39,6 +40,25 @@ class _MsProductCategoryTabState extends State<MsProductCategoryTab> {
       setState(() {
         _isLoading = false;
       });
+    }
+  }
+
+  Future<void> _fetchMenuCategoriesWithRetry() async {
+    bool success = false;
+    int retryCount = 0;
+    const maxRetries = 5;
+    while (!success && retryCount < maxRetries) {
+      try {
+        await MenuService().fetchMenuCategories();
+        success = true;
+      } catch (e) {
+        retryCount++;
+        print("Retry $retryCount: Error fetching menu categories: $e");
+        await Future.delayed(const Duration(seconds: 2));
+      }
+    }
+    if (!success) {
+      print("Failed to fetch user info after $maxRetries retries.");
     }
   }
 
@@ -199,7 +219,9 @@ class _MsProductCategoryTabState extends State<MsProductCategoryTab> {
                   textColor: Colors.white,
                   fontSize: 16.0,
                 );
-                _fetchCategories();
+                // fetch list and state
+                await _fetchCategories();
+                await _fetchMenuCategoriesWithRetry();
               } else {
                 Fluttertoast.showToast(
                   msg: "Gagal menghapus kategori!",
@@ -257,7 +279,8 @@ class _MsProductCategoryTabState extends State<MsProductCategoryTab> {
       );
 
       // Fetch the updated categories after successful addition
-      await _fetchCategories(); // Call the fetch function here
+      await _fetchCategories();
+      await _fetchMenuCategoriesWithRetry(); // Call the fetch function here
     } catch (e) {
       print('Failed to create product category: $e');
       // add toast
