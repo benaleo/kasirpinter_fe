@@ -185,129 +185,135 @@ class _MsProductMobileState extends State<MsProductMobile> {
               SizedBox(height: 20.0),
               Expanded(
                 child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
                   child: Container(
-                    width: widthDevice,
-                    child: DataTable(
-                      headingRowColor: MaterialStateColor.resolveWith(
-                          (states) => Color(0xFF464646)),
-                      columnSpacing: 20.0,
-                      columns: const <DataColumn>[
-                        DataColumn(
-                            label: PoppinsBold(
-                                text: 'ID', size: 16.0, color: Colors.white)),
-                        DataColumn(
-                            label: PoppinsBold(
-                                text: 'Nama', size: 16.0, color: Colors.white)),
-                        DataColumn(
-                            label: PoppinsBold(
-                                text: 'Kategori',
-                                size: 16.0,
-                                color: Colors.white)),
-                        DataColumn(
-                            label: PoppinsBold(
-                                text: 'Status',
-                                size: 16.0,
-                                color: Colors.white)),
-                        DataColumn(
-                            label: PoppinsBold(
-                                text: 'Upsales',
-                                size: 16.0,
-                                color: Colors.white)),
-                        DataColumn(
-                            label: PoppinsBold(
-                                text: 'HPP', size: 16.0, color: Colors.white)),
-                        DataColumn(
-                            label: PoppinsBold(
-                                text: 'Harga Jual',
-                                size: 16.0,
-                                color: Colors.white)),
-                        DataColumn(
-                            label: PoppinsBold(
-                                text: 'Action',
-                                size: 16.0,
-                                color: Colors.white)),
+                    width: 1200.0,
+                    child: ListView(
+                      scrollDirection: Axis.vertical,
+                      children: [
+                        DataTable(
+                          headingRowColor: MaterialStateColor.resolveWith(
+                              (states) => Color(0xFF464646)),
+                          columnSpacing: 20.0,
+                          columns: const <DataColumn>[
+                            DataColumn(
+                                label: PoppinsBold(
+                                    text: 'ID', size: 16.0, color: Colors.white)),
+                            DataColumn(
+                                label: PoppinsBold(
+                                    text: 'Nama', size: 16.0, color: Colors.white)),
+                            DataColumn(
+                                label: PoppinsBold(
+                                    text: 'Kategori',
+                                    size: 16.0,
+                                    color: Colors.white)),
+                            DataColumn(
+                                label: PoppinsBold(
+                                    text: 'Status',
+                                    size: 16.0,
+                                    color: Colors.white)),
+                            DataColumn(
+                                label: PoppinsBold(
+                                    text: 'Upsales',
+                                    size: 16.0,
+                                    color: Colors.white)),
+                            DataColumn(
+                                label: PoppinsBold(
+                                    text: 'HPP', size: 16.0, color: Colors.white)),
+                            DataColumn(
+                                label: PoppinsBold(
+                                    text: 'Harga Jual',
+                                    size: 16.0,
+                                    color: Colors.white)),
+                            DataColumn(
+                                label: PoppinsBold(
+                                    text: 'Action',
+                                    size: 16.0,
+                                    color: Colors.white)),
+                          ],
+                          rows: List<DataRow>.generate(
+                            _isLoading ? 5 : _products.length,
+                            (index) {
+                              if (_isLoading) {
+                                return DataRow(cells: <DataCell>[
+                                  DataCell(SkeletonShimmer(50.0, 20.0)),
+                                  DataCell(SkeletonShimmer(100.0, 20.0)),
+                                  DataCell(SkeletonShimmer(100.0, 20.0)),
+                                  DataCell(SkeletonShimmer(100.0, 20.0)),
+                                  DataCell(SkeletonShimmer(100.0, 20.0)),
+                                  DataCell(SkeletonShimmer(100.0, 20.0)),
+                                  DataCell(SkeletonShimmer(100.0, 20.0)),
+                                  DataCell(SkeletonShimmer(50.0, 20.0)),
+                                ]);
+                              } else {
+                                final product = _products[index];
+                                return DataRow(cells: <DataCell>[
+                                  DataCell(Poppins(
+                                    text:
+                                        (index + 1 + _currentPage * 10).toString(),
+                                    size: 16.0,
+                                  )),
+                                  DataCell(Poppins(
+                                    text: product['name'] ?? '',
+                                    size: 16.0,
+                                  )),
+                                  DataCell(Poppins(
+                                    text: product['categoryName'] ?? '',
+                                    size: 16.0,
+                                  )),
+                                  DataCell(Poppins(
+                                    text: product['isActive'] == true
+                                        ? 'Aktif'
+                                        : 'Tidak Aktif',
+                                    size: 16.0,
+                                  )),
+                                  DataCell(Poppins(
+                                    text: product['isUpSale'] == true
+                                        ? 'Aktif'
+                                        : 'Tidak Aktif',
+                                    size: 16.0,
+                                  )),
+                                  DataCell(Poppins(
+                                    text: product['hppPrice'] != 0
+                                        ? "Rp. ${product['hppPrice'].toString()}"
+                                        : '0',
+                                    size: 16.0,
+                                  )),
+                                  DataCell(Poppins(
+                                    text: product['price'] != 0
+                                        ? "Rp. ${product['price'].toString()}"
+                                        : '0',
+                                    size: 16.0,
+                                  )),
+                                  DataCell(Row(
+                                    children: [
+                                      IconButton(
+                                        icon: Icon(Icons.edit),
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  MsProductFormTab(
+                                                      productId: product['id']),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                      IconButton(
+                                        icon: Icon(Icons.delete, color: Colors.red),
+                                        onPressed: () {
+                                          _popupDeleteProduct(product);
+                                        },
+                                      ),
+                                    ],
+                                  )),
+                                ]);
+                              }
+                            },
+                          ).toList(),
+                        ),
                       ],
-                      rows: List<DataRow>.generate(
-                        _isLoading ? 5 : _products.length,
-                        (index) {
-                          if (_isLoading) {
-                            return DataRow(cells: <DataCell>[
-                              DataCell(SkeletonShimmer(50.0, 20.0)),
-                              DataCell(SkeletonShimmer(100.0, 20.0)),
-                              DataCell(SkeletonShimmer(100.0, 20.0)),
-                              DataCell(SkeletonShimmer(100.0, 20.0)),
-                              DataCell(SkeletonShimmer(100.0, 20.0)),
-                              DataCell(SkeletonShimmer(100.0, 20.0)),
-                              DataCell(SkeletonShimmer(100.0, 20.0)),
-                              DataCell(SkeletonShimmer(50.0, 20.0)),
-                            ]);
-                          } else {
-                            final product = _products[index];
-                            return DataRow(cells: <DataCell>[
-                              DataCell(Poppins(
-                                text:
-                                    (index + 1 + _currentPage * 10).toString(),
-                                size: 16.0,
-                              )),
-                              DataCell(Poppins(
-                                text: product['name'] ?? '',
-                                size: 16.0,
-                              )),
-                              DataCell(Poppins(
-                                text: product['categoryName'] ?? '',
-                                size: 16.0,
-                              )),
-                              DataCell(Poppins(
-                                text: product['isActive'] == true
-                                    ? 'Aktif'
-                                    : 'Tidak Aktif',
-                                size: 16.0,
-                              )),
-                              DataCell(Poppins(
-                                text: product['isUpSale'] == true
-                                    ? 'Aktif'
-                                    : 'Tidak Aktif',
-                                size: 16.0,
-                              )),
-                              DataCell(Poppins(
-                                text: product['hppPrice'] != 0
-                                    ? "Rp. ${product['hppPrice'].toString()}"
-                                    : '0',
-                                size: 16.0,
-                              )),
-                              DataCell(Poppins(
-                                text: product['price'] != 0
-                                    ? "Rp. ${product['price'].toString()}"
-                                    : '0',
-                                size: 16.0,
-                              )),
-                              DataCell(Row(
-                                children: [
-                                  IconButton(
-                                    icon: Icon(Icons.edit),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              MsProductFormTab(
-                                                  productId: product['id']),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                  IconButton(
-                                    icon: Icon(Icons.delete, color: Colors.red),
-                                    onPressed: () {
-                                      _popupDeleteProduct(product);
-                                    },
-                                  ),
-                                ],
-                              )),
-                            ]);
-                          }
-                        },
-                      ).toList(),
                     ),
                   ),
                 ),

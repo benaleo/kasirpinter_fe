@@ -8,7 +8,8 @@ import '../services/ms_product_category_service.dart';
 
 class MsProductCategoryMobile extends StatefulWidget {
   @override
-  _MsProductCategoryMobileState createState() => _MsProductCategoryMobileState();
+  _MsProductCategoryMobileState createState() =>
+      _MsProductCategoryMobileState();
 }
 
 class _MsProductCategoryMobileState extends State<MsProductCategoryMobile> {
@@ -386,102 +387,127 @@ class _MsProductCategoryMobileState extends State<MsProductCategoryMobile> {
               SizedBox(height: 20.0),
               Expanded(
                 child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
                   child: Container(
-                    width: widthDevice,
-                    child: DataTable(
-                      headingRowColor: MaterialStateColor.resolveWith(
-                          (states) => Color(0xFF464646)),
-                      columnSpacing: 20.0,
-                      columns: [
-                        DataColumn(
-                            label: PoppinsBold(
-                                text: 'ID', size: 16.0, color: Colors.white)),
-                        DataColumn(
-                            label: PoppinsBold(
-                                text: 'Name', size: 16.0, color: Colors.white)),
-                        DataColumn(
-                            label: PoppinsBold(
-                                text: 'Status',
-                                size: 16.0,
-                                color: Colors.white)),
-                        DataColumn(
-                            label: PoppinsBold(
-                                text: 'Type', size: 16.0, color: Colors.white)),
-                        DataColumn(
-                            label: PoppinsBold(
-                                text: 'Total Data',
-                                size: 16.0,
-                                color: Colors.white)),
-                        DataColumn(
-                            label: PoppinsBold(
-                                text: 'Action',
-                                size: 16.0,
-                                color: Colors.white)),
-                      ],
-                      rows: List<DataRow>.generate(
-                        _isLoading ? 5 : _categories.length,
-                        (index) {
-                          if (_isLoading) {
-                            return DataRow(cells: <DataCell>[
-                              DataCell(SkeletonShimmer(50.0, 20.0)),
-                              DataCell(SkeletonShimmer(100.0, 20.0)),
-                              DataCell(SkeletonShimmer(100.0, 20.0)),
-                              DataCell(SkeletonShimmer(100.0, 20.0)),
-                              DataCell(SkeletonShimmer(100.0, 20.0)),
-                              DataCell(SkeletonShimmer(50.0, 20.0)),
-                            ]);
-                          } else {
-                            final category = _categories[index];
-                            return DataRow(
-                              color: MaterialStateColor.resolveWith(
-                                (states) => index.isOdd
-                                    ? Colors.grey.shade50
-                                    : Colors.white,
-                              ),
-                              cells: [
-                                DataCell(Poppins(
-                                    text: (index + 1 + _currentPage * 10)
-                                        .toString(),
-                                    size: 14)),
-                                DataCell(
-                                    Poppins(text: category['name'], size: 14)),
-                                DataCell(Poppins(
-                                    text: category['isActive']
-                                        ? 'Active'
-                                        : 'Inactive',
-                                    size: 14)),
-                                DataCell(Poppins(
-                                    text: 'Menu',
-                                    size:
-                                        14)), // Assuming type is always 'Menu'
-                                DataCell(Poppins(
-                                    text: '${category['totalProducts']} item',
-                                    size: 14)),
-                                DataCell(
-                                  Row(
-                                    children: [
-                                      IconButton(
-                                        icon: Icon(Icons.edit),
-                                        onPressed: () => _showAddCategoryDialog(
-                                            category['id'],
-                                            category['name'],
-                                            category['isActive']),
-                                      ),
-                                      IconButton(
-                                        icon: Icon(Icons.delete,
-                                            color: Colors.red),
-                                        onPressed: () {
-                                          _popupDeleteProductCategory(category);
-                                        },
-                                      ),
-                                    ],
+                    width: 600.0,
+                    child: ListView(
+                      scrollDirection: Axis.vertical,
+                      children: [
+                        DataTable(
+                          headingRowColor: MaterialStateColor.resolveWith(
+                              (states) => Color(0xFF464646)),
+                          columnSpacing: 20.0,
+                          columns: [
+                            DataColumn(
+                              label: PoppinsBold(
+                                  text: 'ID', size: 16.0, color: Colors.white),
+                              numeric: false,
+                            ),
+                            DataColumn(
+                              label: PoppinsBold(
+                                  text: 'Name',
+                                  size: 16.0,
+                                  color: Colors.white),
+                              numeric: false,
+                            ),
+                            DataColumn(
+                              label: PoppinsBold(
+                                  text: 'Status',
+                                  size: 16.0,
+                                  color: Colors.white),
+                              numeric: false,
+                            ),
+                            DataColumn(
+                              label: PoppinsBold(
+                                  text: 'Type',
+                                  size: 16.0,
+                                  color: Colors.white),
+                              numeric: false,
+                            ),
+                            DataColumn(
+                              label: PoppinsBold(
+                                  text: 'Total Data',
+                                  size: 16.0,
+                                  color: Colors.white),
+                              numeric: false,
+                            ),
+                            DataColumn(
+                              label: PoppinsBold(
+                                  text: 'Action',
+                                  size: 16.0,
+                                  color: Colors.white),
+                              numeric: false,
+                            ),
+                          ],
+                          rows: List<DataRow>.generate(
+                            _isLoading ? 5 : _categories.length,
+                            (index) {
+                              if (_isLoading) {
+                                return DataRow(cells: <DataCell>[
+                                  DataCell(SkeletonShimmer(50.0, 20.0)),
+                                  DataCell(SkeletonShimmer(100.0, 20.0)),
+                                  DataCell(SkeletonShimmer(100.0, 20.0)),
+                                  DataCell(SkeletonShimmer(100.0, 20.0)),
+                                  DataCell(SkeletonShimmer(100.0, 20.0)),
+                                  DataCell(SkeletonShimmer(50.0, 20.0)),
+                                ]);
+                              } else {
+                                final category = _categories[index];
+                                return DataRow(
+                                  color: MaterialStateColor.resolveWith(
+                                    (states) => index.isOdd
+                                        ? Colors.grey.shade50
+                                        : Colors.white,
                                   ),
-                                ),
-                              ],
-                            );
-                          }
-                        },
-                      ),
+                                  cells: [
+                                    DataCell(Poppins(
+                                        text: (index + 1 + _currentPage * 10)
+                                            .toString(),
+                                        size: 14)),
+                                    DataCell(Poppins(
+                                        text: category['name'], size: 14)),
+                                    DataCell(Poppins(
+                                        text: category['isActive']
+                                            ? 'Active'
+                                            : 'Inactive',
+                                        size: 14)),
+                                    DataCell(Poppins(
+                                        text: 'Menu',
+                                        size:
+                                            14)), // Assuming type is always 'Menu'
+                                    DataCell(Poppins(
+                                        text:
+                                            '${category['totalProducts']} item',
+                                        size: 14)),
+                                    DataCell(
+                                      Row(
+                                        children: [
+                                          IconButton(
+                                            icon: Icon(Icons.edit),
+                                            onPressed: () =>
+                                                _showAddCategoryDialog(
+                                                    category['id'],
+                                                    category['name'],
+                                                    category['isActive']),
+                                          ),
+                                          IconButton(
+                                            icon: Icon(Icons.delete,
+                                                color: Colors.red),
+                                            onPressed: () {
+                                              _popupDeleteProductCategory(
+                                                  category);
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              }
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
