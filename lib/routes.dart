@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:kasirpinter_fe/mobile/auth_login_mobile.dart';
+import 'package:kasirpinter_fe/mobile/pos_dashboard_mobile.dart';
 import 'package:kasirpinter_fe/splash_screen.dart';
+import 'package:kasirpinter_fe/splash_screen_mobile.dart';
 import 'package:kasirpinter_fe/tab/auth_change_password.dart';
 import 'package:kasirpinter_fe/tab/auth_forgot_password_tab.dart';
 import 'package:kasirpinter_fe/tab/auth_login_tab.dart';
 import 'package:kasirpinter_fe/tab/auth_otp_tab.dart';
-import 'package:kasirpinter_fe/tab/ms_product_form_tab.dart';
 import 'package:kasirpinter_fe/tab/ms_product_form_tab.dart';
 import 'package:kasirpinter_fe/tab/ms_product_tab.dart';
 import 'package:kasirpinter_fe/tab/ms_product_category_tab.dart';
@@ -25,7 +27,7 @@ class Routes {
               if (constraints.maxWidth > 800) {
                 return LoginTab();
               } else {
-                return LoginTab();
+                return LoginMobile();
               }
             },
           ),
@@ -38,7 +40,7 @@ class Routes {
               if (constraints.maxWidth > 800) {
                 return LoginTab();
               } else {
-                return LoginTab();
+                return LoginMobile();
               }
             },
           ),
@@ -51,7 +53,7 @@ class Routes {
               if (constraints.maxWidth > 800) {
                 return SplashScreen();
               } else {
-                return SplashScreen();
+                return SplashScreenMobile();
               }
             },
           ),
@@ -100,7 +102,7 @@ class Routes {
               if (constraits.maxWidth > 800) {
                 return PosDashboardTab();
               } else {
-                return PosDashboardTab();
+                return PosDashboardMobile();
               }
             },
           ),

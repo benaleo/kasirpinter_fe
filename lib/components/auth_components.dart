@@ -4,39 +4,51 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'components.dart';
 
 class SideBarAuth extends StatelessWidget {
-  const SideBarAuth({super.key});
+  final bool? isMobile;
+  const SideBarAuth({super.key, this.isMobile = false});
 
   @override
   Widget build(BuildContext context) {
     double heightDevice = MediaQuery.of(context).size.height;
+    double _top = isMobile == true ? 30.0 : 10.0;
+
     return Expanded(
       child: Container(
         height: heightDevice,
         decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage(
-                  'assets/left_side_login.png'), // Ganti dengan path gambar Anda
-              fit: BoxFit.cover,
-            ),
-            borderRadius: BorderRadius.only(
-              topRight: Radius.circular(20.0),
-              bottomRight: Radius.circular(20.0),
-            )),
+          image: DecorationImage(
+            image: AssetImage(
+                'assets/left_side_login.png'), // Ganti dengan path gambar Anda
+            fit: BoxFit.cover,
+          ),
+          borderRadius: BorderRadius.only(
+            topRight: Radius.circular(20.0),
+            bottomRight: Radius.circular(20.0),
+          ),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: EdgeInsets.only(
+                left: 10.0, right: 10.0, bottom: 10.0, top: _top),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: isMobile == true
+                  ? MainAxisAlignment.start
+                  : MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SvgPicture.asset(
                   "assets/images/logo_white.svg",
-                  width: 300.0,
+                  width: isMobile == true ? 150.0 : 300.0,
                 ),
                 SizedBox(height: 10),
-                Sans('Atur dan kembangkan bisnis bersama kami sekarang!', 18,
-                    color: Colors.white),
+                if (isMobile != true)
+                Poppins(
+                  text: 'Atur dan kembangkan bisnis bersama kami sekarang!',
+                  size: 18,
+                  color: Colors.white,
+                  textAlign: TextAlign.center,
+                ),
               ],
             ),
           ),

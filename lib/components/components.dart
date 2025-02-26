@@ -177,6 +177,8 @@ class TextInputCustom extends StatefulWidget {
   final FocusNode? focusNode;
   final VoidCallback? onSubmitted;
   final String? Function(String?)? validator;
+  final bool? isMobile;
+  final Color? textColor;
 
   const TextInputCustom({
     super.key,
@@ -189,6 +191,8 @@ class TextInputCustom extends StatefulWidget {
     this.focusNode,
     this.onSubmitted,
     this.validator,
+    this.isMobile,
+    this.textColor,
   });
 
   @override
@@ -226,6 +230,7 @@ class _TextInputCustomState extends State<TextInputCustom> {
             : false,
         decoration: InputDecoration(
           labelText: widget.text,
+          labelStyle: TextStyle(color: widget.textColor ?? Colors.black),
           errorText: _errorMessage,
           errorStyle: const TextStyle(color: Colors.red),
           suffixIcon: widget.isPassword != null && widget.isPassword!
@@ -237,12 +242,19 @@ class _TextInputCustomState extends State<TextInputCustom> {
                       _obscureText = !_obscureText;
                     });
                   },
+                  color: widget.textColor ?? Colors.black,
                 )
               : widget.icon,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10.0),
+            borderSide: BorderSide(color: widget.textColor ?? Colors.black),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10.0),
+            borderSide: BorderSide(color: widget.textColor ?? Colors.black),
           ),
         ),
+        style: TextStyle(color: widget.textColor ?? Colors.black),
         validator: (value) {
           final errorMessage = widget.validator?.call(value);
           // Don't directly set _errorMessage, just return the error
@@ -342,8 +354,7 @@ class _DrawerElementState extends State<DrawerElement> {
             ),
             child: Text(''),
           ),
-          Container(
-            height: MediaQuery.of(context).size.height - 200.0,
+          Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -411,17 +422,19 @@ class _DrawerElementState extends State<DrawerElement> {
                         routeName: "/setting"),
                   ],
                 ),
-                DrawerListTile(
-                  index: 100,
-                  icon: Icons.logout,
-                  title: "Logout",
-                  selectedIndex: _selectedIndex,
-                  onItemTapped: _onItemTapped,
-                  routeName: "/login",
-                  onPressed: () async {
-                    final AuthService authService = AuthService();
-                    await authService.logout();
-                  },
+                Container(
+                  child: DrawerListTile(
+                    index: 100,
+                    icon: Icons.logout,
+                    title: "Logout",
+                    selectedIndex: _selectedIndex,
+                    onItemTapped: _onItemTapped,
+                    routeName: "/login",
+                    onPressed: () async {
+                      final AuthService authService = AuthService();
+                      await authService.logout();
+                    },
+                  ),
                 ),
               ],
             ),
@@ -646,7 +659,7 @@ class InformationDialog extends StatelessWidget {
         height: 110.0,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Poppins(text: text ?? "Email atau password salah!", size: 16.0),
             SizedBox(height: 10.0),
