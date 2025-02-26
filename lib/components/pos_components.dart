@@ -56,7 +56,10 @@ class _PosMenuOrderTabsState extends State<PosMenuOrderTabs> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     setState(() {
-      currentRoute = ModalRoute.of(context)?.settings.name;
+      currentRoute = ModalRoute
+          .of(context)
+          ?.settings
+          .name;
     });
   }
 
@@ -169,11 +172,8 @@ class _RowListCategoryMenuState extends State<RowListCategoryMenu> {
         } else {
           // Gunakan data yang berhasil di-fetch
           final List<Map<String, dynamic>> fetchedCategories = snapshot.data!;
-          final List<String> categoryNames = fetchedCategories
-              .map((category) => (category['name'] as String))
-              .map((name) => name[0].toUpperCase() + name.substring(1))
-              .toList();
-
+          final List<String> categoryNames =
+          fetchedCategories.map((category) => (category['name'] as String)).map((name) => name[0].toUpperCase() + name.substring(1)).toList();
 
           return Container(
             height: 30.0, // Tinggi tetap untuk ListView horizontal
@@ -241,6 +241,7 @@ class PosMenuList extends StatefulWidget {
   final int crossAxisCount;
   final String Function(String value) format;
   final void Function(Map<String, dynamic> item) addToCart;
+  final bool? isMobile;
 
   const PosMenuList({
     super.key,
@@ -248,6 +249,7 @@ class PosMenuList extends StatefulWidget {
     required this.format,
     required this.addToCart,
     required this.menuItems,
+    this.isMobile,
   });
 
   @override
@@ -348,16 +350,16 @@ class _PosMenuListState extends State<PosMenuList> {
                       ),
                       Positioned(
                         right: 0.0,
-                        top: 20.0,
+                        top: 10.0,
                         child: Container(
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(color: Color(0xffE7772D), width: 3),
                           ),
                           child: CircleAvatar(
-                            radius: 40,
+                            radius: 30,
                             backgroundImage:
-                                item["image"] == null ? AssetImage('assets/images/empty.png') as ImageProvider : NetworkImage(item["image"]),
+                            item["image"] == null ? AssetImage('assets/images/empty.png') as ImageProvider : NetworkImage(item["image"]),
                             backgroundColor: Colors.transparent,
                           ),
                         ),
@@ -383,6 +385,7 @@ class PostMenuSideBarDetail extends StatefulWidget {
   final int Function() getTotalItem;
   final void Function(int count) setCrossAxisCount;
   final void Function() clearCart;
+  final bool? isMobile;
 
   const PostMenuSideBarDetail({
     super.key,
@@ -393,7 +396,7 @@ class PostMenuSideBarDetail extends StatefulWidget {
     required this.getTotalItem,
     required this.getTotalPrice,
     required this.setCrossAxisCount,
-    required this.clearCart,
+    required this.clearCart, this.isMobile,
   });
 
   @override
@@ -522,14 +525,15 @@ class _PostMenuSideBarDetailState extends State<PostMenuSideBarDetail> {
         return ConfirmDialog(
           onPressed: () async {
             final items = widget.cartItems
-                .map((item) => {
-                      "productId": item["id"],
-                      "quantity": item["quantity"],
-                    })
+                .map((item) =>
+            {
+              "productId": item["id"],
+              "quantity": item["quantity"],
+            })
                 .toList();
             final totalPrice = widget.cartItems.fold<int>(
               0,
-              (sum, item) => sum + ((item["price"] as int) * (item["quantity"] as int)),
+                  (sum, item) => sum + ((item["price"] as int) * (item["quantity"] as int)),
             );
             if (totalPrice <= 0) {
               print('Invalid total price: $totalPrice');
@@ -573,16 +577,17 @@ class _PostMenuSideBarDetailState extends State<PostMenuSideBarDetail> {
                 if (_isMounted) {
                   showDialog(
                     context: _stableContext,
-                    builder: (ctx) => AlertDialog(
-                      title: Text('Transaction Failed'),
-                      content: Text(e.toString()),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.of(ctx).pop(),
-                          child: Text('OK'),
+                    builder: (ctx) =>
+                        AlertDialog(
+                          title: Text('Transaction Failed'),
+                          content: Text(e.toString()),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(ctx).pop(),
+                              child: Text('OK'),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
                   );
                 }
               });
@@ -596,11 +601,14 @@ class _PostMenuSideBarDetailState extends State<PostMenuSideBarDetail> {
 
   @override
   Widget build(BuildContext context) {
-    double widthDevice = MediaQuery.of(context).size.width;
+    double widthDevice = MediaQuery
+        .of(context)
+        .size
+        .width;
     return Padding(
       padding: const EdgeInsets.only(left: 20.0),
       child: Container(
-        width: 400.0,
+        width: 300.0,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20.0),
@@ -644,7 +652,10 @@ class _PostMenuSideBarDetailState extends State<PostMenuSideBarDetail> {
             ),
             SizedBox(height: 5.0),
             SizedBox(
-              height: MediaQuery.of(context).viewInsets.bottom == 0 ? 90.0 : 40.0,
+              height: MediaQuery
+                  .of(context)
+                  .viewInsets
+                  .bottom == 0 ? 90.0 : 40.0,
               child: ListView(
                 children: [
                   Poppins(text: "Form data", size: 14.0),
@@ -685,7 +696,6 @@ class _PostMenuSideBarDetailState extends State<PostMenuSideBarDetail> {
                             Flexible(
                               fit: FlexFit.tight,
                               child: ListTile(
-                                // TODO list items
                                 contentPadding: EdgeInsets.zero, // Menghapus padding bawaan ListTile
                                 title: Text(item["name"]),
                                 subtitle: Row(
@@ -724,7 +734,8 @@ class _PostMenuSideBarDetailState extends State<PostMenuSideBarDetail> {
                                     ),
                                     GradientText(
                                       text:
-                                          "Rp ${widget.format((int.parse(item["price"].toString()) * int.parse(item["quantity"].toString())).toString())}",
+                                      "Rp ${widget.format(
+                                          (int.parse(item["price"].toString()) * int.parse(item["quantity"].toString())).toString())}",
                                       style: GoogleFonts.poppins(fontSize: 18.0),
                                     ),
                                   ],
@@ -893,7 +904,9 @@ class _BarcodePopupDialogState extends State<BarcodePopupDialog> {
   @override
   void initState() {
     super.initState();
-    remainingSeconds = widget.targetTime.difference(DateTime.now()).inSeconds;
+    remainingSeconds = widget.targetTime
+        .difference(DateTime.now())
+        .inSeconds;
 
     // Mulai countdown hanya jika waktunya masih berjalan
     if (remainingSeconds > 0) {
@@ -928,7 +941,10 @@ class _BarcodePopupDialogState extends State<BarcodePopupDialog> {
 
   @override
   Widget build(BuildContext context) {
-    double widthDevice = MediaQuery.of(context).size.width;
+    double widthDevice = MediaQuery
+        .of(context)
+        .size
+        .width;
 
     return AlertDialog(
       backgroundColor: Colors.transparent,
@@ -974,7 +990,8 @@ class _BarcodePopupDialogState extends State<BarcodePopupDialog> {
                             SizedBox(height: 5.0),
                             PoppinsBold(
                               text:
-                                  "${widget.targetTime.day} Oktober ${widget.targetTime.year}, ${widget.targetTime.hour}:${widget.targetTime.minute.toString().padLeft(2, '0')}",
+                              "${widget.targetTime.day} Oktober ${widget.targetTime.year}, ${widget.targetTime.hour}:${widget.targetTime.minute
+                                  .toString().padLeft(2, '0')}",
                               size: 20.0,
                             ),
                           ],
@@ -1173,22 +1190,27 @@ class _ShowCheckoutPopupDialogState extends State<ShowCheckoutPopupDialog> {
                           child: PoppinsBold(text: "Checkout", size: 16.0, color: Color(0xff723E29)),
                         ),
                         Container(
-                          height: MediaQuery.of(context).viewInsets.bottom == 0 ? 200.0 : 0.0,
+                          height: MediaQuery
+                              .of(context)
+                              .viewInsets
+                              .bottom == 0 ? 200.0 : 0.0,
                           child: Scrollbar(
                             child: ListView(
                               children: [
-                                ...widget.cartItems.map((item) => ListTile(
-                                    title: Row(
-                                      children: [
-                                        Poppins(text: item["name"], size: 14.0),
-                                        SizedBox(width: 10.0),
-                                        Poppins(text: "x ${item["quantity"]}", size: 12.0, color: Colors.grey.shade600)
-                                      ],
-                                    ),
-                                    trailing: PoppinsBold(
-                                        text:
-                                            "Rp ${widget.format((int.parse(item["price"].toString()) * int.parse(item["quantity"].toString())).toString())}",
-                                        size: 16.0))),
+                                ...widget.cartItems.map((item) =>
+                                    ListTile(
+                                        title: Row(
+                                          children: [
+                                            Poppins(text: item["name"], size: 14.0),
+                                            SizedBox(width: 10.0),
+                                            Poppins(text: "x ${item["quantity"]}", size: 12.0, color: Colors.grey.shade600)
+                                          ],
+                                        ),
+                                        trailing: PoppinsBold(
+                                            text:
+                                            "Rp ${widget.format(
+                                                (int.parse(item["price"].toString()) * int.parse(item["quantity"].toString())).toString())}",
+                                            size: 16.0))),
                               ],
                             ),
                           ),
@@ -1200,7 +1222,10 @@ class _ShowCheckoutPopupDialogState extends State<ShowCheckoutPopupDialog> {
                           dashColor: Colors.black12,
                         ),
                         Container(
-                          height: MediaQuery.of(context).viewInsets.bottom == 0 ? 270.0 : 160.0,
+                          height: MediaQuery
+                              .of(context)
+                              .viewInsets
+                              .bottom == 0 ? 270.0 : 160.0,
                           padding: const EdgeInsets.only(left: 20.0, right: 20.0, bottom: 10.0),
                           child: ListView(
                             children: [
@@ -1277,89 +1302,90 @@ class _ShowCheckoutPopupDialogState extends State<ShowCheckoutPopupDialog> {
                                 onPressed: _isLoading
                                     ? null
                                     : () async {
-                                        if (_paymentAmount >= widget.totalPrice) {
-                                          setState(() {
-                                            _isLoading = true; // Set loading state to true
-                                          });
+                                  if (_paymentAmount >= widget.totalPrice) {
+                                    setState(() {
+                                      _isLoading = true; // Set loading state to true
+                                    });
 
-                                          // Prepare transaction data
-                                          final customerName = widget.customerName; // Replace with actual customer name from input
-                                          final typePayment = "CASH"; // CASH or QRIS
-                                          final status = "PAID"; // Default status
-                                          final items = widget.cartItems
-                                              .map((item) => {
-                                                    "productId": item["id"], // Assuming each item has an "id"
-                                                    "quantity": item["quantity"],
-                                                  })
-                                              .toList();
-                                          final transactionId = widget.transactionId;
+                                    // Prepare transaction data
+                                    final customerName = widget.customerName; // Replace with actual customer name from input
+                                    final typePayment = "CASH"; // CASH or QRIS
+                                    final status = "PAID"; // Default status
+                                    final items = widget.cartItems
+                                        .map((item) =>
+                                    {
+                                      "productId": item["id"], // Assuming each item has an "id"
+                                      "quantity": item["quantity"],
+                                    })
+                                        .toList();
+                                    final transactionId = widget.transactionId;
 
-                                          // Call TransactionService to create the transaction
-                                          try {
-                                            final transactionService = TransactionService();
-                                            final response;
-                                            if (widget.isCreateTransaction) {
-                                              response = await transactionService.createTransaction(
-                                                customerName,
-                                                _paymentAmount,
-                                                typePayment,
-                                                status,
-                                                items: items,
-                                              );
-                                            } else {
-                                              response = await transactionService.updateTransaction(
-                                                transactionId,
-                                                customerName,
-                                                _paymentAmount,
-                                                typePayment,
-                                                status,
-                                                items: items,
-                                              );
-                                            }
+                                    // Call TransactionService to create the transaction
+                                    try {
+                                      final transactionService = TransactionService();
+                                      final response;
+                                      if (widget.isCreateTransaction) {
+                                        response = await transactionService.createTransaction(
+                                          customerName,
+                                          _paymentAmount,
+                                          typePayment,
+                                          status,
+                                          items: items,
+                                        );
+                                      } else {
+                                        response = await transactionService.updateTransaction(
+                                          transactionId,
+                                          customerName,
+                                          _paymentAmount,
+                                          typePayment,
+                                          status,
+                                          items: items,
+                                        );
+                                      }
 
-                                            print("Transaction created: $response");
+                                      print("Transaction created: $response");
 
-                                            // Close the dialog and show success message
-                                            Navigator.of(context).pushNamed("/pos-menu");
+                                      // Close the dialog and show success message
+                                      Navigator.of(context).pushNamed("/pos-menu");
 
-                                            // add toas
-                                            Fluttertoast.showToast(
-                                              msg: "Transaksi berhasil!",
-                                              toastLength: Toast.LENGTH_SHORT,
-                                              gravity: ToastGravity.BOTTOM,
-                                              timeInSecForIosWeb: 1,
-                                              backgroundColor: Colors.green,
-                                              textColor: Colors.white,
-                                              fontSize: 16.0,
-                                            );
-                                          } catch (e) {
-                                            print("Error creating transaction: $e");
-                                            Fluttertoast.showToast(
-                                              msg: "Transaksi gagal!",
-                                              toastLength: Toast.LENGTH_SHORT,
-                                              gravity: ToastGravity.BOTTOM,
-                                              timeInSecForIosWeb: 1,
-                                              backgroundColor: Colors.orange,
-                                              textColor: Colors.white,
-                                              fontSize: 16.0,
-                                            );
-                                          } finally {
-                                            setState(() {
-                                              _isLoading = false; // Set loading state to false after transaction
-                                            });
-                                          }
-                                        } else {
-                                          Fluttertoast.showToast(
-                                            msg: "Transaksi gagal!",
-                                            toastLength: Toast.LENGTH_SHORT,
-                                            gravity: ToastGravity.BOTTOM,
-                                            timeInSecForIosWeb: 1,
-                                            backgroundColor: Colors.orange,
-                                            textColor: Colors.white,
-                                            fontSize: 16.0,
-                                          );
-                                        }
-                                      },
+                                      // add toas
+                                      Fluttertoast.showToast(
+                                        msg: "Transaksi berhasil!",
+                                        toastLength: Toast.LENGTH_SHORT,
+                                        gravity: ToastGravity.BOTTOM,
+                                        timeInSecForIosWeb: 1,
+                                        backgroundColor: Colors.green,
+                                        textColor: Colors.white,
+                                        fontSize: 16.0,
+                                      );
+                                    } catch (e) {
+                                      print("Error creating transaction: $e");
+                                      Fluttertoast.showToast(
+                                        msg: "Transaksi gagal!",
+                                        toastLength: Toast.LENGTH_SHORT,
+                                        gravity: ToastGravity.BOTTOM,
+                                        timeInSecForIosWeb: 1,
+                                        backgroundColor: Colors.orange,
+                                        textColor: Colors.white,
+                                        fontSize: 16.0,
+                                      );
+                                    } finally {
+                                      setState(() {
+                                        _isLoading = false; // Set loading state to false after transaction
+                                      });
+                                    }
+                                  } else {
+                                    Fluttertoast.showToast(
+                                      msg: "Transaksi gagal!",
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.BOTTOM,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: Colors.orange,
+                                      textColor: Colors.white,
+                                      fontSize: 16.0,
+                                    );
+                                  }
+                                },
                                 child: _isLoading ? CircularProgressIndicator() : Poppins(text: "Bayar", size: 16.0, color: Colors.white),
                               ),
                               ElevatedButton(
