@@ -17,6 +17,8 @@ import 'package:kasirpinter_fe/tab/pos_order_tab.dart';
 import 'package:kasirpinter_fe/tab/pos_setting_tab.dart';
 import 'package:kasirpinter_fe/web/login_web.dart';
 
+import 'mobile/pos_order_mobile.dart';
+
 class Routes {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -116,7 +118,7 @@ class Routes {
               if (constraits.maxWidth > 800) {
                 return PosOrderTab();
               } else {
-                return PosOrderTab();
+                return PosOrderMobile();
               }
             },
           ),
