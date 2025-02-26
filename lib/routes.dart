@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kasirpinter_fe/mobile/auth_login_mobile.dart';
+import 'package:kasirpinter_fe/mobile/ms_product_mobile.dart';
 import 'package:kasirpinter_fe/mobile/pos_dashboard_mobile.dart';
 import 'package:kasirpinter_fe/mobile/pos_menu_mobile.dart';
 import 'package:kasirpinter_fe/splash_screen.dart';
@@ -157,7 +158,7 @@ class Routes {
               if (constraits.maxWidth > 800) {
                 return MsProductTab();
               } else {
-                return MsProductTab();
+                return MsProductMobile();
               }
             },
           ),
@@ -184,7 +185,7 @@ class Routes {
               if (constraits.maxWidth > 800) {
                 return MsProductTab();
               } else {
-                return MsProductTab();
+                return MsProductMobile();
               }
             },
           ),
