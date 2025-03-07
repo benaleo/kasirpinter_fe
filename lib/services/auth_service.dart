@@ -35,6 +35,51 @@ class AuthService {
     }
   }
 
+  Future<ApiResponse> register(String email, String password, String name, String phone,
+      String companyName, String companyAddress, String companyCity, String companyPhone) async {
+    print("api url is : $_baseUrl");
+    try {
+      final response = await http.post(
+        Uri.parse('$_baseUrl/$_mainUrl/register'),
+        headers: {"Content-Type": "application/json", "accept": "*/*"},
+        body: jsonEncode(<String, dynamic>{
+          'name': name,
+          'email': email,
+          'password': password,
+          'phone': phone,
+          'company': <String, dynamic>{
+            'name': companyName,
+            'address': companyAddress,
+            'city': companyCity,
+            'phone': companyPhone
+          }
+        }),
+      );
+
+      final data = jsonDecode(response.body);
+      print("Response data: $data");
+      if (data['success']) {
+        return ApiResponse(
+          success: true,
+          message: data['message'],
+          data: null,
+        );
+      }
+      return ApiResponse(
+        success: false,
+        message: data['message'],
+        data: null,
+      );
+    } catch (e) {
+      print("Error: $e");
+      return ApiResponse(
+        success: false,
+        message: e.toString(),
+        data: null,
+      );
+    }
+  }
+
   Future<void> _saveToken(String token) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('token', token);

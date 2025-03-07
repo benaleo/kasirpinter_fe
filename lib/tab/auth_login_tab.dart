@@ -144,7 +144,21 @@ class _LoginTabState extends State<LoginTab> {
                                       color: Colors.white,
                                     ),
                             ),
-                            SizedBox(height: 20.0),
+                            SizedBox(height: 10.0),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Poppins(text: "Belum punya akun ?", size: 14.0),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context)
+                                        .pushNamed("/register");
+                                  },
+                                  child: Poppins(text: "Daftar Sekarang", size: 14.0, color: Colors.blue[600],),
+                                ),
+                              ],
+                            )
                           ],
                         ),
                       ),

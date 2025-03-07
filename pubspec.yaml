@@ -38,7 +38,7 @@ dependencies:
   google_fonts: ^6.2.1
   flutter_svg: ^2.0.17
   url_launcher: ^6.3.1
-  url_strategy: ^0.3.0
+  dynamic_path_url_strategy: ^1.0.0
   intl: ^0.20.2
   flutter_dash: ^1.0.0
   flutter_keyboard_visibility: ^6.0.0
@@ -99,7 +99,6 @@ flutter:
     - assets/images/
     - assets/images/menu/
     - assets/images/icons/
-
 
   # To add assets to your application, add an assets section, like this:
   # assets:

@@ -33,8 +33,7 @@ class _MsProductMobileState extends State<MsProductMobile> {
     });
 
     try {
-      final response = await _service.fetchProducts(
-          page: _currentPage, keyword: _searchKeyword);
+      final response = await _service.fetchProducts(page: _currentPage, keyword: _searchKeyword);
       setState(() {
         _products = List<Map<String, dynamic>>.from(response['data']['result']);
         _isLoading = false;
@@ -140,16 +139,14 @@ class _MsProductMobileState extends State<MsProductMobile> {
         body: Container(
           margin: EdgeInsets.all(20.0),
           padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20.0), color: Colors.white),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(20.0), color: Colors.white),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  PoppinsBold(
-                      text: "Daftar Produk", size: 24.0, color: Colors.black),
+                  PoppinsBold(text: "Daftar Produk", size: 24.0, color: Colors.black),
                   ElevatedButtonCustom(
                     text: "Tambah",
                     size: 16.0,
@@ -192,44 +189,17 @@ class _MsProductMobileState extends State<MsProductMobile> {
                       scrollDirection: Axis.vertical,
                       children: [
                         DataTable(
-                          headingRowColor: MaterialStateColor.resolveWith(
-                              (states) => Color(0xFF464646)),
+                          headingRowColor: MaterialStateColor.resolveWith((states) => Color(0xFF464646)),
                           columnSpacing: 20.0,
                           columns: const <DataColumn>[
-                            DataColumn(
-                                label: PoppinsBold(
-                                    text: 'ID', size: 16.0, color: Colors.white)),
-                            DataColumn(
-                                label: PoppinsBold(
-                                    text: 'Nama', size: 16.0, color: Colors.white)),
-                            DataColumn(
-                                label: PoppinsBold(
-                                    text: 'Kategori',
-                                    size: 16.0,
-                                    color: Colors.white)),
-                            DataColumn(
-                                label: PoppinsBold(
-                                    text: 'Status',
-                                    size: 16.0,
-                                    color: Colors.white)),
-                            DataColumn(
-                                label: PoppinsBold(
-                                    text: 'Upsales',
-                                    size: 16.0,
-                                    color: Colors.white)),
-                            DataColumn(
-                                label: PoppinsBold(
-                                    text: 'HPP', size: 16.0, color: Colors.white)),
-                            DataColumn(
-                                label: PoppinsBold(
-                                    text: 'Harga Jual',
-                                    size: 16.0,
-                                    color: Colors.white)),
-                            DataColumn(
-                                label: PoppinsBold(
-                                    text: 'Action',
-                                    size: 16.0,
-                                    color: Colors.white)),
+                            DataColumn(label: PoppinsBold(text: 'ID', size: 16.0, color: Colors.white)),
+                            DataColumn(label: PoppinsBold(text: 'Nama', size: 16.0, color: Colors.white)),
+                            DataColumn(label: PoppinsBold(text: 'Kategori', size: 16.0, color: Colors.white)),
+                            DataColumn(label: PoppinsBold(text: 'Status', size: 16.0, color: Colors.white)),
+                            DataColumn(label: PoppinsBold(text: 'Upsales', size: 16.0, color: Colors.white)),
+                            DataColumn(label: PoppinsBold(text: 'HPP', size: 16.0, color: Colors.white)),
+                            DataColumn(label: PoppinsBold(text: 'Harga Jual', size: 16.0, color: Colors.white)),
+                            DataColumn(label: PoppinsBold(text: 'Action', size: 16.0, color: Colors.white)),
                           ],
                           rows: List<DataRow>.generate(
                             _isLoading ? 5 : _products.length,
@@ -249,8 +219,7 @@ class _MsProductMobileState extends State<MsProductMobile> {
                                 final product = _products[index];
                                 return DataRow(cells: <DataCell>[
                                   DataCell(Poppins(
-                                    text:
-                                        (index + 1 + _currentPage * 10).toString(),
+                                    text: (index + 1 + _currentPage * 10).toString(),
                                     size: 16.0,
                                   )),
                                   DataCell(Poppins(
@@ -262,27 +231,19 @@ class _MsProductMobileState extends State<MsProductMobile> {
                                     size: 16.0,
                                   )),
                                   DataCell(Poppins(
-                                    text: product['isActive'] == true
-                                        ? 'Aktif'
-                                        : 'Tidak Aktif',
+                                    text: product['isActive'] == true ? 'Aktif' : 'Tidak Aktif',
                                     size: 16.0,
                                   )),
                                   DataCell(Poppins(
-                                    text: product['isUpSale'] == true
-                                        ? 'Aktif'
-                                        : 'Tidak Aktif',
+                                    text: product['isUpSale'] == true ? 'Aktif' : 'Tidak Aktif',
                                     size: 16.0,
                                   )),
                                   DataCell(Poppins(
-                                    text: product['hppPrice'] != 0
-                                        ? "Rp. ${product['hppPrice'].toString()}"
-                                        : '0',
+                                    text: product['hppPrice'] != 0 ? "Rp. ${product['hppPrice'].toString()}" : '0',
                                     size: 16.0,
                                   )),
                                   DataCell(Poppins(
-                                    text: product['price'] != 0
-                                        ? "Rp. ${product['price'].toString()}"
-                                        : '0',
+                                    text: product['price'] != 0 ? "Rp. ${product['price'].toString()}" : '0',
                                     size: 16.0,
                                   )),
                                   DataCell(Row(
@@ -293,9 +254,7 @@ class _MsProductMobileState extends State<MsProductMobile> {
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                              builder: (context) =>
-                                                  MsProductFormTab(
-                                                      productId: product['id']),
+                                              builder: (context) => MsProductFormTab(productId: product['id']),
                                             ),
                                           );
                                         },

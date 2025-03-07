@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kasirpinter_fe/mobile/auth_login_mobile.dart';
+import 'package:kasirpinter_fe/mobile/auth_register_mobile.dart';
 import 'package:kasirpinter_fe/mobile/ms_product_category_mobile.dart';
 import 'package:kasirpinter_fe/mobile/ms_product_mobile.dart';
 import 'package:kasirpinter_fe/mobile/pos_dashboard_mobile.dart';
@@ -10,6 +11,7 @@ import 'package:kasirpinter_fe/tab/auth_change_password.dart';
 import 'package:kasirpinter_fe/tab/auth_forgot_password_tab.dart';
 import 'package:kasirpinter_fe/tab/auth_login_tab.dart';
 import 'package:kasirpinter_fe/tab/auth_otp_tab.dart';
+import 'package:kasirpinter_fe/tab/auth_register_tab.dart';
 import 'package:kasirpinter_fe/tab/ms_product_form_tab.dart';
 import 'package:kasirpinter_fe/tab/ms_product_tab.dart';
 import 'package:kasirpinter_fe/tab/ms_product_category_tab.dart';
@@ -50,6 +52,20 @@ class Routes {
             },
           ),
         );
+      case '/register':
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth > 800) {
+                return RegisterTab();
+              } else {
+                return RegisterMobile();
+              }
+            },
+          ),
+        );
+
       case '/splash-screen':
         return MaterialPageRoute(
           settings: settings,
