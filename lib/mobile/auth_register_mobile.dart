@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:kasirpinter_fe/components/auth_components.dart';
 import 'package:kasirpinter_fe/components/data_model.dart';
 import 'package:kasirpinter_fe/services/auth_service.dart';
-import 'package:kasirpinter_fe/splash_screen.dart';
 
 import '../components/components.dart';
 
@@ -77,7 +77,8 @@ class _RegisterMobileState extends State<RegisterMobile> {
         builder: (context) {
           return SuccessAuthPopup(
             title: "Hore! Berhasil Mendaftar",
-            body: "Silahkan login dengan email dan password yang telah Anda daftarkan",
+            body:
+                "Silahkan login dengan email dan password yang telah Anda daftarkan",
             buttonText: "Login",
             route: "/login",
           );
@@ -89,7 +90,9 @@ class _RegisterMobileState extends State<RegisterMobile> {
           context: context,
           builder: (context) => AlertDialog(
             title: Poppins(text: 'Konfirmasi', size: 20.0),
-            content: Poppins(text: 'Apakah Anda yakin ingin keluar dari aplikasi?', size: 16.0),
+            content: Poppins(
+                text: 'Apakah Anda yakin ingin keluar dari aplikasi?',
+                size: 16.0),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
@@ -121,145 +124,191 @@ class _RegisterMobileState extends State<RegisterMobile> {
       },
       child: Scaffold(
         body: SafeArea(
-          child: Row(
+          child: ListView(
             children: [
-              SideBarAuth(),
-              Expanded(
-                child: ListView(
-                  children: [
-                    Container(
-                      height: MediaQuery.of(context).viewInsets.bottom == 0
-                          ? heightDevice
-                          : heightDevice,
-                      color: Colors.white,
-                      padding: EdgeInsets.symmetric(horizontal: 40.0),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20.0, vertical: 40.0),
-                        child: ListView(
-                          children: [
-                            SizedBox(height: 50.0),
-                            PoppinsBold(text: "Hallo", size: 36.0, textAlign: TextAlign.center,),
-                            SizedBox(height: 10.0),
-                            Poppins(
-                                text: 'Selamat Datang di Sistem Back Office Kasir Pinter',
-                                size: 20.0, textAlign: TextAlign.center),
-                            SizedBox(height: 30.0),
-                            if (!isCompanyForm)
-                              TextInputCustom(
-                                controller: _nameController,
-                                text: "Nama",
-                                icon: Icon(Icons.person),
-                              ),
-                            if (!isCompanyForm) SizedBox(height: 20.0),
-                            if (!isCompanyForm)
-                              TextInputCustom(
-                                controller: _phoneController,
-                                text: "Telepon",
-                                icon: Icon(Icons.phone),
-                              ),
-                            if (!isCompanyForm) SizedBox(height: 20.0),
-                            if (!isCompanyForm)
-                              TextInputCustom(
-                                controller: _emailController,
-                                text: "Email",
-                                icon: Icon(Icons.alternate_email_outlined),
-                              ),
-                            if (!isCompanyForm) SizedBox(height: 20.0),
-                            if (!isCompanyForm)
-                              TextInputCustom(
-                                controller: _passwordController,
-                                text: "Password",
-                                icon: Icon(Icons.lock),
-                                isPassword: true,
-                              ),
-                            if (!isCompanyForm) SizedBox(height: 10.0),
-                            if (!isCompanyForm)
-                              ElevatedButtonCustom(
-                                onPressed: isLoading ? null : _handleNext,
-                                text: 'Selanjutnya',
-                                size: 18.0,
-                                child: isLoading
-                                    ? CircularProgressIndicator(
-                                        color: Colors.white)
-                                    : Poppins(
-                                        text: "Selanjutnya",
-                                        size: 18.0,
-                                        color: Colors.white,
-                                      ),
-                              ),
-                            if (isCompanyForm)
-                              TextInputCustom(
-                                controller: _companyNameController,
-                                text: "Nama Perusahaan",
-                                icon: Icon(Icons.business),
-                              ),
-                            SizedBox(height: 20.0),
-                            if (isCompanyForm)
-                              TextInputCustom(
-                                controller: _companyAddressController,
-                                text: "Alamat Perusahaan",
-                                icon: Icon(Icons.location_on),
-                              ),
-                            SizedBox(height: 20.0),
-                            if (isCompanyForm)
-                              TextInputCustom(
-                                controller: _companyCityController,
-                                text: "Kota Perusahaan",
-                                icon: Icon(Icons.location_city),
-                              ),
-                            SizedBox(height: 20.0),
-                            if (isCompanyForm)
-                              TextInputCustom(
-                                controller: _companyPhoneController,
-                                text: "Telepon Perusahaan",
-                                icon: Icon(Icons.phone),
-                              ),
-                            SizedBox(height: 10.0),
-                            if (isCompanyForm)
-                              Row(
-                                spacing: 10.0,
-                                children: [
-                                  Expanded(
-                                    child: ElevatedButtonCustom(
-                                      onPressed: isLoading ? null : _handleBack,
-                                      text: 'Kembali',
-                                      size: 18.0,
-                                      bgColor: Colors.white,
-                                      child: isLoading
-                                          ? Container(
-                                              color: Colors.black)
-                                          : Poppins(
-                                              text: "Kembali",
-                                              size: 18.0,
-                                              color: Colors.black,
-                                            ),
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: ElevatedButtonCustom(
-                                      onPressed: isLoading ? null : _handleSave,
-                                      text: 'Simpan',
-                                      size: 18.0,
-                                      child: isLoading
-                                          ? CircularProgressIndicator(
-                                              color: Colors.white)
-                                          : Poppins(
-                                              text: "Simpan",
-                                              size: 18.0,
-                                              color: Colors.white,
-                                            ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            SizedBox(height: 20.0),
-                          ],
-                        ),
+              Stack(
+                children: [
+                  Container(
+                    height: heightDevice - 60.0,
+                    padding: EdgeInsets.symmetric(horizontal: 40.0),
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage('assets/images/left_side_login.png'),
+                        fit: BoxFit.cover,
                       ),
                     ),
-                  ],
-                ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20.0, vertical: 40.0),
+                      child: ListView(
+                        children: [
+                          SizedBox(height: 120.0),
+                          PoppinsBold(
+                            text: "Pendaftaran",
+                            size: 36.0,
+                            textAlign: TextAlign.center,
+                            color: Colors.white,
+                          ),
+                          SizedBox(height: 10.0),
+                          // Poppins(
+                          //     text:
+                          //         'Selamat Datang di Sistem Back Office Kasir Pinter',
+                          //     size: 16.0,
+                          //     textAlign: TextAlign.center,
+                          //     color: Colors.white),
+                          SizedBox(height: 30.0),
+                          if (!isCompanyForm)
+                            TextInputCustom(
+                              controller: _nameController,
+                              text: "Nama",
+                              textColor: Colors.white,
+                              icon: Icon(Icons.person, color: Colors.white),
+                            ),
+                          if (!isCompanyForm) SizedBox(height: 20.0),
+                          if (!isCompanyForm)
+                            TextInputCustom(
+                              controller: _phoneController,
+                              text: "Telepon",
+                              textColor: Colors.white,
+                              icon: Icon(Icons.phone, color: Colors.white),
+                            ),
+                          if (!isCompanyForm) SizedBox(height: 20.0),
+                          if (!isCompanyForm)
+                            TextInputCustom(
+                              controller: _emailController,
+                              text: "Email",
+                              textColor: Colors.white,
+                              icon: Icon(Icons.alternate_email_outlined,
+                                  color: Colors.white),
+                            ),
+                          if (!isCompanyForm) SizedBox(height: 20.0),
+                          if (!isCompanyForm)
+                            TextInputCustom(
+                              controller: _passwordController,
+                              text: "Password",
+                              textColor: Colors.white,
+                              icon: Icon(Icons.lock, color: Colors.white),
+                              isPassword: true,
+                            ),
+                          if (!isCompanyForm) SizedBox(height: 10.0),
+                          if (!isCompanyForm)
+                            ElevatedButtonCustom(
+                              onPressed: isLoading ? null : _handleNext,
+                              text: 'Selanjutnya',
+                              size: 18.0,
+                              child: isLoading
+                                  ? CircularProgressIndicator(
+                                      color: Colors.white)
+                                  : Poppins(
+                                      text: "Selanjutnya",
+                                      size: 18.0,
+                                      color: Colors.white,
+                                    ),
+                            ),
+                          if (isCompanyForm)
+                            TextInputCustom(
+                              controller: _companyNameController,
+                              text: "Nama Perusahaan",
+                              textColor: Colors.white,
+                              icon: Icon(Icons.business, color: Colors.white),
+                            ),
+                          if (isCompanyForm) SizedBox(height: 20.0),
+                          if (isCompanyForm)
+                            TextInputCustom(
+                              controller: _companyAddressController,
+                              text: "Alamat Perusahaan",
+                              textColor: Colors.white,
+                              icon:
+                                  Icon(Icons.location_on, color: Colors.white),
+                            ),
+                          if (isCompanyForm) SizedBox(height: 20.0),
+                          if (isCompanyForm)
+                            TextInputCustom(
+                              controller: _companyCityController,
+                              text: "Kota Perusahaan",
+                              textColor: Colors.white,
+                              icon: Icon(Icons.location_city,
+                                  color: Colors.white),
+                            ),
+                          if (isCompanyForm) SizedBox(height: 20.0),
+                          if (isCompanyForm)
+                            TextInputCustom(
+                              controller: _companyPhoneController,
+                              text: "Telepon Perusahaan",
+                              textColor: Colors.white,
+                              icon: Icon(Icons.phone, color: Colors.white),
+                            ),
+                          if (isCompanyForm) SizedBox(height: 10.0),
+                          if (isCompanyForm)
+                            Row(
+                              spacing: 10.0,
+                              children: [
+                                Expanded(
+                                  child: ElevatedButtonCustom(
+                                    onPressed: isLoading ? null : _handleBack,
+                                    text: 'Kembali',
+                                    size: 18.0,
+                                    bgColor: isLoading ? Colors.grey[200] : Colors.white,
+                                    child: Poppins(
+                                      text: "Kembali",
+                                      size: 18.0,
+                                      color: isLoading ? Colors.grey[600] : Colors.black,
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: ElevatedButtonCustom(
+                                    onPressed: isLoading ? null : _handleSave,
+                                    text: 'Daftar',
+                                    size: 18.0,
+                                    child: isLoading
+                                        ? CircularProgressIndicator(
+                                            color: Colors.white)
+                                        : Poppins(
+                                            text: "Daftar",
+                                            size: 18.0,
+                                            color: Colors.white,
+                                          ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          SizedBox(height: 20.0),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Poppins(
+                                text: "Sudah punya akun ?",
+                                size: 14.0,
+                                color: Colors.white,
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pushNamed("/login");
+                                },
+                                child: Poppins(
+                                  text: "Masuk",
+                                  size: 14.0,
+                                  color: Colors.white,
+                                  textDecoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 70,
+                    left: (MediaQuery.of(context).size.width - 150) / 2,
+                    child: SvgPicture.asset(
+                      "assets/images/logo_white.svg",
+                      width: 150.0,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

@@ -49,13 +49,15 @@ class Poppins extends StatelessWidget {
   final double size;
   final TextAlign? textAlign;
   final color;
+  final TextDecoration? textDecoration;
 
   const Poppins(
       {super.key,
       required this.text,
       required this.size,
       this.textAlign,
-      this.color});
+      this.color,
+      this.textDecoration});
 
   @override
   Widget build(BuildContext context) {
@@ -65,6 +67,9 @@ class Poppins extends StatelessWidget {
       style: GoogleFonts.poppins(
         fontSize: size,
         color: color,
+        decoration: textDecoration,
+        decorationColor: color,
+        decorationThickness: 2.0,
       ),
     );
   }
@@ -654,22 +659,23 @@ class InformationDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: Colors.white,
-      content: Container(
-        padding: EdgeInsets.only(top: 20.0),
-        height: 110.0,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Poppins(text: text ?? "Email atau password salah!", size: 16.0),
-            SizedBox(height: 10.0),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Poppins(text: "OK", size: 14.0),
-            ),
-          ],
+      content: SizedBox(
+        height: 80.0,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Poppins(text: text ?? "Email atau password salah!", size: 16.0),
+              SizedBox(height: 10.0),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Poppins(text: "OK", size: 14.0),
+              ),
+            ],
+          ),
         ),
       ),
     );

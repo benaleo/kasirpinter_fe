@@ -86,9 +86,7 @@ class _LoginMobileState extends State<LoginMobile> {
               Stack(
                 children: [
                   Container(
-                    height: MediaQuery.of(context).viewInsets.bottom == 0
-                        ? heightDevice
-                        : heightDevice - 270,
+                    height: heightDevice - 60.0,
                     decoration: BoxDecoration(
                       image: DecorationImage(
                         image: AssetImage('assets/images/left_side_login.png'),
@@ -100,8 +98,9 @@ class _LoginMobileState extends State<LoginMobile> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 20.0, vertical: 40.0),
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
+                          SizedBox(height: 120.0),
                           PoppinsBold(
                             text: "Hallo",
                             size: 36.0,
@@ -161,17 +160,36 @@ class _LoginMobileState extends State<LoginMobile> {
                           SizedBox(height: 30.0),
                           ElevatedButtonCustom(
                             onPressed: isLoading ? null : _handleLogin,
-                            text: 'Login',
+                            text: 'Masuk',
                             size: 18.0,
                             child: isLoading
                                 ? CircularProgressIndicator(color: Colors.white)
                                 : Poppins(
-                              text: "Login",
+                              text: "Masuk",
                               size: 18.0,
                               color: Colors.white,
                             ),
                           ),
                           SizedBox(height: 20.0),
+                          Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Poppins(text: "Belum punya akun ?", size: 14.0, color: Colors.white,),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context)
+                                    .pushNamed("/register");
+                              },
+                              child: Poppins(
+                                text: "Daftar Sekarang",
+                                size: 14.0,
+                                color: Colors.white,
+                                textDecoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ],
+                        )
                         ],
                       ),
                     ),
