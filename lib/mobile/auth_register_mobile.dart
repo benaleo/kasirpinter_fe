@@ -60,7 +60,7 @@ class _RegisterMobileState extends State<RegisterMobile> {
     });
 
     if (response.success) {
-      Navigator.of(context).pushNamed("/login");
+      _successPopup();
     } else {
       showDialog(
         context: context,
@@ -69,6 +69,19 @@ class _RegisterMobileState extends State<RegisterMobile> {
         },
       );
     }
+  }
+
+  void _successPopup() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return SuccessAuthPopup(
+            title: "Hore! Berhasil Mendaftar",
+            body: "Silahkan login dengan email dan password yang telah Anda daftarkan",
+            buttonText: "Login",
+            route: "/login",
+          );
+        });
   }
 
   Future<bool> _onBackPressed() async {
