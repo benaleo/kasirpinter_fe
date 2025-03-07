@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:kasirpinter_fe/components/auth_components.dart';
 import 'package:kasirpinter_fe/services/auth_service.dart';
-
 import '../components/components.dart';
 
 class LoginTab extends StatefulWidget {
@@ -15,29 +15,52 @@ class _LoginTabState extends State<LoginTab> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool isLoading = false;
+  bool _rememberMe = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedCredentials();
+  }
+
+  Future<void> _loadSavedCredentials() async {
+    final prefs = await SharedPreferences.getInstance();
+    final email = prefs.getString('savedEmail');
+    final password = prefs.getString('savedPassword');
+    
+    if (email != null && password != null) {
+      setState(() {
+        _emailController.text = email;
+        _passwordController.text = password;
+        _rememberMe = true;
+      });
+    }
+  }
 
   void _handleLogin() async {
-    setState(() {
-      isLoading = true;
-    });
+    setState(() => isLoading = true);
 
     bool success = await AuthService().login(
       _emailController.text,
       _passwordController.text,
     );
 
-    setState(() {
-      isLoading = false;
-    });
+    setState(() => isLoading = false);
 
     if (success) {
+      final prefs = await SharedPreferences.getInstance();
+      if (_rememberMe) {
+        await prefs.setString('savedEmail', _emailController.text);
+        await prefs.setString('savedPassword', _passwordController.text);
+      } else {
+        await prefs.remove('savedEmail');
+        await prefs.remove('savedPassword');
+      }
       Navigator.of(context).pushReplacementNamed("/splash-screen");
     } else {
       showDialog(
         context: context,
-        builder: (context) {
-          return InformationDialog("Email atau password salah!");
-        },
+        builder: (context) => InformationDialog("Email atau password salah!"),
       );
     }
   }
@@ -68,13 +91,11 @@ class _LoginTabState extends State<LoginTab> {
   Widget build(BuildContext context) {
     double heightDevice = MediaQuery.of(context).size.height;
     return PopScope(
-      canPop: false, // Prevent default back navigation
+      canPop: false,
       onPopInvoked: (didPop) async {
         if (didPop) return;
         bool shouldClose = await _onBackPressed();
-        if (shouldClose) {
-          Navigator.of(context).pop();
-        }
+        if (shouldClose) Navigator.of(context).pop();
       },
       child: Scaffold(
         body: SafeArea(
@@ -122,7 +143,18 @@ class _LoginTabState extends State<LoginTab> {
                         SizedBox(height: 10.0),
                         Row(
                           children: [
-                            Checkbox(value: false, onChanged: (value) {}),
+                            Checkbox(
+                              value: _rememberMe,
+                              onChanged: (value) async {
+                                final newValue = value ?? false;
+                                setState(() => _rememberMe = newValue);
+                                if (!newValue) {
+                                  final prefs = await SharedPreferences.getInstance();
+                                  await prefs.remove('savedEmail');
+                                  await prefs.remove('savedPassword');
+                                }
+                              },
+                            ),
                             Text('Ingat saya'),
                             Spacer(),
                             TextButton(
