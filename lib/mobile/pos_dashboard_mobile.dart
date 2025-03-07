@@ -304,55 +304,54 @@ class _PosDashboardMobileState extends State<PosDashboardMobile> {
                 padding: const EdgeInsets.only(left: 10.0),
                 child: PoppinsBold(text: "Dashboard", size: 24.0),
               ),
-              Expanded(
-                child: Card(
-                  color: Color(0xffFFEDE2),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                          padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-                          width: widthDevice,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(15.0),
-                                topRight: Radius.circular(15.0),
-                              ),
-                              color: Color.fromRGBO(231, 119, 45, 0.3)),
-                          child: PoppinsBold(text: "Profil", size: 20.0)),
-                      SizedBox(height: 10.0),
-                      Container(
-                        height: 150.0,
-                        padding: const EdgeInsets.all(16.0),
-                        child: Row(
-                          spacing: 20.0,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Column(
-                              spacing: 5.0,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Poppins(text: "Name", size: 16.0),
-                                Poppins(text: "Perusahaan", size: 16.0),
-                                Poppins(text: "Shift", size: 16.0),
-                                Poppins(text: "Waktu Shift", size: 16.0),
-                              ],
+              
+              Card(
+                color: Color(0xffFFEDE2),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                        padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+                        width: widthDevice,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(15.0),
+                              topRight: Radius.circular(15.0),
                             ),
-                            Column(
-                              spacing: 5.0,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Poppins(text: ": $name", size: 16.0),
-                                Poppins(text: ": $company", size: 16.0),
-                                Poppins(text: ": $shift", size: 16.0),
-                                Poppins(text: ": $shiftTime", size: 16.0),
-                              ],
-                            ),
-                          ],
-                        ),
+                            color: Color.fromRGBO(231, 119, 45, 0.3)),
+                        child: PoppinsBold(text: "Profil", size: 20.0)),
+                    SizedBox(height: 10.0),
+                    Container(
+                      height: 150.0,
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        spacing: 20.0,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Column(
+                            spacing: 5.0,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Poppins(text: "Name", size: 16.0),
+                              Poppins(text: "Perusahaan", size: 16.0),
+                              Poppins(text: "Shift", size: 16.0),
+                              Poppins(text: "Waktu Shift", size: 16.0),
+                            ],
+                          ),
+                          Column(
+                            spacing: 5.0,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Poppins(text: ": $name", size: 16.0),
+                              Poppins(text: ": $company", size: 16.0),
+                              Poppins(text: ": $shift", size: 16.0),
+                              Poppins(text: ": $shiftTime", size: 16.0),
+                            ],
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
               Expanded(
@@ -477,7 +476,7 @@ class _PosDashboardMobileState extends State<PosDashboardMobile> {
                         height: 350.0,
                         padding: const EdgeInsets.all(16.0),
                         child: Column(
-                          spacing: 20.0,
+                          spacing: 10.0,
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             CardDashboard(
@@ -498,6 +497,7 @@ class _PosDashboardMobileState extends State<PosDashboardMobile> {
                   ),
                 ),
               ),
+
               // Kas
               Expanded(
                 child: Card(
@@ -633,10 +633,10 @@ class CardDashboard extends StatelessWidget {
               borderRadius: BorderRadius.circular(10.0),
             ),
             child: Column(
-              spacing: 5.0,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Poppins(text: title, size: 16.0),
+                SizedBox(height: 5.0),
                 Poppins(text: value, size: 16.0),
               ],
             ),

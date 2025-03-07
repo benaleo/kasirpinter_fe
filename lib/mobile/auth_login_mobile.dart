@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:kasirpinter_fe/components/auth_components.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:kasirpinter_fe/services/auth_service.dart';
-import 'package:kasirpinter_fe/splash_screen.dart';
-
 import '../components/components.dart';
 
 class LoginMobile extends StatefulWidget {
@@ -17,29 +15,52 @@ class _LoginMobileState extends State<LoginMobile> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool isLoading = false;
+  bool _rememberMe = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedCredentials();
+  }
+
+  Future<void> _loadSavedCredentials() async {
+    final prefs = await SharedPreferences.getInstance();
+    final email = prefs.getString('savedEmail');
+    final password = prefs.getString('savedPassword');
+    
+    if (email != null && password != null) {
+      setState(() {
+        _emailController.text = email;
+        _passwordController.text = password;
+        _rememberMe = true;
+      });
+    }
+  }
 
   void _handleLogin() async {
-    setState(() {
-      isLoading = true;
-    });
+    setState(() => isLoading = true);
 
     bool success = await AuthService().login(
       _emailController.text,
       _passwordController.text,
     );
 
-    setState(() {
-      isLoading = false;
-    });
+    setState(() => isLoading = false);
 
     if (success) {
+      final prefs = await SharedPreferences.getInstance();
+      if (_rememberMe) {
+        await prefs.setString('savedEmail', _emailController.text);
+        await prefs.setString('savedPassword', _passwordController.text);
+      } else {
+        await prefs.remove('savedEmail');
+        await prefs.remove('savedPassword');
+      }
       Navigator.of(context).pushReplacementNamed("/splash-screen");
     } else {
       showDialog(
         context: context,
-        builder: (context) {
-          return InformationDialog("Email atau password salah!");
-        },
+        builder: (context) => InformationDialog("Email atau password salah!"),
       );
     }
   }
@@ -71,13 +92,11 @@ class _LoginMobileState extends State<LoginMobile> {
     double heightDevice = MediaQuery.of(context).size.height;
     double widthDevice = MediaQuery.of(context).size.width;
     return PopScope(
-      canPop: false, // Prevent default back navigation
+      canPop: false,
       onPopInvoked: (didPop) async {
         if (didPop) return;
         bool shouldClose = await _onBackPressed();
-        if (shouldClose) {
-          Navigator.of(context).pop();
-        }
+        if (shouldClose) Navigator.of(context).pop();
       },
       child: Scaffold(
         body: SafeArea(
@@ -109,7 +128,7 @@ class _LoginMobileState extends State<LoginMobile> {
                           SizedBox(height: 10.0),
                           Poppins(
                             text:
-                            'Selamat Datang di Sistem Back Office Kasir Pinter',
+                                'Selamat Datang di Sistem Back Office Kasir Pinter',
                             size: 16.0,
                             color: Colors.white,
                             textAlign: TextAlign.center,
@@ -138,7 +157,19 @@ class _LoginMobileState extends State<LoginMobile> {
                           SizedBox(height: 10.0),
                           Row(
                             children: [
-                              Checkbox(value: false, onChanged: (value) {}),
+                              Checkbox(
+                                value: _rememberMe,
+                                onChanged: (value) async {
+                                  final newValue = value ?? false;
+                                  setState(() => _rememberMe = newValue);
+                                  if (!newValue) {
+                                    final prefs =
+                                        await SharedPreferences.getInstance();
+                                    await prefs.remove('savedEmail');
+                                    await prefs.remove('savedPassword');
+                                  }
+                                },
+                              ),
                               Poppins(
                                   text: 'Ingat saya',
                                   size: 12.0,
@@ -165,31 +196,33 @@ class _LoginMobileState extends State<LoginMobile> {
                             child: isLoading
                                 ? CircularProgressIndicator(color: Colors.white)
                                 : Poppins(
-                              text: "Masuk",
-                              size: 18.0,
-                              color: Colors.white,
-                            ),
+                                    text: "Masuk",
+                                    size: 18.0,
+                                    color: Colors.white,
+                                  ),
                           ),
                           SizedBox(height: 20.0),
                           Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Poppins(text: "Belum punya akun ?", size: 14.0, color: Colors.white,),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context)
-                                    .pushNamed("/register");
-                              },
-                              child: Poppins(
-                                text: "Daftar Sekarang",
-                                size: 14.0,
-                                color: Colors.white,
-                                textDecoration: TextDecoration.underline,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Poppins(
+                                  text: "Belum punya akun ?",
+                                  size: 14.0,
+                                  color: Colors.white),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pushNamed("/register");
+                                },
+                                child: Poppins(
+                                  text: "Daftar Sekarang",
+                                  size: 14.0,
+                                  color: Colors.white,
+                                  textDecoration: TextDecoration.underline,
+                                ),
                               ),
-                            ),
-                          ],
-                        )
+                            ],
+                          )
                         ],
                       ),
                     ),
