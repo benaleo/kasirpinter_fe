@@ -83,87 +83,94 @@ class _LoginTabState extends State<LoginTab> {
             children: [
               SideBarAuth(),
               Expanded(
-                child: ListView(
-                  children: [
-                    Container(
-                      height: MediaQuery.of(context).viewInsets.bottom == 0
-                          ? heightDevice
-                          : heightDevice - 270,
-                      color: Colors.white,
-                      padding: EdgeInsets.symmetric(horizontal: 40.0),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20.0, vertical: 40.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                child: Container(
+                  height: MediaQuery.of(context).viewInsets.bottom == 0
+                      ? heightDevice
+                      : heightDevice,
+                  color: Colors.white,
+                  padding: EdgeInsets.symmetric(horizontal: 40.0),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20.0, vertical: 40.0),
+                    child: ListView(
+                      children: [
+                        SizedBox(height: 50.0),
+                        PoppinsBold(
+                          text: "Hallo",
+                          size: 36.0,
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: 10.0),
+                        Poppins(
+                          text:
+                              'Selamat Datang di Sistem Back Office Kasir Pinter',
+                          size: 20.0,
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: 30.0),
+                        TextInputCustom(
+                          controller: _emailController,
+                          text: "Email",
+                          icon: Icon(Icons.alternate_email_outlined),
+                        ),
+                        SizedBox(height: 20.0),
+                        TextInputCustom(
+                          controller: _passwordController,
+                          text: "Password",
+                          icon: Icon(Icons.lock),
+                          isPassword: true,
+                        ),
+                        SizedBox(height: 10.0),
+                        Row(
                           children: [
-                            SansBold("Hallo", 36.0),
-                            SizedBox(height: 10.0),
-                            Sans(
-                                'Selamat Datang di Sistem Back Office Kasir Pinter',
-                                20.0),
-                            SizedBox(height: 30.0),
-                            TextInputCustom(
-                              controller: _emailController,
-                              text: "Email",
-                              icon: Icon(Icons.alternate_email_outlined),
+                            Checkbox(value: false, onChanged: (value) {}),
+                            Text('Ingat saya'),
+                            Spacer(),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context)
+                                    .pushNamed("/forgot-password");
+                              },
+                              child: Text('Lupa password?'),
                             ),
-                            SizedBox(height: 20.0),
-                            TextInputCustom(
-                              controller: _passwordController,
-                              text: "Password",
-                              icon: Icon(Icons.lock),
-                              isPassword: true,
-                            ),
-                            SizedBox(height: 10.0),
-                            Row(
-                              children: [
-                                Checkbox(value: false, onChanged: (value) {}),
-                                Text('Ingat saya'),
-                                Spacer(),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context)
-                                        .pushNamed("/forgot-password");
-                                  },
-                                  child: Text('Lupa password?'),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 30.0),
-                            ElevatedButtonCustom(
-                              onPressed: isLoading ? null : _handleLogin,
-                              text: 'Login',
-                              size: 18.0,
-                              child: isLoading
-                                  ? CircularProgressIndicator(
-                                      color: Colors.white)
-                                  : Poppins(
-                                      text: "Login",
-                                      size: 18.0,
-                                      color: Colors.white,
-                                    ),
-                            ),
-                            SizedBox(height: 10.0),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Poppins(text: "Belum punya akun ?", size: 14.0),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context)
-                                        .pushNamed("/register");
-                                  },
-                                  child: Poppins(text: "Daftar Sekarang", size: 14.0, color: Colors.blue[600],),
-                                ),
-                              ],
-                            )
                           ],
                         ),
-                      ),
+                        SizedBox(height: 30.0),
+                        ElevatedButtonCustom(
+                          onPressed: isLoading ? null : _handleLogin,
+                          text: 'Login',
+                          size: 18.0,
+                          child: isLoading
+                              ? CircularProgressIndicator(
+                                  color: Colors.white)
+                              : Poppins(
+                                  text: "Login",
+                                  size: 18.0,
+                                  color: Colors.white,
+                                ),
+                        ),
+                        SizedBox(height: 10.0),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Poppins(text: "Belum punya akun ?", size: 14.0),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context)
+                                    .pushNamed("/register");
+                              },
+                              child: Poppins(
+                                text: "Daftar Sekarang",
+                                size: 14.0,
+                                color: Colors.blue[600],
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ],
