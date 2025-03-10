@@ -350,17 +350,23 @@ class _PosMenuListState extends State<PosMenuList> {
                       ),
                       Positioned(
                         right: 0.0,
-                        top: 10.0,
+                        top: 18.0,
                         child: Container(
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(color: Color(0xffE7772D), width: 3),
                           ),
                           child: CircleAvatar(
-                            radius: 30,
+                            radius: 40,
                             backgroundImage:
-                            item["image"] == null ? AssetImage('assets/images/empty.png') as ImageProvider : NetworkImage(item["image"]),
+                            AssetImage('assets/images/empty.png'),
                             backgroundColor: Colors.transparent,
+                            child: CircleAvatar(
+                              radius: 40,
+                              backgroundImage:
+                              item["image"] == null ? AssetImage('assets/images/empty.png') as ImageProvider : NetworkImage(item["image"]),
+                              backgroundColor: Colors.transparent,
+                            ),
                           ),
                         ),
                       ),

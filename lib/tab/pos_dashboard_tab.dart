@@ -34,7 +34,77 @@ class _PosDashboardTabState extends State<PosDashboardTab> {
   int _pemasukanPenjualan = 0;
   int _pengeluaran = 0;
   int _totalSummary = 0;
+
+  void presencePopup(String type) {
+    // Capture the state's context here (valid throughout the widget's lifecycle)
+    final stateContext = context;
+    String verb = type == 'IN' ? 'masuk' : 'pulang';
+
+    showDialog(
+      context: stateContext, // Use stateContext for the first dialog
+      builder: (BuildContext dialogContext) {
+        return ConfirmDialog(
+          onPressed: () async {
+            try {
+              final UserService userService = UserService();
+              await userService.userPresence(type);
+              String dateTimeNow = DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now());
+
+              if (type == 'IN') {
+                await _updateUserInfo(dateTimeNow, null);
+              } else if (type == 'OUT') {
+                await _updateUserInfo(null, dateTimeNow);
+              }
+
+              Fluttertoast.showToast(
+                msg: "Absensi $verb berhasil!",
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.BOTTOM,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.green,
+                textColor: Colors.white,
+                fontSize: 16.0,
+              );
+              Navigator.of(dialogContext).pop(); // Close confirm dialog
+
+              await Future.delayed(Duration(milliseconds: 1500));
+
+              // Use the root stateContext (still valid) to show the second dialog
+              showDialog(
+                context: stateContext, // ✅ Valid context from the state
+                builder: (context) => AlertDialog(
+                  title: Text("Absensi $verb berhasil!"),
+                  content: Text("Data absensi berhasil disimpan"),
+                  actions: [
+                    TextButton(
+                      child: Text("OK"),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                ),
+              );
+            } catch (e) {
+              print("Error: $e");
+              if(!e.toString().toLowerCase().contains('widget')) {
+                Fluttertoast.showToast(
+                  msg: e.toString(),
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0,
+                );
+              }
+            }
+          },
+          text: "Apakah kamu yakin akan $verb?",
+        );
+      },
+    );
+  }
   int _diskon = 0;
+
   int _totalPenjualanBersih = 0;
 
   @override
@@ -79,70 +149,6 @@ class _PosDashboardTabState extends State<PosDashboardTab> {
         _modalAwal = userData['company_modal'];
       });
     }
-  }
-
-  void presencePopup(String type) {
-    String verb = type == 'IN' ? 'masuk' : 'pulang';
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return ConfirmDialog(
-          onPressed: () async {
-            try {
-              final UserService userService = UserService();
-              await userService.userPresence(type);
-              String dateTimeNow =
-                  DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now());
-              if (type == 'IN') {
-                await _updateUserInfo(dateTimeNow, null);
-              } else if (type == 'OUT') {
-                await _updateUserInfo(null, dateTimeNow);
-              }
-              Fluttertoast.showToast(
-                msg: "Absensi $verb berhasil!",
-                toastLength: Toast.LENGTH_SHORT,
-                gravity: ToastGravity.BOTTOM,
-                timeInSecForIosWeb: 1,
-                backgroundColor: Colors.green,
-                textColor: Colors.white,
-                fontSize: 16.0,
-              );
-              Navigator.of(context).pop();
-
-              await Future.delayed(Duration(milliseconds: 1500));
-              showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: Text("Absensi $verb berhasil!"),
-                      content: Text("Data absensi berhasil disimpan"),
-                      actions: [
-                        TextButton(
-                          child: Text("OK"),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                      ],
-                    );
-                  });
-            } catch (e) {
-              print("Error on dashboard: $e");
-              Fluttertoast.showToast(
-                msg: e.toString(),
-                toastLength: Toast.LENGTH_SHORT,
-                gravity: ToastGravity.BOTTOM,
-                timeInSecForIosWeb: 1,
-                backgroundColor: Colors.red,
-                textColor: Colors.white,
-                fontSize: 16.0,
-              );
-            }
-          },
-          text: "Apakah kamu yakin akan $verb?",
-        );
-      },
-    );
   }
 
   void _showAddModal() {
@@ -300,369 +306,373 @@ class _PosDashboardTabState extends State<PosDashboardTab> {
             color: Colors.white,
             borderRadius: BorderRadius.circular(10.0),
           ),
-          child: ListView(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 10.0),
-                child: PoppinsBold(text: "Dashboard", size: 24.0),
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Card(
-                      color: Color(0xffFFEDE2),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 16.0, vertical: 10.0),
-                              width: widthDevice,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(15.0),
-                                    topRight: Radius.circular(15.0),
-                                  ),
-                                  color: Color.fromRGBO(231, 119, 45, 0.3)),
-                              child: PoppinsBold(text: "Profil", size: 20.0)),
-                          SizedBox(height: 10.0),
-                          Container(
-                            height: 150.0,
-                            padding: const EdgeInsets.all(16.0),
-                            child: Row(
-                              spacing: 20.0,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Column(
-                                  spacing: 5.0,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Poppins(text: "Name", size: 16.0),
-                                    Poppins(text: "Perusahaan", size: 16.0),
-                                    Poppins(text: "Shift", size: 16.0),
-                                    Poppins(text: "Waktu Shift", size: 16.0),
-                                  ],
-                                ),
-                                Column(
-                                  spacing: 5.0,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Poppins(text: ": $name", size: 16.0),
-                                    Poppins(text: ": $company", size: 16.0),
-                                    Poppins(text: ": $shift", size: 16.0),
-                                    Poppins(text: ": $shiftTime", size: 16.0),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Card(
-                      color: Color(0xffFFEDE2),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 16.0, vertical: 10.0),
-                              width: widthDevice,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(15.0),
-                                    topRight: Radius.circular(15.0),
-                                  ),
-                                  color: Color.fromRGBO(231, 119, 45, 0.3)),
-                              child: PoppinsBold(text: "Absensi", size: 20.0)),
-                          SizedBox(height: 10.0),
-                          Container(
-                            height: 150.0,
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Poppins(
-                                          text: "Waktu mulai: ",
-                                          size: 16.0,
-                                        ),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 20.0),
-                                          child: PoppinsBold(
-                                            text: clockIn ?? '',
-                                            size: 16.0,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    ElevatedButtonCustom(
-                                      boxSize: 250.0,
-                                      text: "Masuk",
-                                      size: 16.0,
-                                      width: 250.0,
-                                      color: clockIn != null
-                                          ? Colors.grey[600]
-                                          : Colors.white,
-                                      bgColor: clockIn != null
-                                          ? Colors.grey[200]
-                                          : null,
-                                      boxHeight: 40.0,
-                                      onPressed: clockIn != null
-                                          ? null
-                                          : () {
-                                              presencePopup('IN');
-                                            },
-                                    )
-                                  ],
-                                ),
-                                SizedBox(height: 10.0),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Poppins(
-                                          text: "Waktu selesai: ",
-                                          size: 16.0,
-                                        ),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 20.0),
-                                          child: PoppinsBold(
-                                            text: clockOut ?? '',
-                                            size: 16.0,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    ElevatedButtonCustom(
-                                      boxSize: 250.0,
-                                      text: "Pulang",
-                                      size: 16.0,
-                                      width: 250.0,
-                                      color: clockIn == null
-                                          ? Colors.grey[600]
-                                          : Colors.white,
-                                      bgColor: clockIn == null
-                                          ? Colors.grey[200]
-                                          : null,
-                                      boxHeight: 40.0,
-                                      onPressed: clockIn == null
-                                          ? null
-                                          : () {
-                                              presencePopup('OUT');
-                                            },
-                                    )
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              // Shift Sales Summary
-              Expanded(
-                child: Card(
-                  color: Color(0xffFFEDE2),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 16.0, vertical: 10.0),
-                          width: widthDevice,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(15.0),
-                                topRight: Radius.circular(15.0),
-                              ),
-                              color: Color.fromRGBO(231, 119, 45, 0.3)),
-                          child: PoppinsBold(text: "Shift Sales", size: 20.0)),
-                      SizedBox(height: 10.0),
-                      Container(
-                        height: 110.0,
-                        padding: const EdgeInsets.all(16.0),
-                        child: Row(
-                          spacing: 20.0,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 10.0),
+                  child: PoppinsBold(text: "Dashboard", size: 24.0),
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Card(
+                        color: Color(0xffFFEDE2),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            CardDashboard(
-                              "Modal Awal",
-                              "Rp. $_modalAwal",
-                              onTap: () {
-                                print("tapped Modal Awal");
-                                _showAddModal();
-                              },
+                            Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 16.0, vertical: 10.0),
+                                width: widthDevice,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(15.0),
+                                      topRight: Radius.circular(15.0),
+                                    ),
+                                    color: Color.fromRGBO(231, 119, 45, 0.3)),
+                                child: PoppinsBold(text: "Profil", size: 20.0)),
+                            SizedBox(height: 10.0),
+                            Container(
+                              height: 150.0,
+                              padding: const EdgeInsets.all(16.0),
+                              child: Row(
+                                spacing: 20.0,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Column(
+                                    spacing: 5.0,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Poppins(text: "Name", size: 16.0),
+                                      Poppins(text: "Perusahaan", size: 16.0),
+                                      Poppins(text: "Shift", size: 16.0),
+                                      Poppins(text: "Waktu Shift", size: 16.0),
+                                    ],
+                                  ),
+                                  Column(
+                                    spacing: 5.0,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Poppins(text: ": $name", size: 16.0),
+                                      Poppins(text: ": $company", size: 16.0),
+                                      Poppins(text: ": $shift", size: 16.0),
+                                      Poppins(text: ": $shiftTime", size: 16.0),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
-                            CardDashboard(
-                                "Total Pemasukan", "Rp. $_pemasukanPenjualan"),
-                            CardDashboard("Total Modal", "Rp. $_pengeluaran"),
-                            CardDashboard(
-                                "Total Profit", "Rp. $_totalPenjualanBersih"),
                           ],
                         ),
                       ),
-                    ],
+                    ),
+                    Expanded(
+                      child: Card(
+                        color: Color(0xffFFEDE2),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 16.0, vertical: 10.0),
+                                width: widthDevice,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(15.0),
+                                      topRight: Radius.circular(15.0),
+                                    ),
+                                    color: Color.fromRGBO(231, 119, 45, 0.3)),
+                                child: PoppinsBold(text: "Absensi", size: 20.0)),
+                            SizedBox(height: 10.0),
+                            Container(
+                              height: 150.0,
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Poppins(
+                                            text: "Waktu mulai: ",
+                                            size: 16.0,
+                                          ),
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 20.0),
+                                            child: PoppinsBold(
+                                              text: clockIn ?? '',
+                                              size: 16.0,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      ElevatedButtonCustom(
+                                        boxSize: 250.0,
+                                        text: "Masuk",
+                                        size: 16.0,
+                                        width: 250.0,
+                                        color: clockIn != null
+                                            ? Colors.grey[600]
+                                            : Colors.white,
+                                        bgColor: clockIn != null
+                                            ? Colors.grey[200]
+                                            : null,
+                                        boxHeight: 40.0,
+                                        onPressed: clockIn != null
+                                            ? null
+                                            : () {
+                                                presencePopup('IN');
+                                              },
+                                      )
+                                    ],
+                                  ),
+                                  SizedBox(height: 10.0),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Poppins(
+                                            text: "Waktu selesai: ",
+                                            size: 16.0,
+                                          ),
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 20.0),
+                                            child: PoppinsBold(
+                                              text: clockOut ?? '',
+                                              size: 16.0,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      ElevatedButtonCustom(
+                                        boxSize: 250.0,
+                                        text: "Pulang",
+                                        size: 16.0,
+                                        width: 250.0,
+                                        color: clockIn == null
+                                            ? Colors.grey[600]
+                                            : Colors.white,
+                                        bgColor: clockIn == null
+                                            ? Colors.grey[200]
+                                            : null,
+                                        boxHeight: 40.0,
+                                        onPressed: clockIn == null
+                                            ? null
+                                            : () {
+                                                presencePopup('OUT');
+                                              },
+                                      )
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                // Shift Sales Summary
+                SizedBox(
+                  width: widthDevice,
+                  height: 200.0,
+                  child: Card(
+                    color: Color(0xffFFEDE2),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 10.0),
+                            width: widthDevice,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(15.0),
+                                  topRight: Radius.circular(15.0),
+                                ),
+                                color: Color.fromRGBO(231, 119, 45, 0.3)),
+                            child: PoppinsBold(text: "Shift Sales", size: 20.0)),
+                        SizedBox(height: 10.0),
+                        Container(
+                          height: 110.0,
+                          padding: const EdgeInsets.all(16.0),
+                          child: Row(
+                            spacing: 20.0,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              CardDashboard(
+                                "Modal Awal",
+                                "Rp. $_modalAwal",
+                                onTap: () {
+                                  print("tapped Modal Awal");
+                                  _showAddModal();
+                                },
+                              ),
+                              CardDashboard(
+                                  "Total Pemasukan", "Rp. $_pemasukanPenjualan"),
+                              CardDashboard("Total Modal", "Rp. $_pengeluaran"),
+                              CardDashboard(
+                                  "Total Profit", "Rp. $_totalPenjualanBersih"),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              // Kas
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Card(
-                      color: Color(0xffFFEDE2),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 16.0, vertical: 10.0),
-                              width: widthDevice,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(15.0),
-                                    topRight: Radius.circular(15.0),
+                // Kas
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Card(
+                        color: Color(0xffFFEDE2),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 16.0, vertical: 10.0),
+                                width: widthDevice,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(15.0),
+                                      topRight: Radius.circular(15.0),
+                                    ),
+                                    color: Color.fromRGBO(231, 119, 45, 0.3)),
+                                child:
+                                    PoppinsBold(text: "Laci uang", size: 20.0)),
+                            SizedBox(height: 10.0),
+                            Container(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Row(
+                                spacing: 20.0,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    spacing: 5.0,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Poppins(text: "Modal Awal", size: 16.0),
+                                      Poppins(
+                                          text: "Pembayaran tunai", size: 16.0),
+                                      Poppins(
+                                          text: "Pengembalian tunai", size: 16.0),
+                                      Poppins(
+                                          text: "Pemasukan Penjualan",
+                                          size: 16.0),
+                                      Poppins(text: "Pengeluaran", size: 16.0),
+                                      PoppinsBold(
+                                          text: "Jumlah Uang yang diharapkan",
+                                          size: 16.0),
+                                    ],
                                   ),
-                                  color: Color.fromRGBO(231, 119, 45, 0.3)),
-                              child:
-                                  PoppinsBold(text: "Laci uang", size: 20.0)),
-                          SizedBox(height: 10.0),
-                          Container(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Row(
-                              spacing: 20.0,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  spacing: 5.0,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Poppins(text: "Modal Awal", size: 16.0),
-                                    Poppins(
-                                        text: "Pembayaran tunai", size: 16.0),
-                                    Poppins(
-                                        text: "Pengembalian tunai", size: 16.0),
-                                    Poppins(
-                                        text: "Pemasukan Penjualan",
-                                        size: 16.0),
-                                    Poppins(text: "Pengeluaran", size: 16.0),
-                                    PoppinsBold(
-                                        text: "Jumlah Uang yang diharapkan",
-                                        size: 16.0),
-                                  ],
-                                ),
-                                Column(
-                                  spacing: 5.0,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Poppins(
-                                        text: "Rp. $_modalAwal", size: 16.0),
-                                    Poppins(
-                                        text: "Rp. $_pembayaranTunai",
-                                        size: 16.0),
-                                    Poppins(
-                                        text: "Rp. $_pengembalianTunai",
-                                        size: 16.0),
-                                    Poppins(
-                                        text: "Rp. $_pemasukanPenjualan",
-                                        size: 16.0),
-                                    Poppins(
-                                        text: "Rp. $_pengeluaran", size: 16.0),
-                                    Poppins(
-                                        text: "Rp. $_totalSummary", size: 16.0),
-                                  ],
-                                ),
-                              ],
+                                  Column(
+                                    spacing: 5.0,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Poppins(
+                                          text: "Rp. $_modalAwal", size: 16.0),
+                                      Poppins(
+                                          text: "Rp. $_pembayaranTunai",
+                                          size: 16.0),
+                                      Poppins(
+                                          text: "Rp. $_pengembalianTunai",
+                                          size: 16.0),
+                                      Poppins(
+                                          text: "Rp. $_pemasukanPenjualan",
+                                          size: 16.0),
+                                      Poppins(
+                                          text: "Rp. $_pengeluaran", size: 16.0),
+                                      Poppins(
+                                          text: "Rp. $_totalSummary", size: 16.0),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  Expanded(
-                    child: Card(
-                      color: Color(0xffFFEDE2),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 16.0, vertical: 10.0),
-                              width: widthDevice,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(15.0),
-                                    topRight: Radius.circular(15.0),
+                    Expanded(
+                      child: Card(
+                        color: Color(0xffFFEDE2),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 16.0, vertical: 10.0),
+                                width: widthDevice,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(15.0),
+                                      topRight: Radius.circular(15.0),
+                                    ),
+                                    color: Color.fromRGBO(231, 119, 45, 0.3)),
+                                child:
+                                    PoppinsBold(text: "Laci uang", size: 20.0)),
+                            SizedBox(height: 10.0),
+                            Container(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Row(
+                                spacing: 20.0,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    spacing: 5.0,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Poppins(
+                                          text: "Penjualan kotor", size: 16.0),
+                                      Poppins(
+                                          text: "Pengembalian uang", size: 16.0),
+                                      Poppins(text: "Diskon", size: 16.0),
+                                      PoppinsBold(
+                                          text: "Penjualan Bersih", size: 16.0),
+                                    ],
                                   ),
-                                  color: Color.fromRGBO(231, 119, 45, 0.3)),
-                              child:
-                                  PoppinsBold(text: "Laci uang", size: 20.0)),
-                          SizedBox(height: 10.0),
-                          Container(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Row(
-                              spacing: 20.0,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  spacing: 5.0,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Poppins(
-                                        text: "Penjualan kotor", size: 16.0),
-                                    Poppins(
-                                        text: "Pengembalian uang", size: 16.0),
-                                    Poppins(text: "Diskon", size: 16.0),
-                                    PoppinsBold(
-                                        text: "Penjualan Bersih", size: 16.0),
-                                  ],
-                                ),
-                                Column(
-                                  spacing: 5.0,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Poppins(
-                                        text: "Rp. $_pemasukanPenjualan",
-                                        size: 16.0),
-                                    Poppins(
-                                        text: "Rp. $_pengembalianTunai",
-                                        size: 16.0),
-                                    Poppins(text: "Rp. $_diskon", size: 16.0),
-                                    Poppins(
-                                        text: "Rp. $_totalPenjualanBersih",
-                                        size: 16.0),
-                                  ],
-                                ),
-                              ],
+                                  Column(
+                                    spacing: 5.0,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Poppins(
+                                          text: "Rp. $_pemasukanPenjualan",
+                                          size: 16.0),
+                                      Poppins(
+                                          text: "Rp. $_pengembalianTunai",
+                                          size: 16.0),
+                                      Poppins(text: "Rp. $_diskon", size: 16.0),
+                                      Poppins(
+                                          text: "Rp. $_totalPenjualanBersih",
+                                          size: 16.0),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              )
-            ],
+                  ],
+                )
+              ],
+            ),
           ),
         ),
       ),
