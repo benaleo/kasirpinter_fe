@@ -298,7 +298,7 @@ class _PosMenuListState extends State<PosMenuList> {
               itemBuilder: (context, index) {
                 final item = items[index];
                 return GestureDetector(
-                  onTap: () => widget.addToCart(item),
+                  onTap: () => item['stock'] != 0 ? widget.addToCart(item) : null,
                   child: Stack(
                     children: [
                       Padding(
@@ -308,6 +308,7 @@ class _PosMenuListState extends State<PosMenuList> {
                           decoration: BoxDecoration(
                             border: Border.all(width: 1.0, color: Colors.grey.shade300),
                             borderRadius: BorderRadius.circular(12.0),
+                            color: item['stock'] == 0 ? Colors.black.withValues(alpha: 0.2) : Colors.white,
                           ),
                           padding: const EdgeInsets.all(12.0),
                           child: Row(
@@ -366,6 +367,12 @@ class _PosMenuListState extends State<PosMenuList> {
                               backgroundImage:
                               item["image"] == null ? AssetImage('assets/images/empty.png') as ImageProvider : NetworkImage(item["image"]),
                               backgroundColor: Colors.transparent,
+                              child: item['stock'] == 0
+                                ? CircleAvatar(
+                                  radius: 40,
+                                  backgroundColor: Colors.black.withValues(alpha: 0.5),
+                                )
+                                : null,
                             ),
                           ),
                         ),
@@ -614,7 +621,7 @@ class _PostMenuSideBarDetailState extends State<PostMenuSideBarDetail> {
     return Padding(
       padding: const EdgeInsets.only(left: 20.0),
       child: Container(
-        width: 300.0,
+        width: 400.0,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20.0),
@@ -628,265 +635,267 @@ class _PostMenuSideBarDetailState extends State<PostMenuSideBarDetail> {
           ],
         ),
         padding: EdgeInsets.all(15.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                PoppinsBold(
-                  text: "Detail Pesanan",
-                  size: 24.0,
-                  color: Color(0xff464646),
-                ),
-                IconButton(
-                  icon: Icon(Icons.close),
-                  onPressed: () {
-                    _confirmCloseSideDetail();
-                  },
-                ),
-              ],
-            ),
-            Container(
-              width: widthDevice,
-              padding: EdgeInsets.only(right: 10.0),
-              child: Poppins(
-                text: "No.123",
-                size: 16.0,
-                textAlign: TextAlign.end,
-              ),
-            ),
-            SizedBox(height: 5.0),
-            SizedBox(
-              height: MediaQuery
-                  .of(context)
-                  .viewInsets
-                  .bottom == 0 ? 90.0 : 40.0,
-              child: ListView(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Poppins(text: "Form data", size: 14.0),
-                  SizedBox(height: 10.0),
-                  TextInputCustom(
-                    controller: _customerName,
-                    text: "Nama Pelanggan",
-                    height: 40.0,
+                  PoppinsBold(
+                    text: "Detail Pesanan",
+                    size: 24.0,
+                    color: Color(0xff464646),
                   ),
-                  SizedBox(height: 10.0),
-                  Divider(height: 1.0, color: Colors.grey.shade200),
+                  IconButton(
+                    icon: Icon(Icons.close),
+                    onPressed: () {
+                      _confirmCloseSideDetail();
+                    },
+                  ),
                 ],
               ),
-            ),
-            KeyboardVisibilityBuilder(builder: (context, visible) {
-              return AnimatedContainer(
-                duration: Duration(milliseconds: 300),
-                height: visible ? 0.0 : 250.0,
-                child: ListView.builder(
-                  itemCount: widget.cartItems.length,
-                  itemBuilder: (context, index) {
-                    final item = widget.cartItems[index];
-                    return Column(
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              width: 60.0,
-                              height: 60.0,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(color: Colors.grey.shade200, width: 2),
-                              ),
-                              child: CircleAvatar(
-                                backgroundImage: item["image"] == null ? AssetImage('assets/images/empty.png') : NetworkImage(item["image"]),
-                              ),
-                            ),
-                            Flexible(
-                              fit: FlexFit.tight,
-                              child: ListTile(
-                                contentPadding: EdgeInsets.zero, // Menghapus padding bawaan ListTile
-                                title: Text(item["name"]),
-                                subtitle: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      icon: Icon(Icons.remove_circle_outline),
-                                      onPressed: () {
-                                        if (item["quantity"] == 1) {
-                                          widget.removeFromCart(item["name"]);
-                                        } else {
-                                          setState(() {
-                                            item["quantity"] -= 1;
-                                          });
-                                        }
-                                      },
-                                    ),
-                                    Text(item["quantity"].toString()),
-                                    IconButton(
-                                      icon: Icon(Icons.add_circle_outline),
-                                      onPressed: () {
-                                        setState(() {
-                                          item["quantity"] += 1;
-                                        });
-                                      },
-                                    ),
-                                  ],
-                                ),
-                                trailing: Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    GradientText(
-                                      text: "Rp ${widget.format(item["price"].toString())}",
-                                      style: GoogleFonts.poppins(fontSize: 12.0),
-                                    ),
-                                    GradientText(
-                                      text:
-                                      "Rp ${widget.format(
-                                          (int.parse(item["price"].toString()) * int.parse(item["quantity"].toString())).toString())}",
-                                      style: GoogleFonts.poppins(fontSize: 18.0),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Divider(height: 1.0, color: Colors.grey.shade200),
-                      ],
-                    );
-                  },
+              Container(
+                width: widthDevice,
+                padding: EdgeInsets.only(right: 10.0),
+                child: Poppins(
+                  text: "No.123",
+                  size: 16.0,
+                  textAlign: TextAlign.end,
                 ),
-              );
-            }),
-            Divider(),
-            KeyboardVisibilityBuilder(builder: (context, visible) {
-              return AnimatedContainer(
-                duration: Duration(milliseconds: 300),
-                height: visible ? 30.0 : 180.0,
+              ),
+              SizedBox(height: 5.0),
+              SizedBox(
+                height: MediaQuery
+                    .of(context)
+                    .viewInsets
+                    .bottom == 0 ? 90.0 : 40.0,
                 child: ListView(
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Poppins(text: "Total: ", size: 18.0),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                    Poppins(text: "Form data", size: 14.0),
+                    SizedBox(height: 10.0),
+                    TextInputCustom(
+                      controller: _customerName,
+                      text: "Nama Pelanggan",
+                      height: 40.0,
+                    ),
+                    SizedBox(height: 10.0),
+                    Divider(height: 1.0, color: Colors.grey.shade200),
+                  ],
+                ),
+              ),
+              KeyboardVisibilityBuilder(builder: (context, visible) {
+                return AnimatedContainer(
+                  duration: Duration(milliseconds: 300),
+                  height: visible ? 0.0 : 250.0,
+                  child: ListView.builder(
+                    itemCount: widget.cartItems.length,
+                    itemBuilder: (context, index) {
+                      final item = widget.cartItems[index];
+                      return Column(
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                width: 60.0,
+                                height: 60.0,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: Colors.grey.shade200, width: 2),
+                                ),
+                                child: CircleAvatar(
+                                  backgroundImage: item["image"] == null ? AssetImage('assets/images/empty.png') : NetworkImage(item["image"]),
+                                ),
+                              ),
+                              Flexible(
+                                fit: FlexFit.tight,
+                                child: ListTile(
+                                  contentPadding: EdgeInsets.zero, // Menghapus padding bawaan ListTile
+                                  title: Text(item["name"]),
+                                  subtitle: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: Icon(Icons.remove_circle_outline),
+                                        onPressed: () {
+                                          if (item["quantity"] == 1) {
+                                            widget.removeFromCart(item["name"]);
+                                          } else {
+                                            setState(() {
+                                              item["quantity"] -= 1;
+                                            });
+                                          }
+                                        },
+                                      ),
+                                      Text(item["quantity"].toString()),
+                                      IconButton(
+                                        icon: Icon(Icons.add_circle_outline),
+                                        onPressed: () {
+                                          setState(() {
+                                            item["quantity"] += 1;
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                  trailing: Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      GradientText(
+                                        text: "Rp ${widget.format(item["price"].toString())}",
+                                        style: GoogleFonts.poppins(fontSize: 12.0),
+                                      ),
+                                      GradientText(
+                                        text:
+                                        "Rp ${widget.format(
+                                            (int.parse(item["price"].toString()) * int.parse(item["quantity"].toString())).toString())}",
+                                        style: GoogleFonts.poppins(fontSize: 18.0),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Divider(height: 1.0, color: Colors.grey.shade200),
+                        ],
+                      );
+                    },
+                  ),
+                );
+              }),
+              Divider(),
+              KeyboardVisibilityBuilder(builder: (context, visible) {
+                return AnimatedContainer(
+                  duration: Duration(milliseconds: 300),
+                  height: visible ? 30.0 : 180.0,
+                  child: ListView(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Poppins(text: "Total: ", size: 18.0),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Poppins(text: "${widget.getTotalItem()} Pcs", size: 12.0),
+                              SizedBox(width: 5.0),
+                              Poppins(text: "-", size: 12.0),
+                              SizedBox(width: 5.0),
+                              GradientText(
+                                text: "Rp ${widget.format(widget.getTotalPrice().toString())}",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 18.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 4.0),
+                      Poppins(text: "Pilih pembayaran", size: 16.0),
+                      SizedBox(height: 4.0),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
+                        decoration: BoxDecoration(
+                          border: Border.all(width: 2.0, color: Colors.grey.shade200, style: BorderStyle.solid),
+                          borderRadius: BorderRadius.circular(50.0),
+                        ),
+                        child: Row(
                           children: [
-                            Poppins(text: "${widget.getTotalItem()} Pcs", size: 12.0),
+                            IconBoxText(
+                              "Cash",
+                              12.0,
+                              color: _paymentMethod == "cash" ? Colors.white : Colors.grey.shade600,
+                              boxColor: _paymentMethodColorCash,
+                              onPresses: () {
+                                setState(() {
+                                  _paymentMethodColorCash = Colors.blue;
+                                  _paymentMethodColorQris = Colors.white;
+                                  _paymentMethod = "cash";
+                                  print(_paymentMethod);
+                                });
+                              },
+                              height: 45.0,
+                              icon: SvgPicture.asset(
+                                "assets/images/icons/payments.svg",
+                                colorFilter: ColorFilter.mode(_paymentMethod == "cash" ? Colors.white : Colors.grey.shade600, BlendMode.srcIn),
+                              ),
+                            ),
                             SizedBox(width: 5.0),
-                            Poppins(text: "-", size: 12.0),
-                            SizedBox(width: 5.0),
-                            GradientText(
-                              text: "Rp ${widget.format(widget.getTotalPrice().toString())}",
-                              style: GoogleFonts.poppins(
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.bold,
+                            IconBoxText(
+                              "QRIS",
+                              12.0,
+                              color: _paymentMethod == "qris" ? Colors.white : Colors.grey.shade600,
+                              boxColor: _paymentMethodColorQris,
+                              onPresses: () {
+                                setState(() {
+                                  _paymentMethodColorCash = Colors.white;
+                                  _paymentMethodColorQris = Colors.blue;
+                                  _paymentMethod = "qris";
+                                  print(_paymentMethod);
+                                });
+                              },
+                              height: 45.0,
+                              icon: SvgPicture.asset(
+                                "assets/images/icons/barcode.svg",
+                                colorFilter: ColorFilter.mode(_paymentMethod == "qris" ? Colors.white : Colors.grey.shade600, BlendMode.srcIn),
                               ),
                             ),
                           ],
                         ),
-                      ],
-                    ),
-                    SizedBox(height: 4.0),
-                    Poppins(text: "Pilih pembayaran", size: 16.0),
-                    SizedBox(height: 4.0),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
-                      decoration: BoxDecoration(
-                        border: Border.all(width: 2.0, color: Colors.grey.shade200, style: BorderStyle.solid),
-                        borderRadius: BorderRadius.circular(50.0),
                       ),
-                      child: Row(
+                      SizedBox(height: 10.0),
+                      Row(
                         children: [
                           IconBoxText(
-                            "Cash",
+                            "Bayar nanti",
                             12.0,
-                            color: _paymentMethod == "cash" ? Colors.white : Colors.grey.shade600,
-                            boxColor: _paymentMethodColorCash,
-                            onPresses: () {
-                              setState(() {
-                                _paymentMethodColorCash = Colors.blue;
-                                _paymentMethodColorQris = Colors.white;
-                                _paymentMethod = "cash";
-                                print(_paymentMethod);
-                              });
-                            },
-                            height: 45.0,
+                            height: 40.0,
+                            color: Colors.white,
+                            boxColor: Color(0xffE7772D),
                             icon: SvgPicture.asset(
-                              "assets/images/icons/payments.svg",
-                              colorFilter: ColorFilter.mode(_paymentMethod == "cash" ? Colors.white : Colors.grey.shade600, BlendMode.srcIn),
+                              "assets/images/icons/paylater.svg",
+                              colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
                             ),
-                          ),
-                          SizedBox(width: 5.0),
-                          IconBoxText(
-                            "QRIS",
-                            12.0,
-                            color: _paymentMethod == "qris" ? Colors.white : Colors.grey.shade600,
-                            boxColor: _paymentMethodColorQris,
                             onPresses: () {
-                              setState(() {
-                                _paymentMethodColorCash = Colors.white;
-                                _paymentMethodColorQris = Colors.blue;
-                                _paymentMethod = "qris";
-                                print(_paymentMethod);
-                              });
+                              if (_customerName.text == "") {
+                                _showErrorNeedSelectPaymentMethod("Harap pilih masukan nama pelanggan terlebih dahulu!");
+                              } else {
+                                _confirmPendingOrderPopup();
+                              }
                             },
-                            height: 45.0,
+                          ),
+                          IconBoxText(
+                            "Checkout",
+                            12.0,
+                            onPresses: () {
+                              if (_paymentMethod == "") {
+                                _showErrorNeedSelectPaymentMethod("Harap pilih method pembayaran terlebih dahulu!");
+                              } else if (_customerName.text == "") {
+                                _showErrorNeedSelectPaymentMethod("Harap pilih masukan nama pelanggan terlebih dahulu!");
+                              } else {
+                                _paymentMethod == "cash" ? _showCheckoutPopup() : _showBarcodePopup(total: widget.getTotalPrice());
+                              }
+                            },
+                            height: 40.0,
+                            color: Colors.white,
+                            boxColor: Color(0xff723E29),
                             icon: SvgPicture.asset(
-                              "assets/images/icons/barcode.svg",
-                              colorFilter: ColorFilter.mode(_paymentMethod == "qris" ? Colors.white : Colors.grey.shade600, BlendMode.srcIn),
+                              "assets/images/icons/cart.svg",
+                              colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
                             ),
                           ),
                         ],
                       ),
-                    ),
-                    SizedBox(height: 10.0),
-                    Row(
-                      children: [
-                        IconBoxText(
-                          "Bayar nanti",
-                          12.0,
-                          height: 40.0,
-                          color: Colors.white,
-                          boxColor: Color(0xffE7772D),
-                          icon: SvgPicture.asset(
-                            "assets/images/icons/paylater.svg",
-                            colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
-                          ),
-                          onPresses: () {
-                            if (_customerName.text == "") {
-                              _showErrorNeedSelectPaymentMethod("Harap pilih masukan nama pelanggan terlebih dahulu!");
-                            } else {
-                              _confirmPendingOrderPopup();
-                            }
-                          },
-                        ),
-                        IconBoxText(
-                          "Checkout",
-                          12.0,
-                          onPresses: () {
-                            if (_paymentMethod == "") {
-                              _showErrorNeedSelectPaymentMethod("Harap pilih method pembayaran terlebih dahulu!");
-                            } else if (_customerName.text == "") {
-                              _showErrorNeedSelectPaymentMethod("Harap pilih masukan nama pelanggan terlebih dahulu!");
-                            } else {
-                              _paymentMethod == "cash" ? _showCheckoutPopup() : _showBarcodePopup(total: widget.getTotalPrice());
-                            }
-                          },
-                          height: 40.0,
-                          color: Colors.white,
-                          boxColor: Color(0xff723E29),
-                          icon: SvgPicture.asset(
-                            "assets/images/icons/cart.svg",
-                            colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              );
-            }),
-          ],
+                    ],
+                  ),
+                );
+              }),
+            ],
+          ),
         ),
       ),
     );
