@@ -35,8 +35,15 @@ class AuthService {
     }
   }
 
-  Future<ApiResponse> register(String email, String password, String name, String phone,
-      String companyName, String companyAddress, String companyCity, String companyPhone) async {
+  Future<ApiResponse> register(
+      String email,
+      String password,
+      String name,
+      String phone,
+      String companyName,
+      String companyAddress,
+      String companyCity,
+      String companyPhone) async {
     print("api url is : $_baseUrl");
     try {
       final response = await http.post(
@@ -102,7 +109,8 @@ class AuthService {
   // send otp
   Future<ApiResponse> sendOtp(String email) async {
     try {
-      String url = '$_baseUrl/$_mainUrl/forgot-password?email=$email';
+      String url =
+          '$_baseUrl/$_mainUrl/forgot-password?email=${Uri.encodeQueryComponent(email)}';
       final response = await http.post(
         Uri.parse(url),
         headers: {"Content-Type": "application/json", "accept": "*/*"},
@@ -136,7 +144,8 @@ class AuthService {
   // verify otp
   Future<ApiResponse> verifyOtp(String email, String otp) async {
     try {
-      String url = '$_baseUrl/$_mainUrl/validate-otp?email=$email&otp=$otp';
+      String url =
+          '$_baseUrl/$_mainUrl/validate-otp?email=${Uri.encodeQueryComponent(email)}&otp=$otp';
       final response = await http.post(
         Uri.parse(url),
         headers: {"Content-Type": "application/json", "accept": "*/*"},
