@@ -55,6 +55,8 @@ class _RegisterTabState extends State<RegisterTab> {
       _companyPhoneController.text.isEmpty ? '' : _companyPhoneController.text,
     );
 
+    print("Response data: ${response.data}");
+
     setState(() {
       isLoading = false;
     });
@@ -77,7 +79,8 @@ class _RegisterTabState extends State<RegisterTab> {
         builder: (context) {
           return SuccessAuthPopup(
             title: "Hore! Berhasil Mendaftar",
-            body: "Silahkan login dengan email dan password yang telah Anda daftarkan",
+            body:
+                "Silahkan login dengan email dan password yang telah Anda daftarkan",
             buttonText: "Login",
             route: "/login",
           );
@@ -202,28 +205,28 @@ class _RegisterTabState extends State<RegisterTab> {
                                 text: "Nama Perusahaan",
                                 icon: Icon(Icons.business),
                               ),
-                            SizedBox(height: 20.0),
+                            if (isCompanyForm) SizedBox(height: 20.0),
                             if (isCompanyForm)
                               TextInputCustom(
                                 controller: _companyAddressController,
                                 text: "Alamat Perusahaan",
                                 icon: Icon(Icons.location_on),
                               ),
-                            SizedBox(height: 20.0),
+                            if (isCompanyForm) SizedBox(height: 20.0),
                             if (isCompanyForm)
                               TextInputCustom(
                                 controller: _companyCityController,
                                 text: "Kota Perusahaan",
                                 icon: Icon(Icons.location_city),
                               ),
-                            SizedBox(height: 20.0),
+                            if (isCompanyForm) SizedBox(height: 20.0),
                             if (isCompanyForm)
                               TextInputCustom(
                                 controller: _companyPhoneController,
                                 text: "Telepon Perusahaan",
                                 icon: Icon(Icons.phone),
                               ),
-                            SizedBox(height: 10.0),
+                            if (isCompanyForm) SizedBox(height: 10.0),
                             if (isCompanyForm)
                               Row(
                                 spacing: 10.0,
@@ -261,6 +264,28 @@ class _RegisterTabState extends State<RegisterTab> {
                                 ],
                               ),
                             SizedBox(height: 20.0),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Poppins(
+                                  text: "Sudah punya akun ?",
+                                  size: 14.0,
+                                  color: Colors.black,
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pushNamed("/login");
+                                  },
+                                  child: Poppins(
+                                    text: "Masuk",
+                                    size: 14.0,
+                                    color: Colors.black,
+                                    textDecoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              ],
+                            )
                           ],
                         ),
                       ),

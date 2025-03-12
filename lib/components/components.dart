@@ -654,20 +654,24 @@ class ToastCustom extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Fluttertoast.showToast(
-        msg: text,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        backgroundColor: color,
-        textColor: textColor != null ? textColor : Colors.white,
-        fontSize: 16.0,
-      );
-    });
+    // Ensure that the widget is still mounted before showing the toast
+    if (ModalRoute.of(context)?.isCurrent ?? false) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Fluttertoast.showToast(
+          msg: text,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: color,
+          textColor: textColor ?? Colors.white,
+          fontSize: 16.0,
+        );
+      });
+    }
     return Container(); // Return an empty container or any other widget
   }
 }
+
 
 class SkeletonShimmer extends StatelessWidget {
   final double width;
