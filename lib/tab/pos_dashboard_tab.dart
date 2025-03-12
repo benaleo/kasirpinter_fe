@@ -48,7 +48,8 @@ class _PosDashboardTabState extends State<PosDashboardTab> {
             try {
               final UserService userService = UserService();
               await userService.userPresence(type);
-              String dateTimeNow = DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now());
+              String dateTimeNow =
+                  DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now());
 
               if (type == 'IN') {
                 await _updateUserInfo(dateTimeNow, null);
@@ -85,7 +86,7 @@ class _PosDashboardTabState extends State<PosDashboardTab> {
               );
             } catch (e) {
               print("Error: $e");
-              if(!e.toString().toLowerCase().contains('widget')) {
+              if (!e.toString().toLowerCase().contains('widget')) {
                 Fluttertoast.showToast(
                   msg: e.toString(),
                   toastLength: Toast.LENGTH_SHORT,
@@ -103,6 +104,7 @@ class _PosDashboardTabState extends State<PosDashboardTab> {
       },
     );
   }
+
   int _diskon = 0;
 
   int _totalPenjualanBersih = 0;
@@ -308,6 +310,7 @@ class _PosDashboardTabState extends State<PosDashboardTab> {
           ),
           child: SingleChildScrollView(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
                   padding: const EdgeInsets.only(left: 10.0),
@@ -343,7 +346,8 @@ class _PosDashboardTabState extends State<PosDashboardTab> {
                                 children: [
                                   Column(
                                     spacing: 5.0,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Poppins(text: "Name", size: 16.0),
                                       Poppins(text: "Perusahaan", size: 16.0),
@@ -353,7 +357,8 @@ class _PosDashboardTabState extends State<PosDashboardTab> {
                                   ),
                                   Column(
                                     spacing: 5.0,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Poppins(text: ": $name", size: 16.0),
                                       Poppins(text: ": $company", size: 16.0),
@@ -384,7 +389,8 @@ class _PosDashboardTabState extends State<PosDashboardTab> {
                                       topRight: Radius.circular(15.0),
                                     ),
                                     color: Color.fromRGBO(231, 119, 45, 0.3)),
-                                child: PoppinsBold(text: "Absensi", size: 20.0)),
+                                child:
+                                    PoppinsBold(text: "Absensi", size: 20.0)),
                             SizedBox(height: 10.0),
                             Container(
                               height: 150.0,
@@ -404,8 +410,8 @@ class _PosDashboardTabState extends State<PosDashboardTab> {
                                             size: 16.0,
                                           ),
                                           Padding(
-                                            padding:
-                                                const EdgeInsets.only(left: 20.0),
+                                            padding: const EdgeInsets.only(
+                                                left: 20.0),
                                             child: PoppinsBold(
                                               text: clockIn ?? '',
                                               size: 16.0,
@@ -447,8 +453,8 @@ class _PosDashboardTabState extends State<PosDashboardTab> {
                                             size: 16.0,
                                           ),
                                           Padding(
-                                            padding:
-                                                const EdgeInsets.only(left: 20.0),
+                                            padding: const EdgeInsets.only(
+                                                left: 20.0),
                                             child: PoppinsBold(
                                               text: clockOut ?? '',
                                               size: 16.0,
@@ -504,7 +510,8 @@ class _PosDashboardTabState extends State<PosDashboardTab> {
                                   topRight: Radius.circular(15.0),
                                 ),
                                 color: Color.fromRGBO(231, 119, 45, 0.3)),
-                            child: PoppinsBold(text: "Shift Sales", size: 20.0)),
+                            child:
+                                PoppinsBold(text: "Shift Sales", size: 20.0)),
                         SizedBox(height: 10.0),
                         Container(
                           height: 110.0,
@@ -521,8 +528,8 @@ class _PosDashboardTabState extends State<PosDashboardTab> {
                                   _showAddModal();
                                 },
                               ),
-                              CardDashboard(
-                                  "Total Pemasukan", "Rp. $_pemasukanPenjualan"),
+                              CardDashboard("Total Pemasukan",
+                                  "Rp. $_pemasukanPenjualan"),
                               CardDashboard("Total Modal", "Rp. $_pengeluaran"),
                               CardDashboard(
                                   "Total Profit", "Rp. $_totalPenjualanBersih"),
@@ -560,17 +567,20 @@ class _PosDashboardTabState extends State<PosDashboardTab> {
                               padding: const EdgeInsets.all(16.0),
                               child: Row(
                                 spacing: 20.0,
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Column(
                                     spacing: 5.0,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Poppins(text: "Modal Awal", size: 16.0),
                                       Poppins(
                                           text: "Pembayaran tunai", size: 16.0),
                                       Poppins(
-                                          text: "Pengembalian tunai", size: 16.0),
+                                          text: "Pengembalian tunai",
+                                          size: 16.0),
                                       Poppins(
                                           text: "Pemasukan Penjualan",
                                           size: 16.0),
@@ -582,7 +592,8 @@ class _PosDashboardTabState extends State<PosDashboardTab> {
                                   ),
                                   Column(
                                     spacing: 5.0,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Poppins(
                                           text: "Rp. $_modalAwal", size: 16.0),
@@ -596,9 +607,11 @@ class _PosDashboardTabState extends State<PosDashboardTab> {
                                           text: "Rp. $_pemasukanPenjualan",
                                           size: 16.0),
                                       Poppins(
-                                          text: "Rp. $_pengeluaran", size: 16.0),
+                                          text: "Rp. $_pengeluaran",
+                                          size: 16.0),
                                       Poppins(
-                                          text: "Rp. $_totalSummary", size: 16.0),
+                                          text: "Rp. $_totalSummary",
+                                          size: 16.0),
                                     ],
                                   ),
                                 ],
@@ -631,16 +644,19 @@ class _PosDashboardTabState extends State<PosDashboardTab> {
                               padding: const EdgeInsets.all(16.0),
                               child: Row(
                                 spacing: 20.0,
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Column(
                                     spacing: 5.0,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Poppins(
                                           text: "Penjualan kotor", size: 16.0),
                                       Poppins(
-                                          text: "Pengembalian uang", size: 16.0),
+                                          text: "Pengembalian uang",
+                                          size: 16.0),
                                       Poppins(text: "Diskon", size: 16.0),
                                       PoppinsBold(
                                           text: "Penjualan Bersih", size: 16.0),
@@ -648,7 +664,8 @@ class _PosDashboardTabState extends State<PosDashboardTab> {
                                   ),
                                   Column(
                                     spacing: 5.0,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Poppins(
                                           text: "Rp. $_pemasukanPenjualan",
