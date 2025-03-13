@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:kasirpinter_fe/components/data_model.dart';
@@ -6,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'auth_service.dart';
 
 class ProfileService {
-  Future<void> userAvatar({bool? isRemove = false}) async {
+  Future<void> userAvatar({ByteData? image, bool? isRemove = false}) async {
     final AuthService authService = AuthService();
     final String? token = await authService.getToken();
     if (token == null) {
@@ -18,20 +20,28 @@ class ProfileService {
       final String _mainUrl = 'api/v1/user/avatar?isRemove=$isRemove';
 
       String url = '$_baseUrl/$_mainUrl';
-      final response = await http.put(
-        Uri.parse(url),
-        headers: {
-          'accept': '*/*',
-          'Authorization': 'Bearer $token',
-        },
-      );
 
+      var request = http.MultipartRequest('PUT', Uri.parse(url));
+      request.headers['accept'] = '*/*';
+      request.headers['Authorization'] = 'Bearer $token';
+      if (image != null) {
+        request.files.add(
+          http.MultipartFile.fromBytes(
+            'avatar',
+            image.buffer.asUint8List(),
+            filename: 'avatar.png',
+          ),
+        );
+      }
+
+      var response = await request.send();
+      var responseBody = await response.stream.bytesToString();
       print("url is: $url");
       print("Token is: $token");
       // print("Response status: ${response.statusCode}");
-      // print("Response body: ${response.body}");
+      // print("Response body: $responseBody");
 
-      final data = json.decode(response.body);
+      final data = json.decode(responseBody);
       if (data['success']) {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('userInfo', json.encode(data['data']));

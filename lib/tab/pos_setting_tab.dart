@@ -1,10 +1,13 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:kasirpinter_fe/components/components.dart';
+import 'package:kasirpinter_fe/services/profile_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PosSettingTab extends StatefulWidget {
@@ -61,9 +64,70 @@ class _PosSettingTabState extends State<PosSettingTab> {
     }
   }
 
-  void handleEditProfile() {}
+  void handleSubmitEditProfile() async {
+    // TODO make a submit edit data
+    showDialog(
+      context: context,
+      builder: (context) {
+        return ConfirmDialog(
+          text: "Apakah kamu yakin menyimpan data ini ?",
+          onPressed: () async {
+            final profileService = ProfileService();
+            await profileService.userProfile(
+              name: _nameController.text,
+              email: _emailController.text,
+              phone: _phoneController.text,
+              address: _addressController.text,
+            );
+            _loadUserInfo();
+            Navigator.pop(context);
+          },
+        );
+      },
+    );
+  }
 
-  void handleEditPassword() {}
+  void handleEditPassword() {
+    // TODO make a submit new password
+    if (_newPasswordController.text != _confirmNewPasswordController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Password baru dan konfirmasi tidak cocok"),
+      ));
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return ConfirmDialog(
+          text: "Apakah kamu yakin mengubah password ?",
+          onPressed: () async {
+            final profileService = ProfileService();
+            await profileService.userPassword(
+              oldPassword: _passwordController.text,
+              newPassword: _newPasswordController.text,
+              confirmPassword: _confirmNewPasswordController.text,
+            );
+            _loadUserInfo();
+            Navigator.pop(context);
+          },
+        );
+      },
+    );
+  }
+
+  void handleSubmitEditAvatar() async {
+    // TODO make a change avatar
+    final imagePicker = ImagePicker();
+    final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      final bytes = await pickedFile.readAsBytes();
+      final profileService = ProfileService();
+      // await profileService.userAvatar(
+      //   image: ByteData.fromBytes(bytes),
+      // );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -171,44 +235,41 @@ class _PosSettingTabState extends State<PosSettingTab> {
             ),
           ),
           SizedBox(height: 10.0),
-          Container(
-            width: 100.0,
-            height: 30.0,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(
+          TextButton(
+            onPressed: () {},
+            child: Text(
+              'Ganti Foto',
+              style: TextStyle(
+                color: Color(0xff1976D2),
+                fontSize: 12.0,
+              ),
+            ),
+            style: TextButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              side: BorderSide(
                 width: 1.0,
                 color: Color(0xff1976D2),
               ),
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            child: Center(
-              child: Text(
-                'Ganti Foto',
-                style: TextStyle(
-                  color: Color(0xff1976D2),
-                  fontSize: 12.0,
-                ),
-              ),
             ),
           ),
-          Container(
-            width: 100.0,
-            height: 30.0,
-            decoration: BoxDecoration(
-              border: Border.all(
+          TextButton(
+            onPressed: () {},
+            child: Text(
+              'Hapus Foto',
+              style: TextStyle(
+                color: Colors.red,
+                fontSize: 12.0,
+              ),
+            ),
+            style: TextButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              side: BorderSide(
                 width: 1.0,
                 color: Colors.red,
-              ),
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            child: Center(
-              child: Text(
-                'Hapus Foto',
-                style: TextStyle(
-                  color: Colors.red,
-                  fontSize: 12.0,
-                ),
               ),
             ),
           ),
@@ -276,7 +337,7 @@ class _PosSettingTabState extends State<PosSettingTab> {
                             color: Colors.white,
                             bgColor: Colors.blue[600],
                             onPressed: () {
-                              handleEditProfile();
+                              handleSubmitEditProfile();
                             })
                     ],
                   ),

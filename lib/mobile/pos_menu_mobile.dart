@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:kasirpinter_fe/components/components.dart';
 import 'package:kasirpinter_fe/components/pos_components.dart';
@@ -30,7 +29,9 @@ class _PosMenuMobileState extends State<PosMenuMobile> {
   void updateSelectedCategory(String? categoryName) {
     setState(() {
       selectedCategory = categoryName;
-      futureMenuItems = MenuService().fetchMenuItems(categoryName: categoryName).then((value) {
+      futureMenuItems = MenuService()
+          .fetchMenuItems(categoryName: categoryName)
+          .then((value) {
         print("futureMenuItems is : $value");
         return value;
       });
@@ -157,16 +158,16 @@ class _PosMenuMobileState extends State<PosMenuMobile> {
                 ),
               ),
               // if (cartItems.isNotEmpty)
-                // PostMenuSideBarDetail(
-                //   crossAxisCount: crossAxisCount,
-                //   cartItems: cartItems,
-                //   removeFromCart: removeFromCart,
-                //   format: format,
-                //   getTotalItem: getTotalItem,
-                //   getTotalPrice: getTotalPrice,
-                //   clearCart: clearCart,
-                //   setCrossAxisCount: setCrossAxisCount,
-                // )
+              // PostMenuSideBarDetail(
+              //   crossAxisCount: crossAxisCount,
+              //   cartItems: cartItems,
+              //   removeFromCart: removeFromCart,
+              //   format: format,
+              //   getTotalItem: getTotalItem,
+              //   getTotalPrice: getTotalPrice,
+              //   clearCart: clearCart,
+              //   setCrossAxisCount: setCrossAxisCount,
+              // )
             ],
           ),
         ),

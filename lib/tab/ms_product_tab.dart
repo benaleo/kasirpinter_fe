@@ -188,7 +188,7 @@ class _MsProductTabState extends State<MsProductTab> {
                   child: Container(
                     width: widthDevice,
                     child: DataTable(
-                      headingRowColor: MaterialStateColor.resolveWith(
+                      headingRowColor: WidgetStateColor.resolveWith(
                           (states) => Color(0xFF464646)),
                       columnSpacing: 20.0,
                       columns: const <DataColumn>[

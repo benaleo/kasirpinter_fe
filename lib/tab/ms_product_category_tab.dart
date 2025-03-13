@@ -389,7 +389,7 @@ class _MsProductCategoryTabState extends State<MsProductCategoryTab> {
                   child: Container(
                     width: widthDevice,
                     child: DataTable(
-                      headingRowColor: MaterialStateColor.resolveWith(
+                      headingRowColor: WidgetStateColor.resolveWith(
                           (states) => Color(0xFF464646)),
                       columnSpacing: 20.0,
                       columns: [
@@ -433,7 +433,7 @@ class _MsProductCategoryTabState extends State<MsProductCategoryTab> {
                           } else {
                             final category = _categories[index];
                             return DataRow(
-                              color: MaterialStateColor.resolveWith(
+                              color: WidgetStateColor.resolveWith(
                                 (states) => index.isOdd
                                     ? Colors.grey.shade50
                                     : Colors.white,
@@ -493,7 +493,7 @@ class _MsProductCategoryTabState extends State<MsProductCategoryTab> {
                     onPressed: _currentPage == 0 ? null : _prevPage,
                     child: Text('Previous'),
                     style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.resolveWith(
+                      backgroundColor: WidgetStateProperty.resolveWith(
                         (states) => _currentPage == 0
                             ? Colors.grey.shade50
                             : Colors.blue,
@@ -504,7 +504,7 @@ class _MsProductCategoryTabState extends State<MsProductCategoryTab> {
                     onPressed: _nextPage,
                     child: Text('Next'),
                     style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.resolveWith(
+                      backgroundColor: WidgetStateProperty.resolveWith(
                         (states) => Colors.blue,
                       ),
                     ),

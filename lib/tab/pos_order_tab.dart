@@ -4,7 +4,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:kasirpinter_fe/services/transaction_service.dart';
-import 'package:flutter/scheduler.dart';
 
 import '../components/components.dart';
 import '../components/pos_components.dart';
@@ -674,7 +673,7 @@ class _PosOrderSideBarDetailState extends State<PosOrderSideBarDetail> {
           onPressed: () async {
             final TransactionService transactionService = TransactionService();
             final response =
-            await transactionService.cancelTransaction(transactionId);
+                await transactionService.cancelTransaction(transactionId);
             if (response['success']) {
               print("Berhasil membatalkan pesanan print toast");
               ToastCustom(

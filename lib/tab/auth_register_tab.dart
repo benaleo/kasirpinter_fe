@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:kasirpinter_fe/components/auth_components.dart';
 import 'package:kasirpinter_fe/components/data_model.dart';
 import 'package:kasirpinter_fe/services/auth_service.dart';
-import 'package:kasirpinter_fe/splash_screen.dart';
 
 import '../components/components.dart';
 
