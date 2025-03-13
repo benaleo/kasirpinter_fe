@@ -88,10 +88,11 @@ class _PosSettingTabState extends State<PosSettingTab> {
   }
 
   void handleEditPassword() {
-    // TODO make a submit new password
+    // Validate new passwords match
     if (_newPasswordController.text != _confirmNewPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text("Password baru dan konfirmasi tidak cocok"),
+        backgroundColor: Colors.red,
       ));
       return;
     }
@@ -102,14 +103,64 @@ class _PosSettingTabState extends State<PosSettingTab> {
         return ConfirmDialog(
           text: "Apakah kamu yakin mengubah password ?",
           onPressed: () async {
-            final profileService = ProfileService();
-            await profileService.userPassword(
-              oldPassword: _passwordController.text,
-              newPassword: _newPasswordController.text,
-              confirmPassword: _confirmNewPasswordController.text,
-            );
-            _loadUserInfo();
+            // Close the confirmation dialog
             Navigator.pop(context);
+            
+            // Show loading indicator
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              },
+            );
+            
+            try {
+              final profileService = ProfileService();
+              final response = await profileService.userPassword(
+                oldPassword: _passwordController.text,
+                newPassword: _newPasswordController.text,
+                confirmPassword: _confirmNewPasswordController.text,
+              );
+              
+              // Close loading dialog
+              Navigator.of(context, rootNavigator: true).pop();
+              
+              if (response.success) {
+                // Password changed successfully
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text(response.message ?? "Password berhasil diubah"),
+                  backgroundColor: Colors.green,
+                ));
+                
+                // Clear password fields
+                setState(() {
+                  _passwordController.clear();
+                  _newPasswordController.clear();
+                  _confirmNewPasswordController.clear();
+                  isPasswordOpen = false; // Close password section
+                });
+                
+                _loadUserInfo(); // Reload user info if needed
+              } else {
+                // Show error message from API
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text(response.message ?? "Gagal mengubah password"),
+                  backgroundColor: Colors.red,
+                ));
+              }
+            } catch (e) {
+              // Close loading dialog if still showing
+              Navigator.of(context, rootNavigator: true).pop();
+              
+              // Show general error message
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text("Error: ${e.toString()}"),
+                backgroundColor: Colors.red,
+              ));
+            }
           },
         );
       },
@@ -117,15 +168,67 @@ class _PosSettingTabState extends State<PosSettingTab> {
   }
 
   void handleSubmitEditAvatar() async {
-    // TODO make a change avatar
-    final imagePicker = ImagePicker();
-    final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      final bytes = await pickedFile.readAsBytes();
-      final profileService = ProfileService();
-      // await profileService.userAvatar(
-      //   image: ByteData.fromBytes(bytes),
-      // );
+    try {
+      final imagePicker = ImagePicker();
+      final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
+      
+      if (pickedFile != null) {
+        // Show loading indicator or dialog
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          },
+        );
+        
+        try {
+          // Read image as bytes
+          final Uint8List bytes = await pickedFile.readAsBytes();
+          
+          // Convert Uint8List to ByteData
+          final ByteData byteData = ByteData.view(bytes.buffer);
+          
+          // Call profileService.userAvatar with the ByteData
+          final profileService = ProfileService();
+          await profileService.userAvatar(image: byteData);
+          
+          // Reload user info to update the UI
+          await _loadUserInfo();
+          
+          // Close loading dialog
+          Navigator.of(context, rootNavigator: true).pop();
+          
+          // Show success message
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Avatar berhasil diperbarui'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        } catch (e) {
+          // Close loading dialog
+          Navigator.of(context, rootNavigator: true).pop();
+          
+          // Show error message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Gagal memperbarui avatar: ${e.toString()}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      // Handle image picker errors
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error mengambil gambar: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -230,13 +333,13 @@ class _PosSettingTabState extends State<PosSettingTab> {
             child: CircleAvatar(
               radius: 100.0,
               backgroundImage: avatar.isNotEmpty
-                  ? NetworkImage(avatar)
-                  : AssetImage('assets/images/empty.png'),
+                  ? NetworkImage(avatar) as ImageProvider
+                  : AssetImage('assets/images/empty.png') as ImageProvider,
             ),
           ),
           SizedBox(height: 10.0),
           TextButton(
-            onPressed: () {},
+            onPressed: handleSubmitEditAvatar,
             child: Text(
               'Ganti Foto',
               style: TextStyle(
@@ -255,7 +358,11 @@ class _PosSettingTabState extends State<PosSettingTab> {
             ),
           ),
           TextButton(
-            onPressed: () {},
+            onPressed: () async {
+              final profileService = ProfileService();
+              await profileService.userAvatar(image: null, isRemove: true);
+              _loadUserInfo();
+            },
             child: Text(
               'Hapus Foto',
               style: TextStyle(
