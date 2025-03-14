@@ -99,24 +99,34 @@ class _PosSettingTabState extends State<PosSettingTab> {
 
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (BuildContext dialogContext) {
         return ConfirmDialog(
           text: "Apakah kamu yakin mengubah password ?",
           onPressed: () async {
             // Close the confirmation dialog
-            Navigator.pop(context);
-            
+            Navigator.pop(dialogContext);
+
+            // Flag to track if loading dialog is shown
+            bool isLoadingShown = false;
+            BuildContext? loadingContext;
+
             // Show loading indicator
-            showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (BuildContext context) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              },
-            );
-            
+            try {
+              await showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (BuildContext context) {
+                  loadingContext = context;
+                  isLoadingShown = true;
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                },
+              );
+            } catch (e) {
+              // Dialog couldn't be shown, continue with the operation
+              print("Could not show loading dialog: $e");
+            }
             try {
               final profileService = ProfileService();
               final response = await profileService.userPassword(
@@ -124,17 +134,22 @@ class _PosSettingTabState extends State<PosSettingTab> {
                 newPassword: _newPasswordController.text,
                 confirmPassword: _confirmNewPasswordController.text,
               );
-              
-              // Close loading dialog
-              Navigator.of(context, rootNavigator: true).pop();
-              
-              if (response.success) {
+
+              // Safely close loading dialog if it's showing
+              if (isLoadingShown &&
+                  loadingContext != null &&
+                  Navigator.canPop(loadingContext!)) {
+                Navigator.pop(loadingContext!);
+                isLoadingShown = false;
+              }
+
+              if (response.success ?? false) {
                 // Password changed successfully
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                   content: Text(response.message ?? "Password berhasil diubah"),
                   backgroundColor: Colors.green,
                 ));
-                
+
                 // Clear password fields
                 setState(() {
                   _passwordController.clear();
@@ -142,8 +157,6 @@ class _PosSettingTabState extends State<PosSettingTab> {
                   _confirmNewPasswordController.clear();
                   isPasswordOpen = false; // Close password section
                 });
-                
-                _loadUserInfo(); // Reload user info if needed
               } else {
                 // Show error message from API
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -152,9 +165,13 @@ class _PosSettingTabState extends State<PosSettingTab> {
                 ));
               }
             } catch (e) {
-              // Close loading dialog if still showing
-              Navigator.of(context, rootNavigator: true).pop();
-              
+              // Safely close loading dialog if it's showing
+              if (isLoadingShown &&
+                  loadingContext != null &&
+                  Navigator.canPop(loadingContext!)) {
+                Navigator.pop(loadingContext!);
+              }
+
               // Show general error message
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text("Error: ${e.toString()}"),
@@ -170,8 +187,9 @@ class _PosSettingTabState extends State<PosSettingTab> {
   void handleSubmitEditAvatar() async {
     try {
       final imagePicker = ImagePicker();
-      final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
-      
+      final pickedFile =
+          await imagePicker.pickImage(source: ImageSource.gallery);
+
       if (pickedFile != null) {
         // Show loading indicator or dialog
         showDialog(
@@ -183,24 +201,24 @@ class _PosSettingTabState extends State<PosSettingTab> {
             );
           },
         );
-        
+
         try {
           // Read image as bytes
           final Uint8List bytes = await pickedFile.readAsBytes();
-          
+
           // Convert Uint8List to ByteData
           final ByteData byteData = ByteData.view(bytes.buffer);
-          
+
           // Call profileService.userAvatar with the ByteData
           final profileService = ProfileService();
           await profileService.userAvatar(image: byteData);
-          
+
           // Reload user info to update the UI
           await _loadUserInfo();
-          
+
           // Close loading dialog
           Navigator.of(context, rootNavigator: true).pop();
-          
+
           // Show success message
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -211,7 +229,7 @@ class _PosSettingTabState extends State<PosSettingTab> {
         } catch (e) {
           // Close loading dialog
           Navigator.of(context, rootNavigator: true).pop();
-          
+
           // Show error message
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(

@@ -121,23 +121,34 @@ class ProfileService {
         headers: {
           'accept': '*/*',
           'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json'
         },
-        body: {
+        body: jsonEncode(<String, dynamic>{
           'oldPassword': oldPassword,
-          'newPassword': newPassword,
+          'password': newPassword,
           'confirmPassword': confirmPassword,
-        },
+        }),
       );
 
       print("url is: $url");
       print("Token is: $token");
-      // print("Response status: ${response.statusCode}");
-      // print("Response body: ${response.body}");
+      print(
+          "curl -X PUT $url -H \"accept: */*\" -H \"Authorization: Bearer $token\" -H \"Content-Type: application/json\" -d '${jsonEncode(<String, dynamic>{
+            'oldPassword': oldPassword,
+            'password': newPassword,
+            'confirmPassword': confirmPassword
+          })}'");
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
 
       final data = json.decode(response.body);
-      if (data['success']) {
+      // Convert data['success'] to bool with null safety
+      final bool isSuccess =
+          data['success'] == null ? false : data['success'] as bool;
+
+      if (isSuccess) {
         return ApiResponse(
-          success: data['success'],
+          success: true,
           message: data['message'],
           data: data['data'] ?? "",
         );
@@ -148,9 +159,9 @@ class ProfileService {
           data: null,
         );
       }
-    } catch (e) {
+    } on Exception catch (e) {
       print("Error fetching user info: $e");
-      throw Exception("Failed to load user info");
+      rethrow;
     }
   }
 }
