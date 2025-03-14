@@ -64,27 +64,132 @@ class _PosSettingTabState extends State<PosSettingTab> {
     }
   }
 
+  bool isLoading = false;
+
   void handleSubmitEditProfile() async {
-    // TODO make a submit edit data
+    // Validasi input
+    if (!validateInputs()) {
+      return;
+    }
+
+    // Store the original context to use for SnackBar messages
+    final BuildContext originalContext = context;
+
+    // Show confirmation dialog
     showDialog(
-      context: context,
-      builder: (context) {
+      context: originalContext,
+      builder: (dialogContext) {
         return ConfirmDialog(
-          text: "Apakah kamu yakin menyimpan data ini ?",
+          text: "Apakah kamu yakin menyimpan data ini?",
           onPressed: () async {
-            final profileService = ProfileService();
-            await profileService.userProfile(
-              name: _nameController.text,
-              email: _emailController.text,
-              phone: _phoneController.text,
-              address: _addressController.text,
-            );
-            _loadUserInfo();
-            Navigator.pop(context);
+            // Close the confirmation dialog
+            Navigator.pop(dialogContext);
+
+            // Flag to track if loading dialog is shown
+            bool isLoadingShown = false;
+            BuildContext? loadingContext;
+
+            // Show loading indicator
+            try {
+              await showDialog(
+                context: originalContext,
+                barrierDismissible: false,
+                builder: (BuildContext context) {
+                  loadingContext = context;
+                  isLoadingShown = true;
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                },
+              );
+            } catch (e) {
+              print("Could not show loading dialog: $e");
+            }
+
+            try {
+              final profileService = ProfileService();
+              final response = await profileService.userProfile(
+                name: _nameController.text,
+                email: _emailController.text,
+                phone: _phoneController.text,
+                address: _addressController.text,
+              );
+
+              // Safely close loading dialog if it's showing
+              if (isLoadingShown &&
+                  loadingContext != null &&
+                  Navigator.canPop(loadingContext!)) {
+                Navigator.pop(loadingContext!);
+                isLoadingShown = false;
+              }
+
+              if (response.success ?? false) {
+                // Profile updated successfully
+                ScaffoldMessenger.of(originalContext).showSnackBar(SnackBar(
+                  content:
+                      Text(response.message ?? "Profil berhasil diperbarui"),
+                  backgroundColor: Colors.green,
+                ));
+
+                // Reload user info
+                await _loadUserInfo();
+
+                // Close edit section without redirecting
+                if (mounted) {
+                  setState(() {
+                    isEditOpen = false;
+                  });
+                }
+              } else {
+                // Show error message from API
+                ScaffoldMessenger.of(originalContext).showSnackBar(SnackBar(
+                  content: Text(response.message ?? "Gagal memperbarui profil"),
+                  backgroundColor: Colors.red,
+                ));
+              }
+            } catch (e) {
+              // Safely close loading dialog if it's showing
+              if (isLoadingShown &&
+                  loadingContext != null &&
+                  Navigator.canPop(loadingContext!)) {
+                Navigator.pop(loadingContext!);
+              }
+
+              // Show general error message
+              ScaffoldMessenger.of(originalContext).showSnackBar(SnackBar(
+                content: Text("Error: ${e.toString()}"),
+                backgroundColor: Colors.red,
+              ));
+            }
           },
         );
       },
     );
+  }
+
+  bool validateInputs() {
+    if (_nameController.text.isEmpty ||
+        _emailController.text.isEmpty ||
+        _phoneController.text.isEmpty ||
+        _addressController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Semua field harus diisi."),
+        backgroundColor: Colors.red,
+      ));
+      return false;
+    }
+
+    // Validasi format email
+    final emailRegex = RegExp(r'^[\w-\.+]+@([\w-]+\.)+[\w-]{2,4}$');
+    if (!emailRegex.hasMatch(_emailController.text)) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Format email tidak valid."),
+        backgroundColor: Colors.red,
+      ));
+      return false;
+    }
+
+    return true;
   }
 
   void handleEditPassword() {

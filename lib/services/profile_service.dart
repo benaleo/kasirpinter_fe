@@ -55,12 +55,16 @@ class ProfileService {
     }
   }
 
-  Future<void> userProfile(
+  Future<ApiResponse> userProfile(
       {String? name, String? email, String? phone, String? address}) async {
     final AuthService authService = AuthService();
     final String? token = await authService.getToken();
     if (token == null) {
-      throw Exception("Token not found");
+      return ApiResponse(
+        success: false,
+        message: "Token not found",
+        data: null,
+      );
     }
 
     try {
@@ -73,13 +77,14 @@ class ProfileService {
         headers: {
           'accept': '*/*',
           'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
         },
-        body: {
+        body: jsonEncode(<String, dynamic>{
           'name': name,
           'email': email,
           'phone': phone,
           'address': address,
-        },
+        }),
       );
 
       print("url is: $url");
@@ -88,16 +93,34 @@ class ProfileService {
       // print("Response body: ${response.body}");
 
       final data = json.decode(response.body);
-      if (data['success']) {
+      // Convert data['success'] to bool with null safety
+      final bool isSuccess =
+          data['success'] == null ? false : data['success'] as bool;
+
+      if (isSuccess) {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('userInfo', json.encode(data['data']));
         print("Stored userInfo: ${json.encode(data['data'])}");
+
+        return ApiResponse(
+          success: true,
+          message: data['message'],
+          data: data['data'] ?? "",
+        );
       } else {
-        throw Exception("Failed to fetch user info: ${data['message']}");
+        return ApiResponse(
+          success: false,
+          message: data['message'],
+          data: null,
+        );
       }
     } catch (e) {
       print("Error fetching user info: $e");
-      throw Exception("Failed to load user info");
+      return ApiResponse(
+        success: false,
+        message: e.toString(),
+        data: null,
+      );
     }
   }
 
